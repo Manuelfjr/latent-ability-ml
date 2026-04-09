@@ -1,11 +1,17 @@
 [tool.poetry]
 name = "latent-ability-ml"
 version = "0.1.0"
-description = ""
+description = "Workshop material for supervised evaluation, IRT, Beta4, and CLAIRE."
 authors = ["Manuel Ferreira-Junior <ferreira.jr.ufpb@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+numpy = "^1.26.4"
+pandas = "^2.2.3"
+matplotlib = "^3.9.2"
+scipy = "^1.14.1"
+scikit-learn = "^1.5.2"
+jupyter = "^1.1.1"
 
 [tool.poetry.dev-dependencies]
 
