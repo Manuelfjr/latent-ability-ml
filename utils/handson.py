@@ -241,6 +241,7 @@ def plot_classification_dataset(df: pd.DataFrame, ax: plt.Axes | None = None) ->
 def plot_iccs(
     item_bank: pd.DataFrame,
     theta: np.ndarray | None = None,
+    discrimination: float = None,
     ax: plt.Axes | None = None,
 ) -> plt.Axes:
     """Plot beta4-IRT ICCs for a small item bank."""
@@ -249,16 +250,21 @@ def plot_iccs(
     if ax is None:
         _, ax = plt.subplots(figsize=(7, 4))
 
+
+
     for row in item_bank.itertuples(index=False):
         probs = beta4_expected_response(
             theta_logit=theta,
             difficulty_logit=row.difficulty,
-            discrimination_sign=row.discrimination_sign,
-            discrimination_magnitude=row.discrimination_magnitude,
+            discrimination_sign=row.discrimination_sign if discrimination is None else 0.5,
+            discrimination_magnitude=row.discrimination_magnitude if discrimination is None else 2,
         )
-        effective_discrimination = float(
-            row.discrimination_magnitude * row.discrimination_sign
-        )
+        if discrimination is None:
+            effective_discrimination = float(
+                row.discrimination_magnitude * row.discrimination_sign
+            )
+        else:
+            effective_discrimination = 1
         diff = float(row.difficulty)
         ax.plot(sigmoid(theta), probs, label=f"{row.item} (a={effective_discrimination:.2f}, diff={diff:.2f})")
 
