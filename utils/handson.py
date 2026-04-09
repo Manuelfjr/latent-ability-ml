@@ -110,8 +110,9 @@ def softplus(x: np.ndarray | float) -> np.ndarray | float:
 def beta4_expected_response(
     theta_logit: np.ndarray,
     difficulty_logit: float,
-    discrimination_sign: float,
-    discrimination_magnitude: float,
+    discrimination: float,
+    # discrimination_sign: float,
+    # discrimination_magnitude: float,
 ) -> np.ndarray:
     """Compute the expected ICC under the beta4-IRT parameterization.
 
@@ -125,12 +126,13 @@ def beta4_expected_response(
     """
     theta = theta_logit  # np.clip(sigmoid(theta_logit), 1e-6, 1.0 - 1e-6)
     delta = difficulty_logit  # float(np.clip(sigmoid(difficulty_logit), 1e-6, 1.0 - 1e-6))
-    omega = discrimination_magnitude  # float(softplus(discrimination_magnitude))
-    beta = discrimination_sign  # float(np.tanh(discrimination_sign))
-    discrimination = omega * beta
+    # omega = discrimination_magnitude  # float(softplus(discrimination_magnitude))
+    # beta = discrimination_sign  # float(np.tanh(discrimination_sign))
+    # discrimination = omega * beta
 
     delta_odds = delta / (1.0 - delta)
     theta_odds = theta / (1.0 - theta)
+
     denominator = 1.0 + (np.power(delta_odds, discrimination) * np.power(theta_odds, -discrimination))
     return 1.0 / denominator
 
@@ -251,22 +253,17 @@ def plot_iccs(
         _, ax = plt.subplots(figsize=(7, 4))
 
 
-
     for row in item_bank.itertuples(index=False):
         probs = beta4_expected_response(
             theta_logit=theta,
             difficulty_logit=row.difficulty,
-            discrimination_sign=row.discrimination_sign if discrimination is None else 0.5,
-            discrimination_magnitude=row.discrimination_magnitude if discrimination is None else 2,
+            discrimination = discrimination if discrimination is not None else 1
+            # discrimination_sign=row.discrimination_sign if discrimination is None else 0.5,
+            # discrimination_magnitude=row.discrimination_magnitude if discrimination is None else 2,
         )
-        if discrimination is None:
-            effective_discrimination = float(
-                row.discrimination_magnitude * row.discrimination_sign
-            )
-        else:
-            effective_discrimination = 1
+
         diff = float(row.difficulty)
-        ax.plot(sigmoid(theta), probs, label=f"{row.item} (a={effective_discrimination:.2f}, diff={diff:.2f})")
+        ax.plot(theta, probs, label=f"{row.item} (a={discrimination:.2f}, diff={diff:.2f})")
 
     ax.set_title("Item characteristic curves under beta4-IRT")
     ax.set_xlabel("Latent ability")
