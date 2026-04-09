@@ -123,42 +123,45 @@ def beta4_expected_response(
     - beta_j = tanh(b_j)
     - a_j = omega_j * beta_j
     """
-    theta = np.clip(sigmoid(theta_logit), 1e-6, 1.0 - 1e-6)
-    delta = float(np.clip(sigmoid(difficulty_logit), 1e-6, 1.0 - 1e-6))
-    omega = float(softplus(discrimination_magnitude))
-    beta = float(np.tanh(discrimination_sign))
+    theta = theta_logit  # np.clip(sigmoid(theta_logit), 1e-6, 1.0 - 1e-6)
+    delta = difficulty_logit  # float(np.clip(sigmoid(difficulty_logit), 1e-6, 1.0 - 1e-6))
+    omega = discrimination_magnitude  # float(softplus(discrimination_magnitude))
+    beta = discrimination_sign  # float(np.tanh(discrimination_sign))
     discrimination = omega * beta
 
     delta_odds = delta / (1.0 - delta)
     theta_odds = theta / (1.0 - theta)
-    denominator = 1.0 + np.power(delta_odds, discrimination) * np.power(theta_odds, -discrimination)
+    denominator = 1.0 + (np.power(delta_odds, discrimination) * np.power(theta_odds, -discrimination))
     return 1.0 / denominator
 
 
-def make_item_bank() -> pd.DataFrame:
+def make_item_bank(dict_values: list[dict[str, str | float]] = None) -> pd.DataFrame:
     """Return a tiny item bank for beta4-IRT ICC demonstrations."""
-    return pd.DataFrame(
-        [
-            {
-                "item": "easy_item",
-                "difficulty": -1.2,
-                "discrimination_sign": 1.8,
-                "discrimination_magnitude": 0.2,
-            },
-            {
-                "item": "medium_item",
-                "difficulty": 0.0,
-                "discrimination_sign": 1.6,
-                "discrimination_magnitude": 0.8,
-            },
-            {
-                "item": "hard_item",
-                "difficulty": 1.2,
-                "discrimination_sign": 1.9,
-                "discrimination_magnitude": 1.1,
-            },
-        ]
-    )
+    if dict_values is None:
+        return pd.DataFrame(
+            [
+                {
+                    "item": "easy_item",
+                    "difficulty": 0.1, # -1.2,
+                    "discrimination_sign": 0.5,
+                    "discrimination_magnitude": 2,
+                },
+                {
+                    "item": "medium_item",
+                    "difficulty": 0.3, # 0.0,
+                    "discrimination_sign": 0.5,
+                    "discrimination_magnitude": 2,
+                },
+                {
+                    "item": "hard_item",
+                    "difficulty": 0.7, # 1.2,
+                    "discrimination_sign": 0.5,
+                    "discrimination_magnitude": 2,
+                },
+            ]
+        )
+    else:
+        return pd.DataFrame(dict_values)
 
 
 def simulate_latent_ability_dataset(
@@ -254,13 +257,14 @@ def plot_iccs(
             discrimination_magnitude=row.discrimination_magnitude,
         )
         effective_discrimination = float(
-            softplus(row.discrimination_magnitude) * np.tanh(row.discrimination_sign)
+            row.discrimination_magnitude * row.discrimination_sign
         )
-        ax.plot(theta, probs, label=f"{row.item} (a={effective_discrimination:.2f})")
+        diff = float(row.difficulty)
+        ax.plot(sigmoid(theta), probs, label=f"{row.item} (a={effective_discrimination:.2f}, diff={diff:.2f})")
 
     ax.set_title("Item characteristic curves under beta4-IRT")
-    ax.set_xlabel("Latent ability logit")
-    ax.set_ylabel("Probability of correct response")
+    ax.set_xlabel("Latent ability")
+    ax.set_ylabel("Response")
     ax.set_ylim(0, 1.05)
     ax.legend()
     return ax
