@@ -12,6 +12,8 @@ from sklearn.datasets import make_classification
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 
 def set_project_root(level: int = 1) -> Path:
@@ -23,6 +25,18 @@ def set_project_root(level: int = 1) -> Path:
     return project_dir
 
 
+def sigmoid(x: np.ndarray | float) -> np.ndarray | float:
+    """Numerically stable logistic function."""
+    x = np.asarray(x, dtype=float)
+    return 1.0 / (1.0 + np.exp(-x))
+
+
+def softplus(x: np.ndarray | float) -> np.ndarray | float:
+    """Numerically stable softplus transform."""
+    x = np.asarray(x, dtype=float)
+    return np.log1p(np.exp(-np.abs(x))) + np.maximum(x, 0)
+
+
 def make_toy_classification_dataset(
     n_samples: int = 300,
     class_sep: float = 1.0,
@@ -30,7 +44,7 @@ def make_toy_classification_dataset(
     weights: tuple[float, float] = (0.5, 0.5),
     random_state: int = 42,
 ) -> pd.DataFrame:
-    """Create a 2D classification dataset for evaluation demos."""
+    """Create a 2D classification dataset for workshop demos."""
     features, labels = make_classification(
         n_samples=n_samples,
         n_features=2,
@@ -46,15 +60,43 @@ def make_toy_classification_dataset(
 
     df = pd.DataFrame(features, columns=["feature_1", "feature_2"])
     df["label"] = labels
+    df["example_id"] = np.arange(len(df))
     return df
 
 
-def evaluate_logistic_workflow(
+def get_default_supervised_models(random_state: int = 42) -> dict[str, object]:
+    """Return a small model set for side-by-side comparisons."""
+    return {
+        "logistic_regression": LogisticRegression(max_iter=500),
+        "decision_tree": DecisionTreeClassifier(max_depth=4, random_state=random_state),
+        "knn": KNeighborsClassifier(n_neighbors=15),
+    }
+
+
+def _build_probability_like_scores(model: object, X_test: pd.DataFrame) -> np.ndarray:
+    """Return probabilities when available, otherwise scale decision scores."""
+    if hasattr(model, "predict_proba"):
+        return model.predict_proba(X_test)[:, 1]
+
+    if hasattr(model, "decision_function"):
+        scores = np.asarray(model.decision_function(X_test), dtype=float)
+        return sigmoid(scores)
+
+    predictions = np.asarray(model.predict(X_test), dtype=float)
+    return predictions
+
+
+def evaluate_models_on_dataset(
     df: pd.DataFrame,
+    scenario: str,
+    models: dict[str, object] | None = None,
     test_size: float = 0.30,
     random_state: int = 42,
-) -> tuple[pd.DataFrame, LogisticRegression]:
-    """Train a logistic model and return test predictions with summary fields."""
+) -> pd.DataFrame:
+    """Train several classifiers and return a long prediction dataframe."""
+    if models is None:
+        models = get_default_supervised_models(random_state=random_state)
+
     features = df[["feature_1", "feature_2"]]
     labels = df["label"]
 
@@ -66,162 +108,79 @@ def evaluate_logistic_workflow(
         stratify=labels,
     )
 
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
+    rows: list[pd.DataFrame] = []
+    for model_name, model in models.items():
+        model.fit(X_train, y_train)
+        probabilities = _build_probability_like_scores(model, X_test)
+        predictions = (probabilities >= 0.5).astype(int)
 
-    probabilities = model.predict_proba(X_test)[:, 1]
-    predictions = (probabilities >= 0.5).astype(int)
+        result = X_test.copy()
+        result["example_id"] = X_test.index.to_numpy()
+        result["label"] = y_test.to_numpy()
+        result["predicted_label"] = predictions
+        result["predicted_probability"] = probabilities
+        result["correct"] = (result["label"] == result["predicted_label"]).astype(int)
+        result["difficulty_proxy"] = 1.0 - np.abs(probabilities - 0.5) * 2.0
+        result["scenario"] = scenario
+        result["model"] = model_name
+        rows.append(result.reset_index(drop=True))
 
-    results = X_test.copy()
-    results["label"] = y_test.to_numpy()
-    results["predicted_label"] = predictions
-    results["predicted_probability"] = probabilities
-    results["correct"] = (results["label"] == results["predicted_label"]).astype(int)
-    results["difficulty_proxy"] = 1.0 - np.abs(probabilities - 0.5) * 2.0
+    return pd.concat(rows, ignore_index=True)
+
+
+def evaluate_logistic_workflow(
+    df: pd.DataFrame,
+    test_size: float = 0.30,
+    random_state: int = 42,
+) -> tuple[pd.DataFrame, LogisticRegression]:
+    """Compatibility helper used by the initial notebook scaffold."""
+    model = LogisticRegression(max_iter=500)
+    results = evaluate_models_on_dataset(
+        df=df,
+        scenario="single_logistic_workflow",
+        models={"logistic_regression": model},
+        test_size=test_size,
+        random_state=random_state,
+    )
     return results.reset_index(drop=True), model
 
 
-def summarize_classification_results(results: pd.DataFrame, scenario: str) -> pd.DataFrame:
-    """Compute a compact metrics table for a prediction dataframe."""
-    return pd.DataFrame(
-        [
-            {
-                "scenario": scenario,
-                "accuracy": accuracy_score(results["label"], results["predicted_label"]),
-                "balanced_accuracy": balanced_accuracy_score(results["label"], results["predicted_label"]),
-                "f1": f1_score(results["label"], results["predicted_label"]),
-                "mean_difficulty_proxy": results["difficulty_proxy"].mean(),
-            }
-        ]
-    )
+def summarize_classification_results(results: pd.DataFrame, scenario: str | None = None) -> pd.DataFrame:
+    """Compute a compact metrics table from a prediction dataframe."""
+    group_cols = ["scenario", "model"]
+    if scenario is not None:
+        results = results.loc[results["scenario"] == scenario].copy()
 
-
-def sigmoid(x: np.ndarray | float) -> np.ndarray | float:
-    """Numerically stable logistic function."""
-    return 1.0 / (1.0 + np.exp(-np.asarray(x)))
-
-
-def softplus(x: np.ndarray | float) -> np.ndarray | float:
-    """Numerically stable softplus transform."""
-    x = np.asarray(x)
-    return np.log1p(np.exp(-np.abs(x))) + np.maximum(x, 0)
-
-
-def beta4_expected_response(
-    theta_logit: np.ndarray,
-    difficulty_logit: float,
-    discrimination: float,
-    # discrimination_sign: float,
-    # discrimination_magnitude: float,
-) -> np.ndarray:
-    """Compute the expected ICC under the beta4-IRT parameterization.
-
-    The implementation follows the beta4-IRT expectation using:
-
-    - theta_i = sigmoid(t_i)
-    - delta_j = sigmoid(d_j)
-    - omega_j = softplus(o_j)
-    - beta_j = tanh(b_j)
-    - a_j = omega_j * beta_j
-    """
-    theta = theta_logit  # np.clip(sigmoid(theta_logit), 1e-6, 1.0 - 1e-6)
-    delta = difficulty_logit  # float(np.clip(sigmoid(difficulty_logit), 1e-6, 1.0 - 1e-6))
-    # omega = discrimination_magnitude  # float(softplus(discrimination_magnitude))
-    # beta = discrimination_sign  # float(np.tanh(discrimination_sign))
-    # discrimination = omega * beta
-
-    delta_odds = delta / (1.0 - delta)
-    theta_odds = theta / (1.0 - theta)
-
-    denominator = 1.0 + (np.power(delta_odds, discrimination) * np.power(theta_odds, -discrimination))
-    return 1.0 / denominator
-
-
-def make_item_bank(dict_values: list[dict[str, str | float]] = None) -> pd.DataFrame:
-    """Return a tiny item bank for beta4-IRT ICC demonstrations."""
-    if dict_values is None:
-        return pd.DataFrame(
-            [
+    summary = (
+        results.groupby(group_cols, as_index=False)
+        .apply(
+            lambda frame: pd.Series(
                 {
-                    "item": "easy_item",
-                    "difficulty": 0.1, # -1.2,
-                    "discrimination_sign": 0.5,
-                    "discrimination_magnitude": 2,
-                },
-                {
-                    "item": "medium_item",
-                    "difficulty": 0.3, # 0.0,
-                    "discrimination_sign": 0.5,
-                    "discrimination_magnitude": 2,
-                },
-                {
-                    "item": "hard_item",
-                    "difficulty": 0.7, # 1.2,
-                    "discrimination_sign": 0.5,
-                    "discrimination_magnitude": 2,
-                },
-            ]
-        )
-    else:
-        return pd.DataFrame(dict_values)
-
-
-def simulate_latent_ability_dataset(
-    n_models: int = 5,
-    item_bank: pd.DataFrame | None = None,
-    random_state: int = 7,
-) -> pd.DataFrame:
-    """Simulate model-item responses using a simple 3PL-style mechanism."""
-    rng = np.random.default_rng(random_state)
-    if item_bank is None:
-        item_bank = make_item_bank()
-
-    abilities = np.linspace(-1.2, 1.2, n_models)
-    model_names = [f"model_{index + 1}" for index in range(n_models)]
-    rows: list[dict[str, float | int | str]] = []
-
-    for model_name, ability in zip(model_names, abilities):
-        for row in item_bank.itertuples(index=False):
-            probability = float(
-                beta4_expected_response(
-                    theta_logit=np.array([ability]),
-                    difficulty_logit=row.difficulty,
-                    discrimination_sign=row.discrimination_sign,
-                    discrimination_magnitude=row.discrimination_magnitude,
-                )[0]
-            )
-            effective_discrimination = float(
-                softplus(row.discrimination_magnitude) * np.tanh(row.discrimination_sign)
-            )
-            outcome = int(rng.binomial(1, probability))
-            rows.append(
-                {
-                    "model": model_name,
-                    "ability": ability,
-                    "item": row.item,
-                    "difficulty": row.difficulty,
-                    "discrimination_sign": row.discrimination_sign,
-                    "discrimination_magnitude": row.discrimination_magnitude,
-                    "effective_discrimination": effective_discrimination,
-                    "probability_correct": probability,
-                    "observed_correct": outcome,
+                    "accuracy": accuracy_score(frame["label"], frame["predicted_label"]),
+                    "balanced_accuracy": balanced_accuracy_score(frame["label"], frame["predicted_label"]),
+                    "f1": f1_score(frame["label"], frame["predicted_label"]),
+                    "mean_difficulty_proxy": frame["difficulty_proxy"].mean(),
                 }
             )
-
-    return pd.DataFrame(rows)
-
-
-def summarize_latent_results(df: pd.DataFrame) -> pd.DataFrame:
-    """Aggregate latent ability simulation results at model level."""
-    summary = (
-        df.groupby(["model", "ability"], as_index=False)
-        .agg(
-            mean_probability=("probability_correct", "mean"),
-            observed_accuracy=("observed_correct", "mean"),
-            mean_item_difficulty=("difficulty", "mean"),
         )
-        .sort_values("ability")
+        .reset_index(drop=True)
     )
+    return summary
+
+
+def summarize_instance_difficulty(results: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate per-example behavior across several supervised models."""
+    summary = (
+        results.groupby(["scenario", "example_id", "feature_1", "feature_2", "label"], as_index=False)
+        .agg(
+            mean_correct=("correct", "mean"),
+            mean_predicted_probability=("predicted_probability", "mean"),
+            mean_difficulty_proxy=("difficulty_proxy", "mean"),
+            disagreement=("predicted_label", "nunique"),
+        )
+        .sort_values(["scenario", "mean_correct", "mean_difficulty_proxy"], ascending=[True, True, False])
+    )
+    summary["disagreement"] = (summary["disagreement"] > 1).astype(int)
     return summary
 
 
@@ -240,34 +199,253 @@ def plot_classification_dataset(df: pd.DataFrame, ax: plt.Axes | None = None) ->
     return ax
 
 
-def plot_iccs(
+def binary_irt_probability(
+    theta: np.ndarray | float,
+    difficulty: np.ndarray | float,
+    discrimination: np.ndarray | float = 1.0,
+) -> np.ndarray:
+    """Binary IRT probability under the logistic 2PL form."""
+    theta = np.asarray(theta, dtype=float)
+    difficulty = np.asarray(difficulty, dtype=float)
+    discrimination = np.asarray(discrimination, dtype=float)
+    return sigmoid(discrimination * (theta - difficulty))
+
+
+def beta4_expected_response(
+    theta: np.ndarray | float,
+    difficulty: np.ndarray | float,
+    discrimination: float, 
+    discrimination_sign: np.ndarray | float,
+    discrimination_magnitude: np.ndarray | float,
+) -> np.ndarray:
+    """Compute expected responses under a simple beta4-style parameterization."""
+    if discrimination is None:
+        discrimination = discrimination_sign * discrimination_magnitude
+
+    theta_odds = theta / (1.0 - theta)
+    difficulty_odds = difficulty / (1.0 - difficulty)
+    denominator = 1.0 + (np.power(difficulty_odds, discrimination) * np.power(theta_odds, -discrimination))
+    return 1.0 / denominator
+
+
+# def effective_beta4_discrimination(
+#     discrimination_sign: np.ndarray | float,
+#     discrimination_magnitude: np.ndarray | float,
+# ) -> np.ndarray:
+#     """Map sign and magnitude into a single effective discrimination value."""
+#     return softplus(discrimination_magnitude) * np.tanh(discrimination_sign)
+
+
+def make_binary_item_bank() -> pd.DataFrame:
+    """Return a tiny item bank for classical binary IRT demos."""
+    return pd.DataFrame(
+        [
+            {"item": "easy_item", "difficulty": -1.2, "discrimination": 0.9},
+            {"item": "medium_item", "difficulty": 0.0, "discrimination": 1.2},
+            {"item": "hard_item", "difficulty": 1.1, "discrimination": 1.5},
+        ]
+    )
+
+
+def make_item_bank(dict_values: list[dict[str, str | float]] | None = None) -> pd.DataFrame:
+    """Return a small beta4 item bank for ICC demonstrations."""
+    if dict_values is None:
+        return pd.DataFrame(
+            [
+                {
+                    "item": "supportive_case",
+                    "difficulty_logit": -1.4,
+                    "discrimination_sign": 0.8,
+                    "discrimination_magnitude": 0.7,
+                },
+                {
+                    "item": "boundary_case",
+                    "difficulty_logit": 0.0,
+                    "discrimination_sign": 1.0,
+                    "discrimination_magnitude": 1.0,
+                },
+                {
+                    "item": "strict_case",
+                    "difficulty_logit": 1.4,
+                    "discrimination_sign": 1.2,
+                    "discrimination_magnitude": 1.6,
+                },
+            ]
+        )
+    return pd.DataFrame(dict_values)
+
+
+def make_model_ability_grid(n_models: int = 6, low: float = -2.0, high: float = 2.0) -> pd.DataFrame:
+    """Create a simple ordered list of models and latent abilities."""
+    abilities = np.linspace(low, high, n_models)
+    return pd.DataFrame(
+        {
+            "model": [f"model_{index + 1}" for index in range(n_models)],
+            "ability": abilities,
+        }
+    )
+
+
+def simulate_binary_irt_responses(
+    n_models: int = 6,
+    item_bank: pd.DataFrame | None = None,
+    random_state: int = 7,
+) -> pd.DataFrame:
+    """Simulate model-item responses using a classical binary IRT curve."""
+    if item_bank is None:
+        item_bank = make_binary_item_bank()
+
+    rng = np.random.default_rng(random_state)
+    abilities = make_model_ability_grid(n_models=n_models)
+    rows: list[dict[str, float | int | str]] = []
+
+    for ability_row in abilities.itertuples(index=False):
+        for item_row in item_bank.itertuples(index=False):
+            probability = float(
+                binary_irt_probability(
+                    theta=ability_row.ability,
+                    difficulty=item_row.difficulty,
+                    discrimination=item_row.discrimination,
+                )
+            )
+            rows.append(
+                {
+                    "model": ability_row.model,
+                    "ability": ability_row.ability,
+                    "item": item_row.item,
+                    "difficulty": item_row.difficulty,
+                    "discrimination": item_row.discrimination,
+                    "expected_probability": probability,
+                    "observed_correct": int(rng.binomial(1, probability)),
+                }
+            )
+
+    return pd.DataFrame(rows)
+
+
+def simulate_latent_ability_dataset(
+    n_models: int = 6,
+    item_bank: pd.DataFrame | None = None,
+    random_state: int = 7,
+) -> pd.DataFrame:
+    """Simulate responses under a beta4-style latent ability setting."""
+    if item_bank is None:
+        item_bank = make_item_bank()
+
+    rng = np.random.default_rng(random_state)
+    abilities = make_model_ability_grid(n_models=n_models)
+    rows: list[dict[str, float | int | str]] = []
+
+    for ability_row in abilities.itertuples(index=False):
+        for item_row in item_bank.itertuples(index=False):
+            probability = float(
+                beta4_expected_response(
+                    theta=ability_row.ability,
+                    difficulty=item_row.difficulty_logit,
+                    discrimination_sign=item_row.discrimination_sign,
+                    discrimination_magnitude=item_row.discrimination_magnitude,
+                )
+            )
+            rows.append(
+                {
+                    "model": ability_row.model,
+                    "ability": ability_row.ability,
+                    "item": item_row.item,
+                    "difficulty_logit": item_row.difficulty_logit,
+                    "difficulty_probability": float(sigmoid(item_row.difficulty_logit)),
+                    "discrimination_sign": item_row.discrimination_sign,
+                    "discrimination_magnitude": item_row.discrimination_magnitude,
+                    "effective_discrimination": item_row.discrimination_sign * item_row.discrimination_magnitude,
+                    "expected_probability": probability,
+                    "observed_correct": int(rng.binomial(1, probability)),
+                }
+            )
+
+    return pd.DataFrame(rows)
+
+
+def summarize_latent_results(df: pd.DataFrame) -> pd.DataFrame:
+    """Aggregate latent ability simulation results at model level."""
+    summary = (
+        df.groupby(["model", "ability"], as_index=False)
+        .agg(
+            mean_expected_probability=("expected_probability", "mean"),
+            observed_accuracy=("observed_correct", "mean"),
+        )
+        .sort_values("ability")
+    )
+    return summary
+
+
+def make_response_matrix(df: pd.DataFrame, value_column: str = "observed_correct") -> pd.DataFrame:
+    """Convert long responses into a model-item matrix."""
+    return df.pivot(index="model", columns="item", values=value_column).sort_index()
+
+
+def plot_binary_iccs(
     item_bank: pd.DataFrame,
     theta: np.ndarray | None = None,
-    discrimination: float = None,
     ax: plt.Axes | None = None,
 ) -> plt.Axes:
-    """Plot beta4-IRT ICCs for a small item bank."""
+    """Plot classical binary IRT ICCs."""
     if theta is None:
-        theta = np.linspace(-4, 4, 300)
+        theta = np.linspace(-3.0, 3.0, 300)
     if ax is None:
         _, ax = plt.subplots(figsize=(7, 4))
 
-
     for row in item_bank.itertuples(index=False):
-        probs = beta4_expected_response(
-            theta_logit=theta,
-            difficulty_logit=row.difficulty,
-            discrimination = discrimination if discrimination is not None else 1
-            # discrimination_sign=row.discrimination_sign if discrimination is None else 0.5,
-            # discrimination_magnitude=row.discrimination_magnitude if discrimination is None else 2,
+        probs = binary_irt_probability(theta, difficulty=row.difficulty, discrimination=row.discrimination)
+        ax.plot(
+            theta,
+            probs,
+            label=f"{row.item} (a={row.discrimination:.1f}, b={row.difficulty:.1f})",
         )
 
-        diff = float(row.difficulty)
-        ax.plot(theta, probs, label=f"{row.item} (a={discrimination:.2f}, diff={diff:.2f})")
-
-    ax.set_title("Item characteristic curves under beta4-IRT")
+    ax.set_title("Binary IRT item characteristic curves")
     ax.set_xlabel("Latent ability")
-    ax.set_ylabel("Response")
+    ax.set_ylabel("Probability of a correct response")
+    ax.set_ylim(0, 1.05)
+    ax.legend()
+    return ax
+
+
+def plot_iccs(
+    item_bank: pd.DataFrame,
+    theta: np.ndarray | None = None,
+    aj: float | None = None,
+    ax: plt.Axes | None = None,
+) -> plt.Axes:
+    """Plot beta4-style ICCs for a small item bank."""
+    if theta is None:
+        theta = np.linspace(-3.0, 3.0, 300)
+    if ax is None:
+        _, ax = plt.subplots(figsize=(7, 4))
+
+    for row in item_bank.itertuples(index=False):
+        if hasattr(row, "discrimination_sign") and hasattr(row, "discrimination_magnitude"):
+            sign = row.discrimination_sign
+            magn = row.discrimination_magnitude
+        else: 
+            sign, magn = None, None
+        probs = beta4_expected_response(
+            theta=theta,
+            difficulty=row.difficulty,
+            discrimination=aj,
+            discrimination_sign=sign,
+            discrimination_magnitude=magn,
+        )
+        ax.plot(
+            theta,
+            probs,
+            label=(
+                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn}, " + 
+                f"d={row.difficulty:.1f})"
+            ),
+        )
+
+    ax.set_title("Beta4-style item characteristic curves")
+    ax.set_xlabel("Ability")
+    ax.set_ylabel("Pij")
     ax.set_ylim(0, 1.05)
     ax.legend()
     return ax
@@ -275,39 +453,44 @@ def plot_iccs(
 
 def plot_beta4_family(
     theta: np.ndarray | None = None,
+    # difficulty: float = 0.5,
+    # discrimination: float | None = None,
     parameter_pairs: list[tuple[float, float]] | None = None,
     ax: plt.Axes | None = None,
 ) -> plt.Axes:
-    """Plot a family of beta4-IRT ICCs for discussion."""
+    """Plot a family of beta4-style ICCs for discussion."""
     if theta is None:
-        theta = np.linspace(-4, 4, 300)
+        theta = np.linspace(-3.0, 3.0, 300)
     if parameter_pairs is None:
-        parameter_pairs = [(1.5, 0.2), (1.5, 1.0), (-1.5, 1.0)]
+        parameter_pairs = [(0.1, -0.5, 2.0), (0.5, 0.1, 2.0), (0.9, 0.5, 2.0)]
     if ax is None:
         _, ax = plt.subplots(figsize=(7, 4))
 
-    for discrimination_sign, discrimination_magnitude in parameter_pairs:
+    for difficulty, discrimination_sign, discrimination_magnitude in parameter_pairs:
         probs = beta4_expected_response(
-            theta_logit=theta,
-            difficulty_logit=0.0,
+            theta=theta,
+            difficulty=difficulty,
+            discrimination=None,
             discrimination_sign=discrimination_sign,
             discrimination_magnitude=discrimination_magnitude,
         )
         effective_discrimination = float(
-            softplus(discrimination_magnitude) * np.tanh(discrimination_sign)
+            discrimination_sign * discrimination_magnitude
         )
         ax.plot(
             theta,
             probs,
             label=(
-                "sign="
-                f"{discrimination_sign}, mag={discrimination_magnitude}, a={effective_discrimination:.2f}"
+                f"diffs={difficulty:.2f}, "
+                f"sign={discrimination_sign:.1f}, "
+                f"mag={discrimination_magnitude:.1f}, "
+                f"aj={effective_discrimination:.2f}"
             ),
         )
 
-    ax.set_title("beta4-IRT response curves")
+    ax.set_title("Beta4 family with varying discrimination")
     ax.set_xlabel("Latent ability logit")
-    ax.set_ylabel("Probability of success")
+    ax.set_ylabel("Probability of a correct response")
     ax.set_ylim(0, 1.05)
     ax.legend()
     return ax
@@ -318,8 +501,9 @@ def plot_latent_accuracy(summary: pd.DataFrame, ax: plt.Axes | None = None) -> p
     if ax is None:
         _, ax = plt.subplots(figsize=(6.5, 4))
 
+    expected_col = "mean_expected_probability"
     ax.plot(summary["ability"], summary["observed_accuracy"], marker="o", label="Observed accuracy")
-    ax.plot(summary["ability"], summary["mean_probability"], marker="s", label="Expected success")
+    ax.plot(summary["ability"], summary[expected_col], marker="s", label="Expected probability")
     ax.set_title("Performance by latent ability")
     ax.set_xlabel("Latent ability")
     ax.set_ylabel("Proportion correct")

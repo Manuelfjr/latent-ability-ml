@@ -1,93 +1,57 @@
 # Latent Ability ML Workshop
 
-This repository contains the material for a hands-on session at the University of Bristol CDT.
-The workshop connects three themes:
+This repository contains the material for a hands-on session for the University of Bristol CDT.
+The workshop is organized around three connected themes:
 
-1. Evaluation of supervised methods with toy problems.
-2. Item Response Theory (IRT), with emphasis on the Beta4 setting.
-3. CLAIRE for latent-ability-aware evaluation.
+1. evaluation of supervised methods with toy problems;
+2. classical binary IRT for model evaluation;
+3. Beta4-IRT and CLAIRE for latent-ability-aware analysis.
 
 ## Audience
 
-The material is designed for CDT students in Bristol who may come from different technical backgrounds.
-The notebooks therefore aim to balance intuition, visual explanations, and reproducible experiments.
+The material is designed for CDT students with mixed backgrounds.
+The notebooks therefore prioritize clear visuals, simple toy problems, and short interpretation exercises.
 
-## Workshop Goals
+## Workshop Narrative
 
-By the end of the session, participants should be able to:
+The core message of the session is that standard supervised metrics are useful, but incomplete.
+They usually treat all instances as if they were equally difficult.
+The notebooks use that limitation to motivate IRT, Beta4, and finally CLAIRE.
 
-- understand why standard supervised metrics can hide important behavior;
-- inspect how data difficulty and latent ability affect evaluation;
-- interpret item characteristic curves (ICCs) in simple IRT examples;
-- connect Beta4-style item behavior to supervised evaluation settings;
-- understand where CLAIRE fits as a method for latent ability analysis.
+## Notebook Structure
 
-## Repository Structure
+- `notebooks/00_workshop_roadmap.ipynb`: workshop framing, timing, and presenter checklist.
+- `notebooks/01_supervised_evaluation_toy_problems.ipynb`: multiple-model comparison on easy and hard classification tasks.
+- `notebooks/02_irt_beta4_icc.ipynb`: classical binary IRT, item characteristic curves, and the bridge to model evaluation.
+- `notebooks/03_claire_latent_ability.ipynb`: Beta4-style ICCs, latent-ability simulations, and CLAIRE positioning.
 
-- `notebooks/00_workshop_roadmap.ipynb`: session framing, learning goals, and narrative.
-- `notebooks/01_supervised_evaluation_toy_problems.ipynb`: classification toy problems and standard metrics.
-- `notebooks/02_irt_beta4_icc.ipynb`: IRT intuition, Beta4 discussion, and ICC plots.
-- `notebooks/03_claire_latent_ability.ipynb`: CLAIRE motivation, workflow, and analysis prompts.
-- `notebooks/workshop_utils.py`: helper functions for synthetic data, plotting, and IRT-style curves.
+## Teaching Format
 
-## Suggested Session Flow
+Each notebook is designed around the same structure:
 
-### 1. Why evaluating supervised methods is hard
+- 15 minutes of theory;
+- 15 minutes of guided practical explanation;
+- 30 minutes of student activity.
 
-Start with simple classification examples and show that accuracy alone is not enough.
-Use class imbalance, overlapping classes, and noisy labels to motivate richer evaluation.
+Each section ends with a small activity so students can interpret the toy results rather than only watch the walkthrough.
 
-### 2. From observed performance to latent ability
+## Development Priorities
 
-Introduce the idea that some examples are intrinsically harder than others.
-Use this transition to motivate IRT as a framework that separates item difficulty from model ability.
+The repository is now structured so that you can keep iterating in this order:
 
-### 3. IRT and Beta4
+1. polish the examples and plots in notebook `01`;
+2. refine the classical binary IRT explanations in notebook `02`;
+3. replace the toy CLAIRE bridge with the final wording and examples you want in notebook `03`;
+4. adjust notebook `00` last so the roadmap matches the final workshop script.
 
-Explain the meaning of ability, difficulty, discrimination, and guessing.
-Then position Beta4 as the specific model variant you want to discuss for this workshop.
-Use ICCs to show how the probability of success changes with ability.
+## Utilities
 
-### 4. CLAIRE
+The shared helper functions live in `utils/handson.py`.
+They cover:
 
-Present CLAIRE as your proposed method for this setting.
-Highlight what problem it solves, how it differs from plain supervised evaluation, and how it relates to IRT.
-
-### 5. Discussion
-
-Close with practical questions:
-
-- When do standard metrics fail?
-- What do latent-ability models reveal that confusion matrices do not?
-- When should practitioners prefer a latent ability perspective?
-
-## Notebook Development Priorities
-
-If you want to build the workshop incrementally, this is a strong order:
-
-1. Finish `01_supervised_evaluation_toy_problems.ipynb`.
-2. Add the core IRT/Beta4 visual narrative in `02_irt_beta4_icc.ipynb`.
-3. Turn `03_claire_latent_ability.ipynb` into the bridge from theory to your method.
-4. Polish `00_workshop_roadmap.ipynb` last so it reflects the final story.
-
-## Recommended Environment
-
-The notebooks are expected to use:
-
-- Python 3.10+
-- NumPy
-- Pandas
-- Matplotlib
-- SciPy
-- scikit-learn
-- Jupyter
-
-## Next Content To Add
-
-The current scaffold is intentionally lightweight.
-The next development step is to replace each notebook placeholder section with:
-
-- one motivating question;
-- one minimal toy dataset or plot;
-- one takeaway message;
-- one transition to the next concept.
+- toy classification dataset generation;
+- multi-model supervised evaluation;
+- instance difficulty summaries;
+- classical binary IRT ICCs;
+- Beta4-style ICCs;
+- latent-ability simulations for the CLAIRE notebook.
