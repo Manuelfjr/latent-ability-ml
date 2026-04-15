@@ -254,21 +254,21 @@ def make_item_bank(dict_values: list[dict[str, str | float]] | None = None) -> p
             [
                 {
                     "item": "supportive_case",
-                    "difficulty_logit": -1.4,
-                    "discrimination_sign": 0.8,
-                    "discrimination_magnitude": 0.7,
+                    "difficulty": 0.1,
+                    "discrimination_sign": 0.1,
+                    "discrimination_magnitude": 0.5,
                 },
                 {
                     "item": "boundary_case",
-                    "difficulty_logit": 0.0,
-                    "discrimination_sign": 1.0,
+                    "difficulty": 0.5,
+                    "discrimination_sign": 0.5,
                     "discrimination_magnitude": 1.0,
                 },
                 {
                     "item": "strict_case",
-                    "difficulty_logit": 1.4,
-                    "discrimination_sign": 1.2,
-                    "discrimination_magnitude": 1.6,
+                    "difficulty": 0.9,
+                    "discrimination_sign": 0.9,
+                    "discrimination_magnitude": 2,
                 },
             ]
         )
@@ -438,7 +438,7 @@ def plot_iccs(
             theta,
             probs,
             label=(
-                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn}, " + 
+                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn:.2f}, " + 
                 f"d={row.difficulty:.1f})"
             ),
         )
