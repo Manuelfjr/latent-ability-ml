@@ -1,57 +1,129 @@
 # Latent Ability ML Workshop
 
-This repository contains the material for a hands-on session for the University of Bristol CDT.
-The workshop is organized around three connected themes:
+This repository contains the current material for a hands-on workshop built around latent-ability-aware evaluation in machine learning.
+The workshop is organized for a University of Bristol context and is structured as a progression from standard supervised evaluation to IRT, Beta4-IRT, and CLAIRE.
 
-1. evaluation of supervised methods with toy problems;
-2. classical binary IRT for model evaluation;
-3. Beta4-IRT and CLAIRE for latent-ability-aware analysis.
+The central message of the handson is simple:
+
+- standard aggregate metrics are useful, but incomplete;
+- they usually treat all instances as if they were equally difficult;
+- latent-variable models help us separate model ability from item difficulty;
+- this opens the door to richer analyses such as Beta4-IRT and CLAIRE.
+
+## Workshop Themes
+
+The material is divided into three connected parts:
+
+1. Evaluation of supervised methods and the limitation of weighting all instances equally.
+2. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation.
+3. Beta4-IRT and CLAIRE as a latent-ability-aware framework for model evaluation.
+
+## Suggested Format
+
+The intended classroom rhythm is:
+
+- `15 minutes` of theory per section
+- `15 minutes` of guided practical explanation per section
+- `30 minutes` of participant activity per section
+
+Total estimated duration: `3 hours`.
 
 ## Audience
 
-The material is designed for CDT students with mixed backgrounds.
-The notebooks therefore prioritize clear visuals, simple toy problems, and short interpretation exercises.
+The notebooks are designed for participants with mixed backgrounds.
+Because of that, the material prioritizes:
 
-## Workshop Narrative
+- toy problems;
+- short interpretation steps;
+- visual explanations;
+- lightweight code that can be modified live during the session.
 
-The core message of the session is that standard supervised metrics are useful, but incomplete.
-They usually treat all instances as if they were equally difficult.
-The notebooks use that limitation to motivate IRT, Beta4, and finally CLAIRE.
+## Current Notebook Sequence
 
-## Notebook Structure
+Use the notebooks in the following order during the handson.
 
-- `notebooks/00_workshop_roadmap.ipynb`: workshop framing, timing, and presenter checklist.
-- `notebooks/01_supervised_evaluation_toy_problems.ipynb`: multiple-model comparison on easy and hard classification tasks.
-- `notebooks/02_irt_beta4_icc.ipynb`: classical binary IRT, item characteristic curves, and the bridge to model evaluation.
-- `notebooks/03_claire_latent_ability.ipynb`: Beta4-style ICCs, latent-ability simulations, and CLAIRE positioning.
+### 0. Roadmap
 
-## Teaching Format
+- `notebooks/00_workshop_roadmap.ipynb`
+  Workshop framing, session arc, and high-level organization.
 
-Each notebook is designed around the same structure:
+### 1. Supervised Evaluation
 
-- 15 minutes of theory;
-- 15 minutes of guided practical explanation;
-- 30 minutes of student activity.
+- `notebooks/01_00_supervised_evaluation_toy_problems.ipynb`
+  Guided notebook for Section 1.
+  Introduces toy supervised datasets, compares models, and motivates the idea that some instances are systematically harder than others.
 
-Each section ends with a small activity so students can interpret the toy results rather than only watch the walkthrough.
+- `notebooks/01_01_activities.ipynb`
+  Participant activity notebook for Section 1.
+  Students create or modify scenarios and inspect how metric summaries can hide important structure.
 
-## Development Priorities
+### 2. Binary IRT and 2PL
 
-The repository is now structured so that you can keep iterating in this order:
+- `notebooks/02_00_binary_irt_and_2pl.ipynb`
+  Guided notebook for Section 2.
+  Covers binary IRT, 1PL intuition, 2PL-IRT, and reading ICCs through toy item banks.
 
-1. polish the examples and plots in notebook `01`;
-2. refine the classical binary IRT explanations in notebook `02`;
-3. replace the toy CLAIRE bridge with the final wording and examples you want in notebook `03`;
-4. adjust notebook `00` last so the roadmap matches the final workshop script.
+- `notebooks/02_01_activities.ipynb`
+  Participant activity notebook for Section 2.
+  Students manipulate difficulty and discrimination values and interpret the resulting curves.
 
-## Utilities
+### 3. Beta4-IRT and CLAIRE
 
-The shared helper functions live in `utils/handson.py`.
-They cover:
 
-- toy classification dataset generation;
-- multi-model supervised evaluation;
-- instance difficulty summaries;
-- classical binary IRT ICCs;
-- Beta4-style ICCs;
-- latent-ability simulations for the CLAIRE notebook.
+## How To Use This Repository During The Handson
+
+A practical way to run the session is:
+
+1. Open `00_workshop_roadmap.ipynb` to frame the workshop.
+2. Run the guided notebook of the section.
+3. Transition immediately to the corresponding activity notebook.
+
+## Repository Structure
+
+```text
+.
+├── README.md
+├── pyproject.toml
+├── notebooks/
+│   ├── 00_workshop_roadmap.ipynb
+│   ├── 01_00_supervised_evaluation_toy_problems.ipynb
+│   ├── 01_01_activities.ipynb
+│   ├── 02_00_binary_irt_and_2pl.ipynb
+│   ├── 02_01_activities.ipynb
+│   └── nb_utils.py
+└── utils/
+    ├── __init__.py
+    └── handson.py
+```
+
+## Shared Utilities
+
+The shared helper code lives mainly in:
+
+- `utils/handson.py`
+- `notebooks/nb_utils.py`
+
+These utilities support the current notebooks with:
+
+- toy dataset generation;
+- supervised evaluation helpers;
+- summaries of difficult instances;
+- binary IRT and 2PL ICC plotting;
+- Beta4-style response visualization;
+- toy CLAIRE-style agreement computations.
+
+## Environment
+
+The project uses Poetry for dependency management.
+
+Typical commands:
+
+```bash
+poetry install
+poetry run jupyter notebook
+```
+
+## Presenter Note
+
+This README is meant to serve as the operational guide for the current handson version of the repository.
+If notebook names, prefixes, or roles change again, this file should be updated first so the workshop flow remains easy to follow.
