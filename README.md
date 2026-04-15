@@ -1,7 +1,7 @@
 # Latent Ability ML Workshop
 
 This repository contains the current material for a hands-on workshop built around latent-ability-aware evaluation in machine learning.
-The workshop is organized for a University of Bristol context and is structured as a progression from standard supervised evaluation to IRT, Beta4-IRT, and CLAIRE.
+The workshop is organized for a University of Bristol context and is structured as a progression from standard unsupervised evaluation to IRT, Beta4-IRT, and CLAIRE.
 
 The central message of the handson is simple:
 
@@ -14,7 +14,7 @@ The central message of the handson is simple:
 
 The material is divided into three connected parts:
 
-1. Evaluation of supervised methods and the limitation of weighting all instances equally.
+1. Evaluation of unsupervised methods and the limitation of weighting all instances equally.
 2. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation.
 3. Beta4-IRT and CLAIRE as a latent-ability-aware framework for model evaluation.
 
@@ -47,15 +47,15 @@ Use the notebooks in the following order during the handson.
 - `notebooks/00_workshop_roadmap.ipynb`
   Workshop framing, session arc, and high-level organization.
 
-### 1. Supervised Evaluation
+### 1. Unsupervised Evaluation
 
-- `notebooks/01_00_supervised_evaluation_toy_problems.ipynb`
+- `notebooks/01_00_unsupervised_evaluation_toy_problems.ipynb`
   Guided notebook for Section 1.
-  Introduces toy supervised datasets, compares models, and motivates the idea that some instances are systematically harder than others.
+  Introduces toy clustering datasets, compares clustering models, and motivates the idea that some instances are systematically harder than others.
 
 - `notebooks/01_01_activities.ipynb`
   Participant activity notebook for Section 1.
-  Students create or modify scenarios and inspect how metric summaries can hide important structure.
+  Students create or modify clustering scenarios and inspect how aggregate metric summaries can hide important structure.
 
 ### 2. Binary IRT and 2PL
 
@@ -86,7 +86,7 @@ A practical way to run the session is:
 ├── pyproject.toml
 ├── notebooks/
 │   ├── 00_workshop_roadmap.ipynb
-│   ├── 01_00_supervised_evaluation_toy_problems.ipynb
+│   ├── 01_00_unsupervised_evaluation_toy_problems.ipynb
 │   ├── 01_01_activities.ipynb
 │   ├── 02_00_binary_irt_and_2pl.ipynb
 │   ├── 02_01_activities.ipynb
@@ -105,9 +105,9 @@ The shared helper code lives mainly in:
 
 These utilities support the current notebooks with:
 
-- toy dataset generation;
-- supervised evaluation helpers;
-- summaries of difficult instances;
+- toy clustering dataset generation;
+- clustering evaluation helpers;
+- agreement-based summaries of difficult instances;
 - binary IRT and 2PL ICC plotting;
 - Beta4-style response visualization;
 - toy CLAIRE-style agreement computations.

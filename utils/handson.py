@@ -8,9 +8,18 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.datasets import make_classification
+from sklearn.cluster import AgglomerativeClustering, KMeans, SpectralClustering
+from sklearn.datasets import make_blobs, make_circles, make_classification, make_moons
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score
+from sklearn.metrics import (
+    accuracy_score,
+    adjusted_rand_score,
+    balanced_accuracy_score,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+    f1_score,
+    silhouette_score,
+)
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
@@ -197,6 +206,165 @@ def plot_example_difficulty(summary: pd.DataFrame, ax: plt.Axes | None = None) -
         linewidth=0.3,
     )
     ax.set_title("Example difficulty proxy and model disagreement")
+    ax.set_xlabel("feature_1")
+    ax.set_ylabel("feature_2")
+    plt.colorbar(scatter, ax=ax, label="difficulty proxy")
+    return ax
+
+
+def make_toy_clustering_dataset(
+    scenario: str = "easy_blobs",
+    n_samples: int = 320,
+    random_state: int = 42,
+) -> pd.DataFrame:
+    """Create a 2D clustering dataset with labels kept only for teaching support."""
+    if scenario == "easy_blobs":
+        features, labels = make_blobs(
+            n_samples=n_samples,
+            centers=[(-2.5, -2.0), (2.5, 2.0)],
+            cluster_std=[0.8, 0.9],
+            random_state=random_state,
+        )
+    elif scenario == "hard_moons":
+        features, labels = make_moons(
+            n_samples=n_samples,
+            noise=0.12,
+            random_state=random_state,
+        )
+    elif scenario == "hard_circles":
+        features, labels = make_circles(
+            n_samples=n_samples,
+            noise=0.08,
+            factor=0.45,
+            random_state=random_state,
+        )
+    else:
+        raise ValueError(f"Unsupported scenario: {scenario}")
+
+    df = pd.DataFrame(features, columns=["feature_1", "feature_2"])
+    df["label"] = labels
+    df["instance_id"] = np.arange(len(df))
+    df["scenario_name"] = scenario
+    return df
+
+
+def get_default_clustering_models(n_clusters: int = 2, random_state: int = 42) -> dict[str, object]:
+    """Return a compact pool of clustering models for workshop comparisons."""
+    return {
+        "kmeans": KMeans(n_clusters=n_clusters, n_init=20, random_state=random_state),
+        "agglomerative": AgglomerativeClustering(n_clusters=n_clusters),
+        "spectral": SpectralClustering(
+            n_clusters=n_clusters,
+            affinity="nearest_neighbors",
+            assign_labels="kmeans",
+            random_state=random_state,
+        ),
+    }
+
+
+def evaluate_clustering_models_on_dataset(
+    df: pd.DataFrame,
+    scenario: str,
+    models: dict[str, object] | None = None,
+    random_state: int = 42,
+) -> pd.DataFrame:
+    """Fit a small set of clustering models and return per-instance assignments."""
+    features = df[["feature_1", "feature_2"]]
+    labels = df["label"]
+    n_clusters = int(labels.nunique())
+
+    if models is None:
+        models = get_default_clustering_models(n_clusters=n_clusters, random_state=random_state)
+
+    rows: list[pd.DataFrame] = []
+    for model_name, model in models.items():
+        predicted_cluster = np.asarray(model.fit_predict(features))
+        result = df[["instance_id", "feature_1", "feature_2", "label"]].copy()
+        result["predicted_cluster"] = predicted_cluster
+        result["scenario"] = scenario
+        result["model"] = model_name
+        rows.append(result)
+
+    return pd.concat(rows, ignore_index=True)
+
+
+def summarize_clustering_results(assignments: pd.DataFrame) -> pd.DataFrame:
+    """Compute compact clustering metrics from a long assignment dataframe."""
+    rows: list[dict[str, float | str]] = []
+    for (scenario, model), frame in assignments.groupby(["scenario", "model"]):
+        X = frame[["feature_1", "feature_2"]].to_numpy()
+        y_true = frame["label"].to_numpy()
+        y_pred = frame["predicted_cluster"].to_numpy()
+        n_pred_clusters = len(np.unique(y_pred))
+
+        metrics = {
+            "scenario": scenario,
+            "model": model,
+            "ari": adjusted_rand_score(y_true, y_pred),
+            "n_predicted_clusters": n_pred_clusters,
+            "silhouette": np.nan,
+            "calinski_harabasz": np.nan,
+            "davies_bouldin": np.nan,
+        }
+        if 1 < n_pred_clusters < len(frame):
+            metrics["silhouette"] = silhouette_score(X, y_pred)
+            metrics["calinski_harabasz"] = calinski_harabasz_score(X, y_pred)
+            metrics["davies_bouldin"] = davies_bouldin_score(X, y_pred)
+        rows.append(metrics)
+
+    return pd.DataFrame(rows).sort_values(["scenario", "ari"], ascending=[True, False]).reset_index(drop=True)
+
+
+def summarize_clustering_instance_difficulty(assignments: pd.DataFrame) -> pd.DataFrame:
+    """Estimate instance difficulty from agreement across clustering models."""
+    key_cols = ["instance_id", "feature_1", "feature_2", "label", "scenario"]
+    partitions = assignments.pivot(index="model", columns="instance_id", values="predicted_cluster").sort_index()
+    response_matrix = build_claire_response_matrix(partitions)
+
+    base = assignments[key_cols].drop_duplicates().sort_values("instance_id").reset_index(drop=True)
+    base["mean_model_agreement"] = response_matrix.mean(axis=0).reindex(base["instance_id"]).to_numpy()
+    base["difficulty_proxy"] = 1.0 - base["mean_model_agreement"]
+    return base.sort_values(["difficulty_proxy", "instance_id"], ascending=[False, True]).reset_index(drop=True)
+
+
+def plot_clustering_dataset(
+    df: pd.DataFrame,
+    ax: plt.Axes | None = None,
+    title: str = "Toy clustering dataset",
+) -> plt.Axes:
+    """Scatter plot for a clustering toy problem."""
+    if ax is None:
+        _, ax = plt.subplots(figsize=(6, 4))
+
+    for label, group in df.groupby("label"):
+        ax.scatter(group["feature_1"], group["feature_2"], label=f"group {label}", alpha=0.75)
+
+    ax.set_title(title)
+    ax.set_xlabel("feature_1")
+    ax.set_ylabel("feature_2")
+    ax.legend()
+    return ax
+
+
+def plot_clustering_instance_difficulty(
+    summary: pd.DataFrame,
+    ax: plt.Axes | None = None,
+) -> plt.Axes:
+    """Visualize difficult clustering instances based on model agreement."""
+    if ax is None:
+        _, ax = plt.subplots(figsize=(6, 4))
+
+    scatter = ax.scatter(
+        summary["feature_1"],
+        summary["feature_2"],
+        c=summary["difficulty_proxy"],
+        s=100,
+        cmap="magma",
+        alpha=0.85,
+        edgecolor="black",
+        linewidth=0.3,
+    )
+    ax.set_title("Instance difficulty proxy from model agreement")
     ax.set_xlabel("feature_1")
     ax.set_ylabel("feature_2")
     plt.colorbar(scatter, ax=ax, label="difficulty proxy")
