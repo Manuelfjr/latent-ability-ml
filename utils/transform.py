@@ -13,7 +13,7 @@ class TransformPairwise:
     def calculate_pij_value(self, i: int) -> List[float]:
         item_i = self.data[i]
         tmp = np.delete(self.data, i, axis=0)
-        data_boolean = np.array([[k == l for k, l in zip(item_i, model_j)] for model_j in tmp])
+        data_boolean = np.array([[k == j for k, j in zip(item_i, model_j)] for model_j in tmp])
 
         pij_values_row = []
         for idx3, b in enumerate(data_boolean.T):
