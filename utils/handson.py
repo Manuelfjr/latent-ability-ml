@@ -23,6 +23,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+from utils.transform import TransformPairwise
 
 
 def set_project_root(level: int = 1) -> Path:
@@ -319,7 +320,9 @@ def summarize_clustering_instance_difficulty(assignments: pd.DataFrame) -> pd.Da
     """Estimate instance difficulty from agreement across clustering models."""
     key_cols = ["instance_id", "feature_1", "feature_2", "label", "scenario"]
     partitions = assignments.pivot(index="model", columns="instance_id", values="predicted_cluster").sort_index()
-    response_matrix = build_claire_response_matrix(partitions)
+    # response_matrix = build_claire_response_matrix(partitions)
+    tp = TransformPairwise(1)
+    response_matrix = tp.generate_pij_matrix(partitions)
 
     base = assignments[key_cols].drop_duplicates().sort_values("instance_id").reset_index(drop=True)
     base["mean_model_agreement"] = response_matrix.mean(axis=0).reindex(base["instance_id"]).to_numpy()
@@ -511,8 +514,8 @@ def plot_beta4_iccs(
         )
 
     ax.set_title("Beta4-style item characteristic curves")
-    ax.set_xlabel("latent ability")
-    ax.set_ylabel("expected response probability")
+    ax.set_xlabel(r"$\theta_i$")
+    ax.set_ylabel(r"$E[p_{ij} | \theta_i, \delta_{j}, \tau_j, \omega_j]$")
     ax.set_ylim(0, 1.05)
     ax.legend(loc="best")
     return ax
