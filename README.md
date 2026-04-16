@@ -1,7 +1,7 @@
 <p align="center">
-  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="40" />
-  <img src="docs/assets/logo_cin_ufpe.png" alt="UFPE" height="40" />
-  <img src="docs/assets/logo_kunumi.png" alt="Kunumi" height="40" />
+  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="72" />
+  <img src="docs/assets/logo_cin_ufpe.png" alt="UFPE" height="72" />
+  <img src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" />
 </p>
 
 # Latent Ability ML Workshop
