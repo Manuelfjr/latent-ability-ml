@@ -1,8 +1,9 @@
-<p align="bottom">
-  <img align="left" src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60"/>
-  <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72"/>
-  <img align="right" src="docs/assets/logo_cin.png" alt="CIn" height="42"/>
-  <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="60"/>
+<p>
+  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60" style="vertical-align: bottom;" />
+
+  <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" style="vertical-align: bottom;" />
+  <img align="right" src="docs/assets/logo_cin.png" alt="CIn" height="42" style="vertical-align: bottom;" />
+  <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="60" style="vertical-align: bottom;" />
 </p>
 
 --- 
