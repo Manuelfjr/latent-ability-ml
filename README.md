@@ -1,15 +1,10 @@
-<table width="100%">
-  <tr>
-    <td align="left" valign="middle" width="38%">
-      <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="78" />
-    </td>
-    <td align="right" valign="middle" width="62%">
-      <img src="docs/assets/logo_cin_ufpe.png" alt="CIn UFPE" height="72" />
-      <img src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" />
-    </td>
-  </tr>
-</table>
+<p align="left">
+  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="72" />
+  <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" />
+  <img align="right" src="docs/assets/logo_cin_ufpe.png" alt="CIn" height="72" />
+</p>
 
+--- 
 # Latent Ability ML
 
 This repository contains the current material for a hands-on workshop on latent-ability-aware evaluation in machine learning.
