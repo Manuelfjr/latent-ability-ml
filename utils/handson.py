@@ -503,17 +503,19 @@ def plot_beta4_iccs(
             magn = row.discrimination_magnitude
         else:
             sign, magn = None, None
+
         probs = beta4_expected_response(
             theta=theta,
             difficulty=row.difficulty,
             discrimination_sign=row.discrimination_sign,
             discrimination_magnitude=row.discrimination_magnitude,
+            discrimination=row.effective_discrimination
         )
         ax.plot(
             theta,
             probs,
             label=(
-                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn:.2f}, " +
+                f"{row.item} (" + f"aj={row.effective_discrimination if row.effective_discrimination is not None else row.discrimination_sign * row.discrimination_magnitude:.2f}, " +
                 f"d={row.difficulty:.1f})"
             ),
         )
