@@ -170,3 +170,42 @@ poetry run jupyter notebook
 
 This README is meant to serve as the operational guide for the current version of the workshop.
 If notebook names, numbering, or roles change again, this file should be updated first so the session flow remains clear.
+
+---
+
+# Authors
+
+<table align="center">
+  <tr>
+    <td align="center" width="280">
+      <img src="docs/assets/author_rbcp.png" alt="Ricardo Prudêncio" width="140" height="140" style="border-radius: 50%;" />
+    </td>
+    <td align="center" width="280">
+      <img src="docs/assets/author_mfjr.png" alt="Manuel Ferreira Junior" width="140" height="140" style="border-radius: 50%;" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="280" height="40" valign="top">
+      <strong>Ricardo Prudêncio</strong>
+    </td>
+    <td align="center" width="280" height="40" valign="top">
+      <strong>Manuel Ferreira Junior</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="280" height="72" valign="top">
+      Professor at UFPE
+      <br />
+      Center for Informatics (CIn)
+    </td>
+    <td align="center" width="280" height="72" valign="top">
+      Data Scientist at Instituto Kunumi
+      <br />
+      M.Sc. Student at CIn, UFPE
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <em>Latent-Ability Evaluation in Machine Learning</em>
+</p>
