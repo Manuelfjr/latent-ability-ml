@@ -1,3 +1,9 @@
+<p align="center">
+  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="40" />
+  <img src="docs/assets/logo_cin_ufpe.png" alt="UFPE" height="40" />
+  <img src="docs/assets/logo_kunumi.png" alt="Kunumi" height="40" />
+</p>
+
 # Latent Ability ML Workshop
 
 This repository contains the current material for a hands-on workshop on latent-ability-aware evaluation in machine learning.
