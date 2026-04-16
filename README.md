@@ -1,57 +1,230 @@
-# Latent Ability ML Workshop
+<p>
+  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60" style="vertical-align: bottom;" />
 
-This repository contains the material for a hands-on session for the University of Bristol CDT.
-The workshop is organized around three connected themes:
+  <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" style="vertical-align: bottom;" />
+  <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="60" style="vertical-align: bottom;" />
+</p>
 
-1. evaluation of supervised methods with toy problems;
-2. classical binary IRT for model evaluation;
-3. Beta4-IRT and CLAIRE for latent-ability-aware analysis.
+--- 
+# Latent Ability ML
+
+This repository contains the current material for a hands-on workshop on latent-ability-aware evaluation in machine learning.
+The workshop is organized as a progression from unsupervised evaluation to binary IRT, and then to Beta4-IRT and CLAIRE.
+
+The main message of the handson is:
+
+- aggregate metrics are useful, but incomplete;
+- they usually treat all instances as if they were equally difficult;
+- latent-variable models help us separate model ability from item difficulty;
+- this leads naturally to richer analyses such as Beta4-IRT and CLAIRE.
+
+## Themes
+
+The current workshop is divided into three connected parts:
+
+1. Unsupervised evaluation and the limitation of weighting all instances equally.
+2. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation.
+3. Beta4-IRT and CLAIRE as a latent-ability-aware framework for model evaluation.
+
+## Suggested Format
+
+The intended classroom rhythm is:
+
+- `15 minutes` of theory per section
+- `15 minutes` of guided practical explanation per section
+- `30 minutes` of participant activity per section
+
+Total estimated duration: `3 hours`.
 
 ## Audience
 
-The material is designed for CDT students with mixed backgrounds.
-The notebooks therefore prioritize clear visuals, simple toy problems, and short interpretation exercises.
+The notebooks were designed for participants with mixed backgrounds.
+Because of that, the material prioritizes:
 
-## Workshop Narrative
+- toy problems;
+- visual interpretation;
+- compact activities;
+- code that can be adapted live during the session.
 
-The core message of the session is that standard supervised metrics are useful, but incomplete.
-They usually treat all instances as if they were equally difficult.
-The notebooks use that limitation to motivate IRT, Beta4, and finally CLAIRE.
+## Current Notebook Sequence
 
-## Notebook Structure
+Use the notebooks in the following order during the handson.
 
-- `notebooks/00_workshop_roadmap.ipynb`: workshop framing, timing, and presenter checklist.
-- `notebooks/01_supervised_evaluation_toy_problems.ipynb`: multiple-model comparison on easy and hard classification tasks.
-- `notebooks/02_irt_beta4_icc.ipynb`: classical binary IRT, item characteristic curves, and the bridge to model evaluation.
-- `notebooks/03_claire_latent_ability.ipynb`: Beta4-style ICCs, latent-ability simulations, and CLAIRE positioning.
+### 0. Roadmap
 
-## Teaching Format
+- `notebooks/00_workshop_roadmap.ipynb`
+  Workshop framing, timing, and general sequence.
 
-Each notebook is designed around the same structure:
+### 1. Unsupervised Evaluation
 
-- 15 minutes of theory;
-- 15 minutes of guided practical explanation;
-- 30 minutes of student activity.
+- `notebooks/01_00_unsupervised_evaluation_toy_problems.ipynb`
+  Guided notebook for Section 1.
+  Introduces toy clustering datasets, compares clustering models, and motivates the idea that some instances are systematically harder than others.
 
-Each section ends with a small activity so students can interpret the toy results rather than only watch the walkthrough.
+- `notebooks/01_01_activities.ipynb`
+  Activity notebook for Section 1.
+  Participants create or adapt a clustering scenario and inspect how aggregate metrics can hide instance-level structure.
 
-## Development Priorities
+- `notebooks/01_99_answer.ipynb`
+  Answer notebook for Section 1.
+  Provides one possible worked solution for the activity.
 
-The repository is now structured so that you can keep iterating in this order:
+### 2. Binary IRT and 2PL
 
-1. polish the examples and plots in notebook `01`;
-2. refine the classical binary IRT explanations in notebook `02`;
-3. replace the toy CLAIRE bridge with the final wording and examples you want in notebook `03`;
-4. adjust notebook `00` last so the roadmap matches the final workshop script.
+- `notebooks/02_00_binary_irt_and_2pl.ipynb`
+  Guided notebook for Section 2.
+  Covers binary IRT, 1PL intuition, 2PL-IRT, and reading ICCs through toy item banks.
 
-## Utilities
+- `notebooks/02_01_activities.ipynb`
+  Activity notebook for Section 2.
+  Participants manipulate difficulty and discrimination values and interpret the resulting ICCs.
 
-The shared helper functions live in `utils/handson.py`.
-They cover:
+- `notebooks/02_99_answer.ipynb`
+  Answer notebook for Section 2.
+  Provides one possible worked solution for the activity.
 
-- toy classification dataset generation;
-- multi-model supervised evaluation;
-- instance difficulty summaries;
-- classical binary IRT ICCs;
-- Beta4-style ICCs;
-- latent-ability simulations for the CLAIRE notebook.
+### 3. Beta4-IRT and CLAIRE
+
+- `notebooks/03_00_beta4_and_claire.ipynb`
+  Guided notebook for Section 3.
+  Connects the workshop to the research context: Beta4-IRT, CLAIRE, agreement-based response matrices, abilities, difficulties, and discriminations.
+
+- `notebooks/03_01_extra_negative_disc.ipynb`
+  Extra analysis notebook.
+  This is not the main activity; it was created to investigate, in a more controlled way, how negative discrimination can emerge when the agreement structure is directly perturbed.
+
+- `notebooks/03_02_activities.ipynb`
+  Activity notebook for Section 3.
+  Participants generate a synthetic dataset with medium to high variability, build the CLAIRE response matrix, train Beta4-IRT, inspect abilities and item parameters, and generate ICCs.
+
+- `notebooks/03_99_answer.ipynb`
+  Answer notebook for Section 3.
+  Provides a worked version of the main activity.
+
+## How To Use This Repository During The Handson
+
+A practical way to run the session is:
+
+1. Open `00_workshop_roadmap.ipynb` to frame the workshop.
+2. Run the guided notebook for the section.
+3. Transition immediately to the corresponding activity notebook.
+4. Use the `*_99_answer.ipynb` notebooks when you want to consolidate or discuss the activity solutions.
+5. Use `03_01_extra_negative_disc.ipynb` only as an extra analytical notebook, not as the default participant activity.
+
+## Repository Structure
+
+```text
+.
+├── README.md
+├── pyproject.toml
+├── notebooks/
+│   ├── 00_workshop_roadmap.ipynb
+│   ├── 01_00_unsupervised_evaluation_toy_problems.ipynb
+│   ├── 01_01_activities.ipynb
+│   ├── 01_99_answer.ipynb
+│   ├── 02_00_binary_irt_and_2pl.ipynb
+│   ├── 02_01_activities.ipynb
+│   ├── 02_99_answer.ipynb
+│   ├── 03_00_beta4_and_claire.ipynb
+│   ├── 03_01_extra_negative_disc.ipynb
+│   ├── 03_02_activities.ipynb
+│   ├── 03_99_answer.ipynb
+│   └── nb_utils.py
+├── docs/
+│   ├── 99_script_portuguese.md
+│   └── 99_script_english.md
+└── utils/
+    ├── __init__.py
+    ├── handson.py
+    └── transform.py
+```
+
+## Shared Utilities
+
+The shared helper code lives mainly in:
+
+- `utils/handson.py`
+- `utils/transform.py`
+- `notebooks/nb_utils.py`
+
+These utilities currently support:
+
+- toy clustering dataset generation;
+- clustering evaluation helpers;
+- agreement-based response matrix generation;
+- summaries of difficult instances;
+- binary IRT and 2PL ICC plotting;
+- Beta4-style response visualization;
+- CLAIRE-style agreement analysis.
+
+## Environment
+
+The project uses Poetry for dependency management.
+
+Typical commands:
+
+```bash
+poetry install
+poetry run jupyter notebook
+```
+
+## Presenter Note
+
+This README is meant to serve as the operational guide for the current version of the workshop.
+If notebook names, numbering, or roles change again, this file should be updated first so the session flow remains clear.
+
+---
+
+# Authors
+
+<table align="center">
+  <tr>
+    <td align="center" width="280">
+      <img src="docs/assets/author_rbcp.png" alt="Ricardo Prudêncio" width="140" height="140" style="border-radius: 50%;" />
+    </td>
+    <td align="center" width="280">
+      <img src="docs/assets/author_mfjr.png" alt="Manuel Ferreira Junior" width="140" height="140" style="border-radius: 50%;" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="280" height="40" valign="top">
+      <strong>Ricardo Prudêncio</strong>
+    </td>
+    <td align="center" width="280" height="40" valign="top">
+      <strong>Manuel Ferreira Junior</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="280" height="72" valign="top">
+      Professor at UFPE
+      <br />
+      Centro de Informática (CIn)
+    </td>
+    <td align="center" width="280" height="72" valign="top">
+      Data Scientist at Instituto Kunumi
+      <br />
+      M.Sc. Student at CIn, UFPE
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <em>Latent-Ability Evaluation in Machine Learning</em>
+</p>
+
+## Contact
+
+<p align="center">
+  <a href="mailto:mfj@cin.ufpe.br">
+    <img src="https://img.shields.io/badge/Email-black?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+  <a href="https://github.com/Manuelfjr">
+    <img src="https://img.shields.io/badge/GitHub-black?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="mailto:mfj@cin.ufpe.br">mfj@cin.ufpe.br</a>
+  <br />
+  <a href="https://github.com/Manuelfjr">github.com/Manuelfjr</a>
+</p>
