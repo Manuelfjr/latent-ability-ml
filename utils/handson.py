@@ -214,7 +214,7 @@ def binary_irt_probability(
 def beta4_expected_response(
     theta: np.ndarray | float,
     difficulty: np.ndarray | float,
-    discrimination: float, 
+    discrimination: float,
     discrimination_sign: np.ndarray | float,
     discrimination_magnitude: np.ndarray | float,
 ) -> np.ndarray:
@@ -425,7 +425,7 @@ def plot_iccs(
         if hasattr(row, "discrimination_sign") and hasattr(row, "discrimination_magnitude"):
             sign = row.discrimination_sign
             magn = row.discrimination_magnitude
-        else: 
+        else:
             sign, magn = None, None
         probs = beta4_expected_response(
             theta=theta,
@@ -438,7 +438,7 @@ def plot_iccs(
             theta,
             probs,
             label=(
-                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn:.2f}, " + 
+                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn:.2f}, " +
                 f"d={row.difficulty:.1f})"
             ),
         )
