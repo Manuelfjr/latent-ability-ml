@@ -23,8 +23,18 @@ class TransformPairwise:
         return pij_values_row
 
     def generate_pij_matrix(self, data: pd.DataFrame = None) -> pd.DataFrame:
-        self.columns = data.columns if isinstance(data, pd.DataFrame) else None
-        self.data = data.values if isinstance(data, pd.DataFrame) else data
+        if data is None:
+            raise ValueError("`data` must be provided as a pandas DataFrame or numpy ndarray.")
+
+        if isinstance(data, pd.DataFrame):
+            self.columns = data.columns
+            self.data = data.values
+        elif isinstance(data, np.ndarray):
+            self.columns = None
+            self.data = data
+        else:
+            raise TypeError("`data` must be a pandas DataFrame or numpy ndarray.")
+
         num_samples = self.data.shape[0]
         pij_values = Parallel(n_jobs=self.works)(delayed(self.calculate_pij_value)(i) for i in tqdm(range(num_samples)))
         self.transformed_matrix = np.array(pij_values)
