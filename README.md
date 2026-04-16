@@ -2,7 +2,7 @@
   <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60" />
   <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" />
   <img align="right" src="docs/assets/logo_cin.png" alt="CIn" height="50" />
-    <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="50" />
+    <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="58" />
 </p>
 
 --- 
