@@ -4,7 +4,7 @@
   <img src="docs/assets/logo_kunumi.png" alt="Kunumi" height="75" />
 </p>
 
-# Latent Ability ML Workshop
+# Latent Ability ML
 
 This repository contains the current material for a hands-on workshop on latent-ability-aware evaluation in machine learning.
 The workshop is organized as a progression from unsupervised evaluation to binary IRT, and then to Beta4-IRT and CLAIRE.
@@ -16,7 +16,7 @@ The main message of the handson is:
 - latent-variable models help us separate model ability from item difficulty;
 - this leads naturally to richer analyses such as Beta4-IRT and CLAIRE.
 
-## Workshop Themes
+## Themes
 
 The current workshop is divided into three connected parts:
 
