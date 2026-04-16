@@ -214,17 +214,16 @@ If notebook names, numbering, or roles change again, this file should be updated
 
 ## Contact
 
-<p align="center">
+<p align="left">
   <a href="mailto:mfj@cin.ufpe.br">
-    <img src="https://img.shields.io/badge/Email-black?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+    <img src="https://img.shields.io/badge/-000000?style=flat-square&logo=gmail&logoColor=white" alt="Email" />
   </a>
-  <a href="https://github.com/Manuelfjr">
-    <img src="https://img.shields.io/badge/GitHub-black?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
-  </a>
-</p>
-
-<p align="center">
+  &nbsp;&nbsp;&nbsp;
   <a href="mailto:mfj@cin.ufpe.br">mfj@cin.ufpe.br</a>
   <br />
-  <a href="https://github.com/Manuelfjr">github.com/Manuelfjr</a>
+  <a href="https://github.com/manuelfjr">
+    <img src="https://img.shields.io/badge/-000000?style=flat-square&logo=github&logoColor=white" alt="GitHub" />
+  </a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/manuelfjr">github.com/manuelfjr</a>
 </p>
