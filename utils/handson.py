@@ -23,6 +23,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
+
 from utils.transform import TransformPairwise
 
 
@@ -211,17 +212,6 @@ def plot_example_difficulty(summary: pd.DataFrame, ax: plt.Axes | None = None) -
     ax.set_ylabel("feature_2")
     plt.colorbar(scatter, ax=ax, label="difficulty proxy")
     return ax
-
-def beta4_expected_response(
-    theta: np.ndarray | float,
-    difficulty: np.ndarray | float,
-    discrimination: float,
-    discrimination_sign: np.ndarray | float,
-    discrimination_magnitude: np.ndarray | float,
-) -> np.ndarray:
-    """Compute expected responses under a simple beta4-style parameterization."""
-    if discrimination is None:
-        discrimination = discrimination_sign * discrimination_magnitude
 
 def make_toy_clustering_dataset(
     scenario: str = "easy_blobs",
