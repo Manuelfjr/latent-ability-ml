@@ -196,7 +196,7 @@ If notebook names, numbering, or roles change again, this file should be updated
     <td align="center" width="280" height="72" valign="top">
       Professor at UFPE
       <br />
-      Center for Informatics (CIn)
+      Centro de Informática (CIn)
     </td>
     <td align="center" width="280" height="72" valign="top">
       Data Scientist at Instituto Kunumi
