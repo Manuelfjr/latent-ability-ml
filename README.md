@@ -212,3 +212,20 @@ If notebook names, numbering, or roles change again, this file should be updated
 <p align="center">
   <em>Latent-Ability Evaluation in Machine Learning</em>
 </p>
+
+## Contact
+
+<p align="center">
+  <a href="mailto:mfj@cin.ufpe.br">
+    <img src="https://img.shields.io/badge/Email-black?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+  <a href="https://github.com/Manuelfjr">
+    <img src="https://img.shields.io/badge/GitHub-black?style=for-the-badge&logo=github&logoColor=white" alt="GitHub" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="mailto:mfj@cin.ufpe.br">mfj@cin.ufpe.br</a>
+  <br />
+  <a href="https://github.com/Manuelfjr">github.com/Manuelfjr</a>
+</p>
