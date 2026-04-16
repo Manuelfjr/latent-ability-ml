@@ -515,7 +515,7 @@ def plot_beta4_iccs(
             theta,
             probs,
             label=(
-                f"{row.item} (" + f"aj={row.effective_discrimination if row.effective_discrimination is not None else row.discrimination_sign * row.discrimination_magnitude:.2f}, " +
+                f"{row.item} (" + f"aj={row.effective_discrimination if row.effective_discrimination is not None else sign * magn:.2f}, " +
                 f"d={row.difficulty:.1f})"
             ),
         )
