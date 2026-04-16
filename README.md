@@ -1,15 +1,9 @@
-<table width="100%">
-  <tr>
-    <td align="left" valign="bottom" width="36%">
-      <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60" />
-    </td>
-    <td align="right" valign="bottom" width="64%">
-      <img src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" />
-      <img src="docs/assets/logo_cin.png" alt="CIn" height="44" />
-      <img src="docs/assets/logo_ufpe.png" alt="UFPE" height="60" />
-    </td>
-  </tr>
-</table>
+<p align="bottom">
+  <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60" />
+  <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" />
+  <img align="right" src="docs/assets/logo_cin.png" alt="CIn" height="42" />
+    <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="60" />
+</p>
 
 --- 
 # Latent Ability ML
