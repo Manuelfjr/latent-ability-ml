@@ -212,6 +212,16 @@ def plot_example_difficulty(summary: pd.DataFrame, ax: plt.Axes | None = None) -
     plt.colorbar(scatter, ax=ax, label="difficulty proxy")
     return ax
 
+def beta4_expected_response(
+    theta: np.ndarray | float,
+    difficulty: np.ndarray | float,
+    discrimination: float,
+    discrimination_sign: np.ndarray | float,
+    discrimination_magnitude: np.ndarray | float,
+) -> np.ndarray:
+    """Compute expected responses under a simple beta4-style parameterization."""
+    if discrimination is None:
+        discrimination = discrimination_sign * discrimination_magnitude
 
 def make_toy_clustering_dataset(
     scenario: str = "easy_blobs",
@@ -498,6 +508,11 @@ def plot_beta4_iccs(
         _, ax = plt.subplots(figsize=(7, 4))
 
     for row in item_bank.itertuples(index=False):
+        if hasattr(row, "discrimination_sign") and hasattr(row, "discrimination_magnitude"):
+            sign = row.discrimination_sign
+            magn = row.discrimination_magnitude
+        else:
+            sign, magn = None, None
         probs = beta4_expected_response(
             theta=theta,
             difficulty=row.difficulty,
@@ -508,8 +523,8 @@ def plot_beta4_iccs(
             theta,
             probs,
             label=(
-                f"{row.item} (d={row.difficulty:.2f}, "
-                f"sign={row.discrimination_sign:.2f}, mag={row.discrimination_magnitude:.2f})"
+                f"{row.item} (" + f"aj={aj if aj is not None else sign * magn:.2f}, " +
+                f"d={row.difficulty:.1f})"
             ),
         )
 
