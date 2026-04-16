@@ -1,10 +1,7 @@
 <p>
   <img src="docs/assets/logo_bristol.png" alt="University of Bristol" height="60" style="vertical-align: bottom;" />
-  
   <img align="right" src="docs/assets/logo_kunumi.png" alt="Kunumi" height="72" hspace="10" style="vertical-align: bottom;" />
-
   <img align="right" src="docs/assets/logo_cin.png" alt="CIn" height="42" hspace="10" style="vertical-align: bottom;" />
-
   <img align="right" src="docs/assets/logo_ufpe.png" alt="UFPE" height="60" hspace="10" style="vertical-align: bottom;" />
 </p>
 
