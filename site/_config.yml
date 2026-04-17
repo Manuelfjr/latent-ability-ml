@@ -1,5 +1,5 @@
 title: Latent Ability ML
-description: Workshop website for latent-ability-aware evaluation in machine learning.
+description: Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning.
 baseurl: "/latent-ability-ml"
 url: "https://manuelfjr.github.io"
 markdown: kramdown
