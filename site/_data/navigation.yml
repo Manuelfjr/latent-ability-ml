@@ -4,28 +4,33 @@
   url: /readme/
 - title: Roadmap
   url: /roadmap/
+- title: Authors
+  url: /authors/
+- title: Contact Me
+  url: /contact/
 - title: Section 1
-  url: /section-1/
   children:
+    - title: Overview
+      url: /section-1/
     - title: Activity
       url: /section-1-activity/
     - title: Answer
       url: /section-1-answer/
 - title: Section 2
-  url: /section-2/
   children:
+    - title: Overview
+      url: /section-2/
     - title: Activity
       url: /section-2-activity/
     - title: Answer
       url: /section-2-answer/
 - title: Section 3
-  url: /section-3/
   children:
+    - title: Overview
+      url: /section-3/
     - title: Extra
       url: /section-3-extra/
     - title: Activity
       url: /section-3-activity/
     - title: Answer
       url: /section-3-answer/
-- title: Contact Me
-  url: /contact/
