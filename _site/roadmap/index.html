@@ -236,6 +236,7 @@
               </svg>
             </button>
           </form>
+          <div class="page-search-suggestions" id="page-search-suggestions" role="listbox" aria-label="Search suggestions"></div>
         </div>
         
         <div class="eyebrow">Session Flow</div>
@@ -287,11 +288,13 @@
         const input = document.getElementById("page-search-input");
         const button = document.getElementById("page-search-button");
         const clearButton = document.getElementById("page-search-clear");
+        const suggestions = document.getElementById("page-search-suggestions");
         const content = document.querySelector(".content");
-        if (!input || !button || !clearButton || !content) return;
+        if (!input || !button || !clearButton || !suggestions || !content) return;
 
         let matches = [];
         let activeIndex = -1;
+        let searchEntries = [];
 
         const clearMarks = () => {
           matches.forEach((mark) => {
@@ -302,6 +305,11 @@
           });
           matches = [];
           activeIndex = -1;
+        };
+
+        const clearSuggestions = () => {
+          suggestions.innerHTML = "";
+          suggestions.classList.remove("visible");
         };
 
         const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -371,6 +379,79 @@
           }
         };
 
+        const truncateText = (text, query) => {
+          const normalized = text.replace(/\s+/g, " ").trim();
+          const lower = normalized.toLowerCase();
+          const idx = lower.indexOf(query.toLowerCase());
+          if (idx === -1) return normalized.slice(0, 120);
+          const start = Math.max(0, idx - 36);
+          const end = Math.min(normalized.length, idx + query.length + 64);
+          const snippet = normalized.slice(start, end).trim();
+          return `${start > 0 ? "..." : ""}${snippet}${end < normalized.length ? "..." : ""}`;
+        };
+
+        const buildSearchEntries = () => {
+          const selectors = "h1, h2, h3, p, li, .button, .meta, .notice";
+          searchEntries = Array.from(content.querySelectorAll(selectors))
+            .filter((element) => !element.closest(".page-search"))
+            .map((element, index) => ({
+              id: `search-entry-${index}`,
+              element,
+              text: element.textContent.replace(/\s+/g, " ").trim(),
+              kind: element.tagName.toLowerCase(),
+            }))
+            .filter((entry) => entry.text.length > 0);
+        };
+
+        const renderSuggestions = (query) => {
+          clearSuggestions();
+          if (!query) return;
+
+          const results = searchEntries
+            .filter((entry) => entry.text.toLowerCase().includes(query.toLowerCase()))
+            .slice(0, 8);
+
+          if (!results.length) return;
+
+          const fragment = document.createDocumentFragment();
+          results.forEach((entry) => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "page-search-suggestion";
+            item.setAttribute("role", "option");
+            item.dataset.targetId = entry.id;
+
+            entry.element.dataset.searchEntryId = entry.id;
+
+            const label = document.createElement("span");
+            label.className = "page-search-suggestion-label";
+            label.textContent =
+              entry.kind === "h1" || entry.kind === "h2" || entry.kind === "h3"
+                ? entry.text
+                : entry.kind === "li"
+                  ? "List item"
+                  : "Page content";
+
+            const snippet = document.createElement("span");
+            snippet.className = "page-search-suggestion-snippet";
+            snippet.textContent = truncateText(entry.text, query);
+
+            item.appendChild(label);
+            item.appendChild(snippet);
+            item.addEventListener("click", () => {
+              input.value = query;
+              highlightQuery(query);
+              clearSuggestions();
+              entry.element.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
+
+            fragment.appendChild(item);
+          });
+
+          suggestions.appendChild(fragment);
+          suggestions.classList.add("visible");
+        };
+
         const activateMatch = (index) => {
           if (!matches.length) return;
           matches.forEach((mark) => mark.classList.remove("active"));
@@ -386,11 +467,14 @@
         clearButton.addEventListener("click", () => {
           input.value = "";
           clearMarks();
+          clearSuggestions();
           input.focus();
         });
 
         input.addEventListener("input", () => {
-          highlightQuery(input.value.trim());
+          const query = input.value.trim();
+          highlightQuery(query);
+          renderSuggestions(query);
         });
 
         input.addEventListener("keydown", (event) => {
@@ -401,9 +485,18 @@
           if (event.key === "Escape") {
             input.value = "";
             clearMarks();
+            clearSuggestions();
             input.blur();
           }
         });
+
+        document.addEventListener("click", (event) => {
+          if (!event.target.closest(".page-search")) {
+            clearSuggestions();
+          }
+        });
+
+        buildSearchEntries();
       })();
     </script>
   </body>
