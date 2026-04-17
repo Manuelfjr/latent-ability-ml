@@ -346,7 +346,6 @@ img {
   align-items: flex-end;
   gap: 12px;
   opacity: 0.92;
-  pointer-events: none;
 }
 
 .corner-logo {
