@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Section 1 Activity
+title: Activity
 eyebrow: Activity Notebook
 lead: Participants create or adapt a clustering scenario and inspect how aggregate metrics can mask hard instances.
 permalink: /section-1-activity/

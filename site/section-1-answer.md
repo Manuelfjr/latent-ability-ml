@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Section 1 Answer
+title: Answer
 eyebrow: Answer Notebook
 lead: This page is reserved for the worked answer of Section 1 and can be released after the participant activity window.
 permalink: /section-1-answer/

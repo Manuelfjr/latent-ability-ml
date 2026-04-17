@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Section 3 Extra
+title: Extra
 eyebrow: Negative Discrimination
 lead: A separate analytical notebook used to inspect, in a more controlled setting, how negative discrimination can emerge.
 permalink: /section-3-extra/

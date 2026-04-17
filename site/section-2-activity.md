@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Section 2 Activity
+title: Activity
 eyebrow: Activity Notebook
 lead: Participants manipulate difficulty and discrimination values and then interpret the resulting ICCs.
 permalink: /section-2-activity/

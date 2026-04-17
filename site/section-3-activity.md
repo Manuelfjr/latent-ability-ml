@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Section 3 Activity
+title: Activity
 eyebrow: Activity Notebook
 lead: Participants generate a synthetic dataset, build the response matrix, train Beta4-IRT, inspect abilities and item parameters, and generate ICCs.
 permalink: /section-3-activity/
