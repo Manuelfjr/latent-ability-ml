@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}</title>
+    <meta name="description" content="{{ site.description }}" />
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <img
+            src="{{ '/docs/assets/icon_bristol.png' | relative_url }}"
+            alt="University of Bristol"
+            class="sidebar-logo"
+          />
+          <div class="sidebar-title">Latent Ability ML</div>
+          <div class="sidebar-subtitle">Workshop Notes and Notebooks</div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Workshop navigation">
+          {% for item in site.data.navigation %}
+          <a
+            href="{{ item.url | relative_url }}"
+            class="nav-link{% if page.url == item.url %} active{% endif %}"
+          >
+            {{ item.title }}
+          </a>
+          {% endfor %}
+        </nav>
+      </aside>
+
+      <main class="content">
+        {% if page.eyebrow %}
+        <div class="eyebrow">{{ page.eyebrow }}</div>
+        {% endif %}
+        <h1>{{ page.title }}</h1>
+        {% if page.lead %}
+        <p class="lead">{{ page.lead }}</p>
+        {% endif %}
+        {{ content }}
+      </main>
+    </div>
+  </body>
+</html>
