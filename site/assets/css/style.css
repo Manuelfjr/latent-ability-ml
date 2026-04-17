@@ -14,7 +14,7 @@
 
 body {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Arial, Helvetica, sans-serif;
   color: var(--ink);
   background: linear-gradient(180deg, #f8f5ef 0%, #f4efe5 100%);
 }
@@ -31,11 +31,11 @@ a:hover {
 .site-shell {
   min-height: 100vh;
   display: grid;
-  grid-template-columns: 300px minmax(0, 1fr);
+  grid-template-columns: 260px minmax(0, 1fr);
 }
 
 .sidebar {
-  padding: 28px 22px;
+  padding: 24px 18px;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--sidebar-border);
   position: sticky;
@@ -50,7 +50,7 @@ a:hover {
 }
 
 .sidebar-logo {
-  width: 92px;
+  width: 72px;
   height: auto;
   display: block;
   margin-bottom: 14px;
@@ -94,8 +94,8 @@ a:hover {
 }
 
 .content {
-  padding: 48px 56px 64px;
-  max-width: 960px;
+  padding: 36px 40px 56px;
+  max-width: 980px;
 }
 
 .eyebrow {
@@ -134,8 +134,8 @@ h2 {
 
 p,
 li {
-  font-size: 1.02rem;
-  line-height: 1.75;
+  font-size: 1rem;
+  line-height: 1.65;
 }
 
 ul,
@@ -196,6 +196,10 @@ code {
   background: #f1ece3;
   padding: 2px 6px;
   border-radius: 6px;
+}
+
+img {
+  max-width: 100%;
 }
 
 @media (max-width: 960px) {
