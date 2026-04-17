@@ -1,8 +1,8 @@
 ---
 layout: default
-title: README
-eyebrow: Repository Guide
-lead: A direct page for the repository guide, bringing the workshop README into the site navigation.
+title: Guide
+eyebrow: Workshop Guide
+lead: A direct page for the workshop guide, bringing the main repository context into the site navigation.
 permalink: /readme/
 ---
 
@@ -23,8 +23,8 @@ This project contains the full material for a hands-on workshop on latent-abilit
 2. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation.
 3. Beta4-IRT and CLAIRE as a latent-ability-aware framework for model evaluation.
 
-## Full README
+## Full Guide
 
 <div class="button-row">
-  <a class="button" href="{{ site.repo_url }}/blob/main/README.md">Open full README on GitHub</a>
+  <a class="button" href="{{ site.repo_url }}/blob/main/README.md">Open full guide on GitHub</a>
 </div>

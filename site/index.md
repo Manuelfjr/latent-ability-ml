@@ -52,10 +52,10 @@ Total estimated duration: `3 hours`.
 - Portuguese script: [99_script_portuguese.md]({{ site.repo_url }}/blob/main/docs/text/99_script_portuguese.md)
 - English script: [99_script_english.md]({{ site.repo_url }}/blob/main/docs/text/99_script_english.md)
 
-## README
+## Guide
 
-The repository README is also available through the site navigation, so participants can access the workshop guide without leaving the website.
+The workshop guide is also available through the site navigation, so participants can access the repository overview without leaving the website.
 
 <div class="button-row">
-  <a class="button secondary" href="{{ '/readme/' | relative_url }}">Open README page</a>
+  <a class="button secondary" href="{{ '/readme/' | relative_url }}">Open guide page</a>
 </div>
