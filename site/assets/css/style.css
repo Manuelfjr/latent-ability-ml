@@ -338,6 +338,31 @@ img {
   color: var(--muted);
 }
 
+.corner-logos {
+  position: fixed;
+  right: 22px;
+  bottom: 18px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.corner-logo {
+  display: block;
+  height: auto;
+}
+
+.corner-logo-ufpe {
+  width: 76px;
+}
+
+.corner-logo-kunumi {
+  width: 104px;
+  transform: translateY(5px);
+}
+
 @media (max-width: 960px) {
   .site-shell {
     grid-template-columns: 1fr;
@@ -352,5 +377,20 @@ img {
 
   .content {
     padding: 32px 22px 48px;
+  }
+
+  .corner-logos {
+    right: 14px;
+    bottom: 12px;
+    gap: 8px;
+  }
+
+  .corner-logo-ufpe {
+    width: 58px;
+  }
+
+  .corner-logo-kunumi {
+    width: 82px;
+    transform: translateY(3px);
   }
 }
