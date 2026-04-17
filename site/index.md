@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Latent Ability ML
+title: Latent Ability
 eyebrow: Bristol Workshop
 lead: A browsable workshop site for the latent-ability-aware evaluation material, organized by section, activities, and supporting notes.
 permalink: /

@@ -6,7 +6,7 @@
 </p>
 
 --- 
-# Latent Ability ML
+# Latent Ability
 
 This repository contains the current material for a hands-on workshop on latent-ability-aware evaluation in machine learning.
 The workshop is organized as a progression from unsupervised evaluation to binary IRT, and then to Beta4-IRT and CLAIRE.
