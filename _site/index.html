@@ -3,8 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Latent Ability ML | Latent Ability ML</title>
+    <title>Latent Ability ML</title>
     <meta name="description" content="Workshop website for latent-ability-aware evaluation in machine learning." />
+    <link rel="icon" type="image/png" href="/assets/icon_bristol.png" />
+    <link rel="apple-touch-icon" href="/assets/icon_bristol.png" />
+    <meta property="og:title" content="Latent Ability ML" />
+    <meta property="og:description" content="Workshop website for latent-ability-aware evaluation in machine learning." />
+    <meta property="og:image" content="http://localhost:4000/assets/icon_bristol.png" />
+    <meta property="og:type" content="website" />
     <link rel="stylesheet" href="/assets/css/style.css" />
   </head>
   <body>
@@ -325,7 +331,8 @@
 
         let matches = [];
         let activeIndex = -1;
-        let searchEntries = [];
+        let searchIndex = [];
+        const currentUrl = window.location.pathname.replace(/\/+$/, "") || "/";
 
         const clearMarks = () => {
           matches.forEach((mark) => {
@@ -421,25 +428,16 @@
           return `${start > 0 ? "..." : ""}${snippet}${end < normalized.length ? "..." : ""}`;
         };
 
-        const buildSearchEntries = () => {
-          const selectors = "h1, h2, h3, p, li, .button, .meta, .notice";
-          searchEntries = Array.from(content.querySelectorAll(selectors))
-            .filter((element) => !element.closest(".page-search"))
-            .map((element, index) => ({
-              id: `search-entry-${index}`,
-              element,
-              text: element.textContent.replace(/\s+/g, " ").trim(),
-              kind: element.tagName.toLowerCase(),
-            }))
-            .filter((entry) => entry.text.length > 0);
-        };
-
         const renderSuggestions = (query) => {
           clearSuggestions();
           if (!query) return;
 
-          const results = searchEntries
-            .filter((entry) => entry.text.toLowerCase().includes(query.toLowerCase()))
+          const normalizedQuery = query.toLowerCase();
+          const results = searchIndex
+            .filter((entry) => {
+              const haystack = `${entry.title} ${entry.eyebrow} ${entry.lead} ${entry.content}`.toLowerCase();
+              return haystack.includes(normalizedQuery);
+            })
             .slice(0, 8);
 
           if (!results.length) return;
@@ -450,30 +448,26 @@
             item.type = "button";
             item.className = "page-search-suggestion";
             item.setAttribute("role", "option");
-            item.dataset.targetId = entry.id;
-
-            entry.element.dataset.searchEntryId = entry.id;
 
             const label = document.createElement("span");
             label.className = "page-search-suggestion-label";
-            label.textContent =
-              entry.kind === "h1" || entry.kind === "h2" || entry.kind === "h3"
-                ? entry.text
-                : entry.kind === "li"
-                  ? "List item"
-                  : "Page content";
+            label.textContent = entry.eyebrow || entry.title;
 
             const snippet = document.createElement("span");
             snippet.className = "page-search-suggestion-snippet";
-            snippet.textContent = truncateText(entry.text, query);
+            snippet.textContent = truncateText(entry.lead || entry.content || entry.title, query);
 
             item.appendChild(label);
             item.appendChild(snippet);
             item.addEventListener("click", () => {
               input.value = query;
-              highlightQuery(query);
               clearSuggestions();
-              entry.element.scrollIntoView({ behavior: "smooth", block: "center" });
+              const targetUrl = entry.url.replace(/\/+$/, "") || "/";
+              if (targetUrl === currentUrl) {
+                highlightQuery(query);
+              } else {
+                window.location.href = `${entry.url}?q=${encodeURIComponent(query)}`;
+              }
             });
 
             fragment.appendChild(item);
@@ -527,7 +521,23 @@
           }
         });
 
-        buildSearchEntries();
+        const initialQuery = new URLSearchParams(window.location.search).get("q");
+        if (initialQuery) {
+          input.value = initialQuery;
+          highlightQuery(initialQuery);
+        }
+
+        fetch("/search.json")
+          .then((response) => response.json())
+          .then((data) => {
+            searchIndex = Array.isArray(data) ? data : [];
+            if (input.value.trim()) {
+              renderSuggestions(input.value.trim());
+            }
+          })
+          .catch(() => {
+            searchIndex = [];
+          });
       })();
     </script>
   </body>

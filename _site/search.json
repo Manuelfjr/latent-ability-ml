@@ -1,0 +1,124 @@
+[
+
+
+{
+  "title": "Latent Ability ML",
+  "eyebrow": "Bristol Workshop",
+  "lead": "A browsable workshop site for the latent-ability-aware evaluation material, organized by section, activities, and supporting notes.",
+  "url": "/",
+  "content": "The workshop is organized as a progression from unsupervised evaluation to binary IRT, and then to Beta4-IRT and CLAIRE. This site was designed to make navigation easier during the session, especially for participants who need a cleaner entry point than the repository root. Workshop Structure Section 1 Unsupervised evaluation and the limitation of treating all instances as equally difficult. Open section Open activity Section 2 Binary IRT, 1PL intuition, 2PL-IRT, and how to interpret ICCs. Open section Open activity Section 3 Beta4-IRT, CLAIRE, agreement-based response matrices, and item-level inspection. Open section Open activity Suggested Rhythm 15 minutes of theory per section 15 minutes of guided hands-on explanation per section 30 minutes of participant activity per section Total estimated duration: 3 hours. Repository Main repository: latent-ability-ml Roadmap notebook: 00_workshop_roadmap.ipynb Portuguese script: 99_script_portuguese.md English script: 99_script_english.md Guide The workshop guide is also available through the site navigation, so participants can access the repository overview without leaving the website. Open guide page"
+},
+
+{
+  "title": "Authors",
+  "eyebrow": "Workshop Team",
+  "lead": "The workshop is presented by collaborators from UFPE, CIn, Instituto Kunumi, and the University of Bristol context that motivates the visit and the exchange.",
+  "url": "/authors/",
+  "content": "Ricardo Prudêncio Professor at UFPE Centro de Informática (CIn) Manuel Ferreira Junior Data Scientist at Instituto Kunumi M.Sc. Student at CIn, UFPE Latent-Ability Evaluation in Machine Learning"
+},
+
+{
+  "title": "Contact Me",
+  "eyebrow": "Contact",
+  "lead": "For questions about the workshop material, repository organization, or the notebooks, feel free to get in touch.",
+  "url": "/contact/",
+  "content": "Contact Email: mfj@cin.ufpe.br GitHub: github.com/manuelfjr Notes If you are using this material during the workshop, the fastest path is usually: check the roadmap page first; open the section notebook; move to the corresponding activity; return to the answer page only after the discussion window is over."
+},
+
+{
+  "title": "Guide",
+  "eyebrow": "Guide",
+  "lead": "A direct page for the workshop guide, bringing the main repository context into the site navigation.",
+  "url": "/readme/",
+  "content": "Repository Overview This project contains the full material for a hands-on workshop on latent-ability-aware evaluation in machine learning. Main Message aggregate metrics are useful, but incomplete; they usually treat all instances as if they were equally difficult; latent-variable models help us separate model ability from item difficulty; this leads naturally to richer analyses such as Beta4-IRT and CLAIRE. Main Sections Unsupervised evaluation and the limitation of weighting all instances equally. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation. Beta4-IRT and CLAIRE as a latent-ability-aware framework for model evaluation. Full Guide Open full guide on GitHub"
+},
+
+{
+  "title": "Workshop Roadmap",
+  "eyebrow": "Session Flow",
+  "lead": "The full workshop sequence, from framing to activities.",
+  "url": "/roadmap/",
+  "content": "Recommended Order 00_workshop_roadmap.ipynb 01_00_unsupervised_evaluation_toy_problems.ipynb 01_01_activities.ipynb 02_00_binary_irt_and_2pl.ipynb 02_01_activities.ipynb 03_00_beta4_and_claire.ipynb 03_01_extra_negative_disc.ipynb 03_02_activities.ipynb Notes Use the roadmap notebook to frame the workshop before the first section. Move directly from each guided notebook into the corresponding activity notebook. Keep 03_01_extra_negative_disc.ipynb as an extra analytical notebook rather than the main participant task. Notebook Links Open roadmap notebook"
+},
+
+{
+  "title": "Activity",
+  "eyebrow": "Activity Notebook",
+  "lead": "Participants create or adapt a clustering scenario and inspect how aggregate metrics can mask hard instances.",
+  "url": "/section-1-activity/",
+  "content": "Notebook Activity notebook: 01_01_activities.ipynb Goal: analyze a synthetic clustering scenario with a more instance-aware perspective What Participants Should Do create or adapt a toy clustering dataset; compare clustering models; inspect hard instances rather than relying only on summary metrics. Open activity notebook Back to section"
+},
+
+{
+  "title": "Answer",
+  "eyebrow": "Answer Notebook",
+  "lead": "This page is reserved for the worked answer of Section 1 and can be released after the participant activity window.",
+  "url": "/section-1-answer/",
+  "content": "This answer page is intentionally kept as a release-later page. You can enable or enrich it after the 30-minute activity window. Planned Notebook Answer notebook: 01_99_answer.ipynb Back to section"
+},
+
+{
+  "title": "Section 1",
+  "eyebrow": "Unsupervised Evaluation",
+  "lead": "Aggregate evaluation is useful, but it can hide that some instances are consistently harder than others.",
+  "url": "/section-1/",
+  "content": "Focus Toy clustering datasets Model comparison under unsupervised evaluation Why average metrics can hide instance-level structure Main Notebook Guided notebook: 01_00_unsupervised_evaluation_toy_problems.ipynb Role: introduce the problem and motivate instance difficulty Open guided notebook Go to activity"
+},
+
+{
+  "title": "Activity",
+  "eyebrow": "Activity Notebook",
+  "lead": "Participants manipulate difficulty and discrimination values and then interpret the resulting ICCs.",
+  "url": "/section-2-activity/",
+  "content": "Notebook Activity notebook: 02_01_activities.ipynb Goal: connect item parameters to the geometry of the curves What Participants Should Do change item difficulty; change item discrimination; compare ICC shapes and discuss what they mean. Open activity notebook Back to section"
+},
+
+{
+  "title": "Answer",
+  "eyebrow": "Answer Notebook",
+  "lead": "This page is reserved for the worked answer of Section 2 and can be released after the participant activity window.",
+  "url": "/section-2-answer/",
+  "content": "This answer page is intentionally kept as a release-later page. You can enable or enrich it after the 30-minute activity window. Planned Notebook Answer notebook: 02_99_answer.ipynb Back to section"
+},
+
+{
+  "title": "Section 2",
+  "eyebrow": "Binary IRT and 2PL",
+  "lead": "This section introduces the language of latent ability, item difficulty, discrimination, and ICC interpretation.",
+  "url": "/section-2/",
+  "content": "Focus Binary response modeling 1PL intuition 2PL-IRT ICC reading and interpretation Main Notebook Guided notebook: 02_00_binary_irt_and_2pl.ipynb Role: build intuition before the activity Open guided notebook Go to activity"
+},
+
+{
+  "title": "Activity",
+  "eyebrow": "Activity Notebook",
+  "lead": "Participants generate a synthetic dataset, build the response matrix, train Beta4-IRT, inspect abilities and item parameters, and generate ICCs.",
+  "url": "/section-3-activity/",
+  "content": "Notebook Activity notebook: 03_02_activities.ipynb Goal: inspect the individual item and connect the practical workflow back to the theory What Participants Should Do generate a synthetic dataset; produce the response matrix; fit the Beta4 model; inspect ability, difficulty, discrimination, and ICCs. Open activity notebook Back to section"
+},
+
+{
+  "title": "Answer",
+  "eyebrow": "Answer Notebook",
+  "lead": "This page is reserved for the worked answer of Section 3 and can be released after the participant activity window.",
+  "url": "/section-3-answer/",
+  "content": "This answer page is intentionally kept as a release-later page. You can enable or enrich it after the 30-minute activity window. Planned Notebook Answer notebook: 03_99_answer.ipynb Back to section"
+},
+
+{
+  "title": "Extra",
+  "eyebrow": "Negative Discrimination",
+  "lead": "A separate analytical notebook used to inspect, in a more controlled setting, how negative discrimination can emerge.",
+  "url": "/section-3-extra/",
+  "content": "Extra Notebook Extra notebook: 03_01_extra_negative_disc.ipynb Role: support deeper discussion, not the default participant task Open extra notebook Back to section"
+},
+
+{
+  "title": "Section 3",
+  "eyebrow": "Beta4-IRT and CLAIRE",
+  "lead": "The final section connects the workshop to the research framing of bounded latent variables and agreement-based evaluation.",
+  "url": "/section-3/",
+  "content": "Focus Beta4-IRT agreement-based response matrices model abilities item difficulties and discriminations CLAIRE-style analysis Main Notebook Guided notebook: 03_00_beta4_and_claire.ipynb Role: explain the workflow before the main activity Open guided notebook Go to activity"
+}
+
+]
