@@ -22,12 +22,26 @@
 
         <nav class="sidebar-nav" aria-label="Workshop navigation">
           {% for item in site.data.navigation %}
-          <a
-            href="{{ item.url | relative_url }}"
-            class="nav-link{% if page.url == item.url %} active{% endif %}"
-          >
-            {{ item.title }}
-          </a>
+          <div class="nav-group">
+            <a
+              href="{{ item.url | relative_url }}"
+              class="nav-link{% if page.url == item.url %} active{% endif %}"
+            >
+              {{ item.title }}
+            </a>
+            {% if item.children %}
+            <div class="nav-children">
+              {% for child in item.children %}
+              <a
+                href="{{ child.url | relative_url }}"
+                class="nav-sublink{% if page.url == child.url %} active{% endif %}"
+              >
+                {{ child.title }}
+              </a>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </div>
           {% endfor %}
         </nav>
       </aside>

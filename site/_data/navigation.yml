@@ -1,18 +1,31 @@
 - title: Home
   url: /
+- title: README
+  url: /readme/
 - title: Roadmap
   url: /roadmap/
 - title: Section 1
   url: /section-1/
-- title: Section 1 Activity
-  url: /section-1-activity/
+  children:
+    - title: Activity
+      url: /section-1-activity/
+    - title: Answer
+      url: /section-1-answer/
 - title: Section 2
   url: /section-2/
-- title: Section 2 Activity
-  url: /section-2-activity/
+  children:
+    - title: Activity
+      url: /section-2-activity/
+    - title: Answer
+      url: /section-2-answer/
 - title: Section 3
   url: /section-3/
-- title: Section 3 Extra
-  url: /section-3-extra/
-- title: Section 3 Activity
-  url: /section-3-activity/
+  children:
+    - title: Extra
+      url: /section-3-extra/
+    - title: Activity
+      url: /section-3-activity/
+    - title: Answer
+      url: /section-3-answer/
+- title: Contact Me
+  url: /contact/

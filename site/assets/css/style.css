@@ -72,6 +72,12 @@ a:hover {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+}
+
+.nav-group {
+  display: flex;
+  flex-direction: column;
   gap: 6px;
 }
 
@@ -91,6 +97,31 @@ a:hover {
   background: var(--panel);
   color: var(--accent);
   box-shadow: 0 8px 24px rgba(25, 25, 25, 0.08);
+}
+
+.nav-children {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-left: 14px;
+}
+
+.nav-sublink {
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.nav-sublink:hover {
+  background: rgba(171, 35, 48, 0.08);
+  text-decoration: none;
+}
+
+.nav-sublink.active {
+  background: rgba(255, 255, 255, 0.8);
+  color: var(--accent);
 }
 
 .content {
@@ -190,6 +221,14 @@ ol {
 .meta {
   color: var(--muted);
   font-size: 0.96rem;
+}
+
+.notice {
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: #fff7ea;
+  border: 1px solid #ead6ac;
+  color: #5b4b2d;
 }
 
 code {

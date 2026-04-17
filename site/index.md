@@ -51,3 +51,11 @@ Total estimated duration: `3 hours`.
 - Roadmap notebook: [00_workshop_roadmap.ipynb]({{ site.repo_url }}/blob/main/notebooks/00_workshop_roadmap.ipynb)
 - Portuguese script: [99_script_portuguese.md]({{ site.repo_url }}/blob/main/docs/text/99_script_portuguese.md)
 - English script: [99_script_english.md]({{ site.repo_url }}/blob/main/docs/text/99_script_english.md)
+
+## README
+
+The repository README is also available through the site navigation, so participants can access the workshop guide without leaving the website.
+
+<div class="button-row">
+  <a class="button secondary" href="{{ '/readme/' | relative_url }}">Open README page</a>
+</div>
