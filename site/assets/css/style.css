@@ -283,6 +283,11 @@ ol {
   text-align: left;
 }
 
+.sidebar-footer-dot {
+  font-size: 0.5em;
+  vertical-align: middle;
+}
+
 code {
   background: #f1ece3;
   padding: 2px 6px;
