@@ -355,11 +355,11 @@ img {
 }
 
 .corner-logo-ufpe {
-  width: 76px;
+  width: 92px;
 }
 
 .corner-logo-kunumi {
-  width: 104px;
+  width: 124px;
   transform: translateY(5px);
 }
 
@@ -386,11 +386,11 @@ img {
   }
 
   .corner-logo-ufpe {
-    width: 58px;
+    width: 72px;
   }
 
   .corner-logo-kunumi {
-    width: 82px;
+    width: 98px;
     transform: translateY(3px);
   }
 }
