@@ -168,9 +168,9 @@ a:hover {
 }
 
 .page-search {
-  position: absolute;
-  top: 28px;
-  right: 32px;
+  position: fixed;
+  top: 26px;
+  right: 34px;
   z-index: 20;
 }
 
@@ -221,11 +221,41 @@ a:hover {
   transition: width 220ms ease, opacity 180ms ease, padding 220ms ease, margin 220ms ease;
 }
 
+.page-search-clear {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #35518e;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.page-search-clear svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
 .page-search:hover .page-search-input,
 .page-search:focus-within .page-search-input {
-  width: 260px;
+  width: 340px;
   opacity: 1;
   pointer-events: auto;
+}
+
+.page-search:hover .page-search-clear,
+.page-search:focus-within .page-search-clear {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
 }
 
 .page-search-input::placeholder {
@@ -235,6 +265,18 @@ a:hover {
 .page-search-input:focus {
   outline: 2px solid rgba(171, 35, 48, 0.22);
   outline-offset: 0;
+}
+
+.page-search-highlight {
+  background: #f4dd77;
+  color: var(--ink);
+  padding: 0.04em 0.08em;
+  border-radius: 0.2em;
+}
+
+.page-search-highlight.active {
+  background: #f0b32d;
+  box-shadow: 0 0 0 2px rgba(171, 35, 48, 0.14);
 }
 
 .eyebrow {
@@ -463,6 +505,12 @@ img {
     width: 220px;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  .page-search-clear {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
   }
 
   .corner-logos {

@@ -19,7 +19,7 @@
             />
           </a>
           <div class="sidebar-title">Latent Ability ML</div>
-          <div class="sidebar-subtitle">Workshop Notes and Notebooks</div>
+          <div class="sidebar-subtitle">Latent-Ability Evaluation in Machine Learning</div>
         </div>
 
         <nav class="sidebar-nav" aria-label="Workshop navigation">
@@ -228,6 +228,13 @@
               placeholder="Search this page"
               aria-label="Search this page"
             />
+            <button class="page-search-clear" type="button" id="page-search-clear" aria-label="Clear search">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M18.3 5.71 12 12l6.3 6.29-1.42 1.42L10.59 13.4 4.29 19.7 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3Z"
+                />
+              </svg>
+            </button>
           </form>
         </div>
         
@@ -273,38 +280,122 @@
       (() => {
         const input = document.getElementById("page-search-input");
         const button = document.getElementById("page-search-button");
-        if (!input || !button) return;
+        const clearButton = document.getElementById("page-search-clear");
+        const content = document.querySelector(".content");
+        if (!input || !button || !clearButton || !content) return;
 
-        let lastQuery = "";
+        let matches = [];
+        let activeIndex = -1;
 
-        const runSearch = () => {
-          const query = input.value.trim();
+        const clearMarks = () => {
+          matches.forEach((mark) => {
+            const parent = mark.parentNode;
+            if (!parent) return;
+            parent.replaceChild(document.createTextNode(mark.textContent || ""), mark);
+            parent.normalize();
+          });
+          matches = [];
+          activeIndex = -1;
+        };
+
+        const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const shouldSkipNode = (node) => {
+          const parentElement = node.parentElement;
+          if (!parentElement) return true;
+          return Boolean(
+            parentElement.closest(".page-search") ||
+              parentElement.closest("script") ||
+              parentElement.closest("style") ||
+              parentElement.closest("mark")
+          );
+        };
+
+        const highlightQuery = (query) => {
+          clearMarks();
           if (!query) return;
 
-          const sameQuery = query === lastQuery;
-          lastQuery = query;
+          const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+              if (!node.nodeValue || !node.nodeValue.trim() || shouldSkipNode(node)) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              return node.nodeValue.toLowerCase().includes(query.toLowerCase())
+                ? NodeFilter.FILTER_ACCEPT
+                : NodeFilter.FILTER_REJECT;
+            },
+          });
 
-          if (typeof window.find === "function") {
-            const found = window.find(query, false, !sameQuery, true, false, false, false);
-            if (found) return;
-            window.find(query, false, false, true, false, false, false);
+          const textNodes = [];
+          while (walker.nextNode()) {
+            textNodes.push(walker.currentNode);
           }
+
+          const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
+
+          textNodes.forEach((node) => {
+            const parent = node.parentNode;
+            if (!parent) return;
+
+            const fragment = document.createDocumentFragment();
+            const parts = node.nodeValue.split(regex);
+
+            if (parts.length === 1) return;
+
+            parts.forEach((part) => {
+              if (!part) return;
+              if (part.toLowerCase() === query.toLowerCase()) {
+                const mark = document.createElement("mark");
+                mark.className = "page-search-highlight";
+                mark.textContent = part;
+                fragment.appendChild(mark);
+                matches.push(mark);
+              } else {
+                fragment.appendChild(document.createTextNode(part));
+              }
+            });
+
+            parent.replaceChild(fragment, node);
+          });
+
+          if (matches.length) {
+            activeIndex = 0;
+            matches[0].classList.add("active");
+            matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        };
+
+        const activateMatch = (index) => {
+          if (!matches.length) return;
+          matches.forEach((mark) => mark.classList.remove("active"));
+          activeIndex = ((index % matches.length) + matches.length) % matches.length;
+          matches[activeIndex].classList.add("active");
+          matches[activeIndex].scrollIntoView({ behavior: "smooth", block: "center" });
         };
 
         button.addEventListener("click", () => {
           input.focus();
-          runSearch();
+        });
+
+        clearButton.addEventListener("click", () => {
+          input.value = "";
+          clearMarks();
+          input.focus();
+        });
+
+        input.addEventListener("input", () => {
+          highlightQuery(input.value.trim());
         });
 
         input.addEventListener("keydown", (event) => {
           if (event.key === "Enter") {
             event.preventDefault();
-            runSearch();
+            activateMatch(activeIndex + 1);
           }
           if (event.key === "Escape") {
             input.value = "";
+            clearMarks();
             input.blur();
-            lastQuery = "";
           }
         });
       })();
