@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Guide
-eyebrow: Workshop Guide
+eyebrow: Guide
 lead: A direct page for the workshop guide, bringing the main repository context into the site navigation.
 permalink: /readme/
 ---
