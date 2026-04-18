@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: latent-ability-runtime
+    env: python
+    plan: starter
+    buildCommand: |
+      pip install poetry
+      poetry install --no-interaction --no-root
+    startCommand: poetry run python tools/notebook_runtime_server.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.16
+      - key: NOTEBOOK_RUNTIME_HOST
+        value: 0.0.0.0

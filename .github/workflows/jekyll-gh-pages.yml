@@ -25,17 +25,31 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    env:
+      RUNTIME_API_URL: ${{ vars.RUNTIME_API_URL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Pages
         uses: actions/configure-pages@v5
+      - name: Write runtime config
+        run: |
+          if [ -n "$RUNTIME_API_URL" ]; then
+            cat > site/_config.runtime.yml <<EOF
+          runtime_api_urls:
+            - "$RUNTIME_API_URL"
+          EOF
+          else
+            cat > site/_config.runtime.yml <<EOF
+          runtime_api_urls: []
+          EOF
+          fi
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
           source: ./site
           destination: ./_site
-          config: ./site/_config.yml,./site/_config.prod.yml
+          config: ./site/_config.yml,./site/_config.prod.yml,./site/_config.runtime.yml
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 

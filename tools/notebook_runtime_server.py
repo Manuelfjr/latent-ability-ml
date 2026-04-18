@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import sys
 import traceback
 from contextlib import redirect_stderr, redirect_stdout
@@ -20,8 +21,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
-HOST = "127.0.0.1"
-PORT = 8765
+HOST = os.getenv("NOTEBOOK_RUNTIME_HOST", "0.0.0.0")
+PORT = int(os.getenv("PORT", os.getenv("NOTEBOOK_RUNTIME_PORT", "8765")))
 SESSIONS: dict[str, dict[str, Any]] = {}
 
 
@@ -72,11 +73,11 @@ class NotebookRuntimeHandler(BaseHTTPRequestHandler):
         self._set_headers(status=204)
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/health":
+        if self.path in {"/", "/health"}:
             self._write_json(
                 {
                     "ok": True,
-                    "mode": "local-poetry",
+                    "mode": "poetry-runtime",
                     "python": sys.version.split()[0],
                     "birt_available": _birt_available(),
                 }
@@ -132,7 +133,7 @@ class NotebookRuntimeHandler(BaseHTTPRequestHandler):
                 "stderr": stderr_buffer.getvalue(),
                 "figures": figures,
                 "birt_available": _birt_available(),
-                "mode": "local-poetry",
+                "mode": "poetry-runtime",
             }
         )
 
