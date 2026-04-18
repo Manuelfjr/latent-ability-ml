@@ -17,13 +17,20 @@
     <div class="site-shell">
       <aside class="sidebar">
         <div class="sidebar-brand">
-          <a href="https://www.bristol.ac.uk/" target="_blank" rel="noreferrer">
-            <img
-              src="/assets/icon_bristol.png"
-              alt="University of Bristol"
-              class="sidebar-logo"
-            />
-          </a>
+          <div class="sidebar-brand-top">
+            <a href="https://www.bristol.ac.uk/" target="_blank" rel="noreferrer">
+              <img
+                src="/assets/icon_bristol.png"
+                alt="University of Bristol"
+                class="sidebar-logo"
+              />
+            </a>
+            <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
           <div class="sidebar-title">Latent Ability</div>
           <div class="sidebar-subtitle">Latent-Ability Evaluation in Machine Learning</div>
         </div>
@@ -291,6 +298,26 @@
     </div>
     <script>
       (() => {
+        const siteShell = document.querySelector(".site-shell");
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebarStorageKey = "latent-ability-sidebar-collapsed";
+
+        if (siteShell && sidebarToggle && window.matchMedia("(min-width: 961px)").matches) {
+          const applySidebarState = (collapsed) => {
+            siteShell.classList.toggle("sidebar-collapsed", collapsed);
+            sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+            sidebarToggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+          };
+
+          applySidebarState(window.localStorage.getItem(sidebarStorageKey) === "true");
+
+          sidebarToggle.addEventListener("click", () => {
+            const collapsed = !siteShell.classList.contains("sidebar-collapsed");
+            applySidebarState(collapsed);
+            window.localStorage.setItem(sidebarStorageKey, String(collapsed));
+          });
+        }
+
         const input = document.getElementById("page-search-input");
         const button = document.getElementById("page-search-button");
         const clearButton = document.getElementById("page-search-clear");
