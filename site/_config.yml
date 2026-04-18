@@ -1,8 +1,9 @@
 title: Latent Ability
 description: Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning.
-baseurl: "/latent-ability-ml"
-url: "https://manuelfjr.github.io"
+baseurl: ""
+url: ""
 markdown: kramdown
 theme: null
 permalink: pretty
 repo_url: https://github.com/manuelfjr/latent-ability-ml
+runtime_api_urls: []

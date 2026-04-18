@@ -6,18 +6,847 @@ lead: Participants create or adapt a clustering scenario and inspect how aggrega
 permalink: /section-1-activity/
 ---
 
-## Notebook
+## Interactive Activity
 
-- Activity notebook: `01_01_activities.ipynb`
-- Goal: analyze a synthetic clustering scenario with a more instance-aware perspective
+This pilot turns `01_01_activities.ipynb` into an in-site activity. Participants can switch scenarios, inspect the model summaries, identify hard instances, and write their answers directly on the page. The plots at the top are guided examples, but the coding task can also be used to create a custom dataset from scratch.
 
-## What Participants Should Do
-
-- create or adapt a toy clustering dataset;
-- compare clustering models;
-- inspect hard instances rather than relying only on summary metrics.
-
-<div class="button-row">
-  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_01_activities.ipynb">Open activity notebook</a>
-  <a class="button secondary" href="{{ '/section-1/' | relative_url }}">Back to section</a>
+<div class="notice">
+  This first version keeps the workshop logic from the notebook, but packages the outputs into an interactive site experience. Responses are stored locally in the browser so participants can work without leaving the page.
 </div>
+
+<div
+  class="activity-lab"
+  data-activity-lab
+  data-activity-source="{{ '/assets/data/section-1-activity.json' | relative_url }}"
+  data-storage-key="latent-ability-section-1-activity"
+  data-runtime-api-urls='{{ site.runtime_api_urls | jsonify | escape }}'
+>
+  <div class="activity-lab__header">
+    <div>
+      <p class="activity-lab__eyebrow">Pilot Notebook</p>
+      <h2>Unsupervised evaluation beyond aggregate metrics</h2>
+      <p class="meta">Use the scenarios below as guided examples for model-level comparison and the agreement-based instance difficulty view, or create your own dataset in Task 1.</p>
+    </div>
+    <div class="button-row">
+      <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_01_activities.ipynb">Open original notebook</a>
+      <a class="button secondary" href="{{ '/section-1/' | relative_url }}">Back to section</a>
+    </div>
+  </div>
+
+  <div class="activity-lab__controls">
+    <label class="activity-lab__control">
+      <span>Scenario</span>
+      <select data-scenario-select>
+        <option value="easy_blobs">Easy blobs</option>
+        <option value="hard_moons">Hard moons</option>
+        <option value="hard_circles">Hard circles</option>
+      </select>
+    </label>
+
+    <div class="activity-lab__helper" data-scenario-summary>
+      Select an example scenario to render the dataset, compare clustering models, and inspect where disagreement concentrates. You may also ignore the example and create your own dataset in the coding area below.
+    </div>
+  </div>
+
+  <div class="activity-lab__grid">
+    <section class="activity-panel">
+      <div class="activity-panel__heading">
+        <div>
+          <p class="activity-panel__eyebrow">Task 1</p>
+          <h3>Example dataset view</h3>
+        </div>
+        <span class="activity-panel__meta">A guided example for teaching support, or a starting point for your own dataset</span>
+      </div>
+      <div class="activity-plot" data-dataset-plot></div>
+      <p class="activity-panel__note">Each point is colored by the latent group used to build the synthetic scenario. You can use this example directly or create a different dataset in Task 1.</p>
+    </section>
+
+    <section class="activity-panel">
+      <div class="activity-panel__heading">
+        <div>
+          <p class="activity-panel__eyebrow">Task 2</p>
+          <h3>Aggregate metrics</h3>
+        </div>
+        <span class="activity-panel__meta">Compare ranking changes across scenarios</span>
+      </div>
+      <div class="activity-table-wrap">
+        <table class="activity-table">
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>ARI</th>
+              <th>Silhouette</th>
+              <th>Calinski-Harabasz</th>
+              <th>Davies-Bouldin</th>
+            </tr>
+          </thead>
+          <tbody data-metrics-table></tbody>
+        </table>
+      </div>
+      <p class="activity-panel__note" data-metrics-summary></p>
+    </section>
+
+    <section class="activity-panel">
+      <div class="activity-panel__heading">
+        <div>
+          <p class="activity-panel__eyebrow">Task 3</p>
+          <h3>Instance difficulty</h3>
+        </div>
+        <span class="activity-panel__meta">Agreement-based proxy from the notebook utilities</span>
+      </div>
+      <div class="activity-plot" data-difficulty-plot></div>
+      <p class="activity-panel__note" data-difficulty-summary></p>
+    </section>
+
+    <section class="activity-panel activity-panel--coding">
+      <div class="activity-panel__heading">
+        <div>
+          <p class="activity-panel__eyebrow">Notebook Mode</p>
+          <h3>Executable code cells</h3>
+        </div>
+        <span class="activity-panel__meta">Python runs in the browser so participants can code inside the site itself</span>
+      </div>
+
+      <div class="notice">
+        The published site runs safely in browser mode by default, while local development can additionally connect to a Poetry runtime bridge when available. Participants can edit the starter code, split cells, add new ones, and use the currently selected example scenario through helper variables such as <code>dataset</code>, <code>metrics</code>, and <code>difficulty</code>. They can also ignore the example and create their own dataset directly in the code cells. For the full workshop environment, including <code>birt-gd</code>, run <code>poetry run python tools/notebook_runtime_server.py</code> in the project root before opening the page locally.
+      </div>
+
+      <div class="runtime-status" data-runtime-status>
+        Python runtime idle. Run any cell to initialize it.
+      </div>
+
+      <div class="code-lab__toolbar">
+        <button type="button" class="button" data-add-cell>Add cell</button>
+        <p class="meta">Use <code>Shift+Enter</code> to run the current cell. Use <code>Split</code> to break a cell at the cursor position.</p>
+      </div>
+
+      <div class="code-lab" data-code-lab>
+        <article class="code-cell code-cell--template" data-initial-code-cell data-cell-label="Task 1" data-cell-title="Inspect the example dataset or create your own">
+          <textarea data-code-template hidden># you can use the dataset in the example using `dataset` object
+# answer</textarea>
+        </article>
+
+        <article class="code-cell code-cell--template" data-initial-code-cell data-cell-label="Task 2" data-cell-title="Compare aggregate metrics">
+          <textarea data-code-template hidden># answer</textarea>
+        </article>
+
+        <article class="code-cell code-cell--template" data-initial-code-cell data-cell-label="Task 3" data-cell-title="Study difficult instances">
+          <textarea data-code-template hidden># answer</textarea>
+        </article>
+      </div>
+    </section>
+
+    <section class="activity-panel activity-panel--responses">
+      <div class="activity-panel__heading">
+        <div>
+          <p class="activity-panel__eyebrow">Participant Response</p>
+          <h3>Write your answers here</h3>
+        </div>
+        <button type="button" class="button ghost-button" data-reset-responses>Reset responses</button>
+      </div>
+
+      <div class="response-list">
+        <label class="response-field">
+          <span>1. Which scenario feels easiest or hardest under the aggregate metrics?</span>
+          <textarea data-response="metrics_takeaway" rows="4" placeholder="Write your comparison of the metrics and ranking here."></textarea>
+        </label>
+
+        <label class="response-field">
+          <span>2. Which model seems most sensitive to geometric difficulty in this scenario?</span>
+          <textarea data-response="model_takeaway" rows="4" placeholder="Explain which model changes the most and why."></textarea>
+        </label>
+
+        <label class="response-field">
+          <span>3. Where do the hard instances appear, and why would averages hide them?</span>
+          <textarea data-response="difficulty_takeaway" rows="5" placeholder="Describe the region where disagreement concentrates and connect it to the evaluation argument."></textarea>
+        </label>
+      </div>
+
+      <p class="meta" data-save-status>Responses are saved locally in this browser.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(() => {
+  const container = document.querySelector("[data-activity-lab]");
+  if (!container) return;
+
+  const select = container.querySelector("[data-scenario-select]");
+  const datasetPlot = container.querySelector("[data-dataset-plot]");
+  const difficultyPlot = container.querySelector("[data-difficulty-plot]");
+  const metricsTable = container.querySelector("[data-metrics-table]");
+  const metricsSummary = container.querySelector("[data-metrics-summary]");
+  const difficultySummary = container.querySelector("[data-difficulty-summary]");
+  const scenarioSummary = container.querySelector("[data-scenario-summary]");
+  const resetButton = container.querySelector("[data-reset-responses]");
+  const saveStatus = container.querySelector("[data-save-status]");
+  const runtimeStatus = container.querySelector("[data-runtime-status]");
+  const codeLab = container.querySelector("[data-code-lab]");
+  const addCellButton = container.querySelector("[data-add-cell]");
+  const storageKey = container.dataset.storageKey;
+  const codeSessionKey = `${storageKey}:code-cells-session`;
+  const runtimeSessionKey = `${storageKey}:runtime-session-id`;
+  const localRuntimeBases = (() => {
+    try {
+      const parsed = JSON.parse(container.dataset.runtimeApiUrls || "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+      return [];
+    }
+  })();
+  const source = container.dataset.activitySource;
+  const palette = ["#ab2330", "#35518e"];
+  let pyodideReady = null;
+  let aceReady = null;
+  let activeStdout = [];
+  let activeStderr = [];
+  let activityData = null;
+  let cellsState = [];
+  const editorRegistry = new Map();
+  let pendingFocusCellId = null;
+  let birtAvailable = false;
+  let localRuntimeAvailable = null;
+  let activeLocalRuntimeBase = null;
+  const runtimeSessionId = (() => {
+    const saved = window.sessionStorage.getItem(runtimeSessionKey);
+    if (saved) return saved;
+    const next = `runtime-${Math.random().toString(36).slice(2, 10)}`;
+    window.sessionStorage.setItem(runtimeSessionKey, next);
+    return next;
+  })();
+
+  const scenarioCopy = {
+    easy_blobs: "A clean baseline where all three models recover the same partition almost perfectly.",
+    hard_moons: "A curved geometry where the ranking depends on what the metric values reward.",
+    hard_circles: "A strong example of how aggregate clustering metrics can look reasonable even when the partition is wrong."
+  };
+
+  const modelLabels = {
+    agglomerative: "Agglomerative",
+    kmeans: "K-means",
+    spectral: "Spectral"
+  };
+
+  const formatNumber = (value, digits = 3) =>
+    typeof value === "number" && Number.isFinite(value) ? value.toFixed(digits) : "n/a";
+
+  const getRange = (points, key) => {
+    const values = points.map((point) => point[key]);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const pad = (max - min || 1) * 0.14;
+    return [min - pad, max + pad];
+  };
+
+  const scalePoint = (value, [min, max], size, padding) => {
+    return padding + ((value - min) / (max - min || 1)) * (size - padding * 2);
+  };
+
+  const buildScatter = ({ points, colorForPoint, title, legendMarkup = "" }) => {
+    const width = 520;
+    const height = 320;
+    const padding = 28;
+    const xRange = getRange(points, "x");
+    const yRange = getRange(points, "y");
+    const circles = points
+      .map((point) => {
+        const cx = scalePoint(point.x, xRange, width, padding);
+        const cy = height - scalePoint(point.y, yRange, height, padding);
+        const { fill, opacity = 0.9, radius = 5 } = colorForPoint(point);
+        return `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${radius}" fill="${fill}" fill-opacity="${opacity}" />`;
+      })
+      .join("");
+
+    return `
+      <div class="activity-plot__frame">
+        <div class="activity-plot__title">${title}</div>
+        <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${title}">
+          <rect x="0" y="0" width="${width}" height="${height}" rx="18" fill="#fffdfa"></rect>
+          <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#d7cebf" stroke-width="1" />
+          <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#d7cebf" stroke-width="1" />
+          ${circles}
+        </svg>
+        ${legendMarkup}
+      </div>
+    `;
+  };
+
+  const loadResponses = () => {
+    try {
+      return JSON.parse(window.localStorage.getItem(storageKey) || "{}");
+    } catch (error) {
+      return {};
+    }
+  };
+
+  const persistResponses = () => {
+    const payload = {};
+    container.querySelectorAll("[data-response]").forEach((field) => {
+      payload[field.dataset.response] = field.value;
+    });
+    window.localStorage.setItem(storageKey, JSON.stringify(payload));
+    saveStatus.textContent = "Responses saved in this browser.";
+  };
+
+  const escapeHtml = (value) =>
+    value
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+  const createId = () => `cell-${Math.random().toString(36).slice(2, 10)}`;
+
+  const getDefaultCells = () =>
+    [...container.querySelectorAll("[data-initial-code-cell]")].map((cell, index) => {
+      const template = cell.querySelector("[data-code-template]").value;
+      return {
+        id: `seed-${index + 1}`,
+        label: cell.dataset.cellLabel || `Cell ${index + 1}`,
+        title: cell.dataset.cellTitle || "Code cell",
+        template,
+        code: template,
+        output: "Output will appear here.",
+      };
+    });
+
+  const saveCodeCells = () => {
+    window.sessionStorage.setItem(codeSessionKey, JSON.stringify(cellsState));
+  };
+
+  const loadCodeCells = () => {
+    try {
+      const saved = JSON.parse(window.sessionStorage.getItem(codeSessionKey) || "null");
+      cellsState = Array.isArray(saved) && saved.length ? saved : getDefaultCells();
+    } catch (error) {
+      cellsState = getDefaultCells();
+    }
+  };
+
+  const loadExternalScript = (src) =>
+    new Promise((resolve, reject) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) {
+        if (window.loadPyodide) {
+          resolve();
+          return;
+        }
+        existing.addEventListener("load", () => resolve(), { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve();
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+
+  const ensureAce = async () => {
+    if (aceReady) return aceReady;
+    aceReady = (async () => {
+      await loadExternalScript("https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ace.js");
+      await loadExternalScript("https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.6/ext-language_tools.min.js");
+      return window.ace;
+    })();
+    return aceReady;
+  };
+
+  const checkLocalRuntime = async () => {
+    if (localRuntimeAvailable === true && activeLocalRuntimeBase) return true;
+
+    for (const base of localRuntimeBases) {
+      try {
+        const response = await fetch(`${base}/health`, { method: "GET" });
+        if (!response.ok) throw new Error("health check failed");
+        const payload = await response.json();
+        localRuntimeAvailable = Boolean(payload.ok);
+        activeLocalRuntimeBase = base;
+        birtAvailable = Boolean(payload.birt_available);
+        return localRuntimeAvailable;
+      } catch (error) {
+        continue;
+      }
+    }
+
+    localRuntimeAvailable = false;
+    activeLocalRuntimeBase = null;
+    return localRuntimeAvailable;
+  };
+
+  const updateEditorHeight = (editor) => {
+    const minHeight = 120;
+    const maxHeight = 520;
+    const lineHeight = editor.renderer.lineHeight || 19;
+    const nextHeight = Math.min(
+      maxHeight,
+      Math.max(minHeight, editor.session.getScreenLength() * lineHeight + 24)
+    );
+    editor.container.style.height = `${nextHeight}px`;
+    editor.resize();
+  };
+
+  const executeCellLocal = async (cell) => {
+    if (!activeLocalRuntimeBase) {
+      throw new Error("Local runtime endpoint is not available.");
+    }
+
+    const response = await fetch(`${activeLocalRuntimeBase}/execute`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        session_id: runtimeSessionId,
+        prelude: getPythonPrelude(),
+        code: cell.code,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Local runtime request failed.");
+    }
+
+    const payload = await response.json();
+    birtAvailable = Boolean(payload.birt_available);
+    return {
+      mode: "local-poetry",
+      stdout: payload.stdout || "",
+      stderr: payload.stderr || "",
+      figures: payload.figures || [],
+      ok: Boolean(payload.ok),
+    };
+  };
+
+  const ensurePyodide = async () => {
+    if (pyodideReady) return pyodideReady;
+
+    runtimeStatus.textContent = "Loading Python runtime in the browser...";
+    pyodideReady = (async () => {
+      await loadExternalScript("https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js");
+      const pyodide = await window.loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.5/full/",
+        stdout: (msg) => activeStdout.push(msg),
+        stderr: (msg) => activeStderr.push(msg),
+      });
+      runtimeStatus.textContent = "Loading browser Python packages: numpy, pandas, matplotlib, scipy, scikit-learn, seaborn...";
+      await pyodide.loadPackage(["micropip", "numpy", "pandas", "matplotlib", "scipy", "scikit-learn"]);
+      try {
+        await pyodide.loadPackage(["seaborn"]);
+      } catch (error) {
+        await pyodide.runPythonAsync(`
+import micropip
+await micropip.install("seaborn")
+        `);
+      }
+      birtAvailable = false;
+      await pyodide.runPythonAsync(`
+import matplotlib
+matplotlib.use("AGG")
+      `);
+      runtimeStatus.textContent = "Python runtime ready with browser packages. The deployed site uses this mode by default; start the local Poetry runtime if you need birt-gd.";
+      return pyodide;
+    })();
+
+    return pyodideReady;
+  };
+
+  const getPythonPrelude = () => `
+import json
+from math import *
+
+activity_data = json.loads(${JSON.stringify(JSON.stringify(activityData || {}))})
+scenario_name = ${JSON.stringify(select.value)}
+scenario = activity_data[scenario_name]
+dataset = scenario["dataset"]
+metrics = scenario["metrics"]
+difficulty = scenario["difficulty"]
+birt_available = ${birtAvailable ? "True" : "False"}
+
+def current_scenario_key():
+    return scenario_name
+
+def current_scenario():
+    return scenario
+`;
+
+  const renderOutput = (outputElement, text, figures = []) => {
+    outputElement.innerHTML = `
+      <div class="code-cell__output-text">${escapeHtml(text || "Cell executed with no printed output.")}</div>
+      ${figures.map((svg) => `<div class="code-cell__figure">${svg}</div>`).join("")}
+    `;
+  };
+
+  const normalizeRuntimeError = (error) => {
+    const message = error?.message || String(error);
+
+    if (message.includes("No module named 'birt'")) {
+      return localRuntimeBases.length
+        ? "The `birt` package is only available through the Poetry runtime bridge. On this local setup, start `poetry run python tools/notebook_runtime_server.py` and run the cell again."
+        : "The `birt` package is not available in the published browser-only version of the workshop. To use `birt` and `birt-gd`, run the site locally together with the Poetry runtime bridge.";
+    }
+
+    return message;
+  };
+
+  const collectFigures = async (pyodide) => {
+    const payload = await pyodide.runPythonAsync(`
+import io
+import json
+
+figures = []
+try:
+    import matplotlib.pyplot as plt
+    for figure_id in plt.get_fignums():
+        fig = plt.figure(figure_id)
+        buffer = io.StringIO()
+        fig.savefig(buffer, format="svg", bbox_inches="tight")
+        figures.append(buffer.getvalue())
+    plt.close("all")
+except Exception:
+    figures = []
+
+json.dumps(figures)
+    `);
+    return JSON.parse(payload);
+  };
+
+  const getEditor = (cellId) => editorRegistry.get(cellId);
+
+  const syncCellCode = (cellId) => {
+    const editor = getEditor(cellId);
+    const cell = cellsState.find((item) => item.id === cellId);
+    if (!editor || !cell) return;
+    cell.code = editor.getValue();
+    saveCodeCells();
+  };
+
+  const executeCell = async (cellId) => {
+    const cell = cellsState.find((item) => item.id === cellId);
+    const cellElement = codeLab.querySelector(`[data-code-id="${cellId}"]`);
+    const outputElement = cellElement?.querySelector("[data-code-output]");
+    const runButton = cellElement?.querySelector("[data-run-code]");
+    const editor = getEditor(cellId);
+
+    if (!cell || !outputElement || !runButton || !editor) return;
+
+    if (!activityData) {
+      renderOutput(outputElement, "Activity data not loaded yet.");
+      return;
+    }
+
+    syncCellCode(cellId);
+    runButton.disabled = true;
+    renderOutput(outputElement, "Running...");
+    activeStdout = [];
+    activeStderr = [];
+
+    try {
+      if (await checkLocalRuntime()) {
+        const payload = await executeCellLocal(cell);
+        const chunks = [];
+        if (payload.stdout) chunks.push(payload.stdout.trimEnd());
+        if (payload.stderr) chunks.push(payload.stderr.trimEnd());
+        cell.output = chunks.join("\n\n") || "Cell executed with no printed output.";
+        renderOutput(outputElement, cell.output, payload.figures);
+        runtimeStatus.textContent = birtAvailable
+          ? "Connected to the local Poetry runtime. Full workshop environment, including birt-gd, is available."
+          : "Connected to the local Poetry runtime, but birt-gd could not be imported there.";
+      } else {
+        const pyodide = await ensurePyodide();
+        const result = await pyodide.runPythonAsync(`${getPythonPrelude()}\n${cell.code}`);
+        const chunks = [];
+        if (activeStdout.length) chunks.push(activeStdout.join("\n"));
+        if (result !== undefined && result !== null) chunks.push(String(result));
+        if (activeStderr.length) chunks.push(activeStderr.join("\n"));
+        const figures = await collectFigures(pyodide);
+        cell.output = chunks.join("\n\n") || "Cell executed with no printed output.";
+        renderOutput(outputElement, cell.output, figures);
+        runtimeStatus.textContent = "Python runtime ready in browser mode. On the deployed site this is expected; locally, start the Poetry runtime bridge if you need birt-gd.";
+      }
+    } catch (error) {
+      localRuntimeAvailable = null;
+      cell.output = normalizeRuntimeError(error);
+      renderOutput(outputElement, cell.output);
+      runtimeStatus.textContent = "The selected runtime raised an error. If you are working locally and need birt-gd, make sure the Poetry runtime bridge is running.";
+    } finally {
+      runButton.disabled = false;
+      saveCodeCells();
+    }
+  };
+
+  const buildCellMarkup = (cell) => `
+    <article class="code-cell" data-code-id="${cell.id}">
+      <div class="code-cell__header">
+        <div>
+          <p class="activity-panel__eyebrow">${cell.label}</p>
+          <h4>${cell.title}</h4>
+        </div>
+        <div class="code-cell__actions">
+          <button type="button" class="button ghost-button" data-split-cell>Split</button>
+          <button type="button" class="button ghost-button" data-add-below>Add below</button>
+          <button type="button" class="button ghost-button" data-duplicate-cell>Duplicate</button>
+          <button type="button" class="button ghost-button" data-reset-code>Reset</button>
+          <button type="button" class="button ghost-button" data-delete-cell>Delete</button>
+          <button type="button" class="button" data-run-code>Run cell</button>
+        </div>
+      </div>
+      <div class="code-cell__editor-wrap">
+        <div class="code-cell__editor" data-code-editor></div>
+      </div>
+      <div class="code-cell__output" data-code-output></div>
+    </article>
+  `;
+
+  const initializeEditors = async () => {
+    const ace = await ensureAce();
+
+    editorRegistry.forEach((editor) => editor.destroy());
+    editorRegistry.clear();
+
+    cellsState.forEach((cell) => {
+      const cellElement = codeLab.querySelector(`[data-code-id="${cell.id}"]`);
+      const editorElement = cellElement?.querySelector("[data-code-editor]");
+      const outputElement = cellElement?.querySelector("[data-code-output]");
+      if (!cellElement || !editorElement || !outputElement) return;
+
+      const editor = ace.edit(editorElement);
+      editor.setTheme("ace/theme/one_dark");
+      editor.session.setMode("ace/mode/python");
+      editor.setValue(cell.code, -1);
+      editor.setOptions({
+        fontSize: "15px",
+        useSoftTabs: true,
+        tabSize: 4,
+        wrap: true,
+        showPrintMargin: false,
+        enableBasicAutocompletion: true,
+        enableLiveAutocompletion: true,
+      });
+      updateEditorHeight(editor);
+      editor.session.on("change", () => {
+        updateEditorHeight(editor);
+        syncCellCode(cell.id);
+      });
+      editor.commands.addCommand({
+        name: "runCell",
+        bindKey: { win: "Shift-Enter", mac: "Shift-Enter" },
+        exec: () => executeCell(cell.id),
+      });
+
+      editorRegistry.set(cell.id, editor);
+      renderOutput(outputElement, cell.output || "Output will appear here.");
+    });
+
+    if (pendingFocusCellId) {
+      const focused = getEditor(pendingFocusCellId);
+      if (focused) focused.focus();
+      pendingFocusCellId = null;
+    }
+  };
+
+  const renderCodeCells = () => {
+    codeLab.innerHTML = cellsState.map(buildCellMarkup).join("");
+
+    codeLab.querySelectorAll("[data-code-id]").forEach((cellElement) => {
+      const cellId = cellElement.dataset.codeId;
+      const index = cellsState.findIndex((item) => item.id === cellId);
+
+      cellElement.querySelector("[data-run-code]").addEventListener("click", () => executeCell(cellId));
+      cellElement.querySelector("[data-reset-code]").addEventListener("click", () => {
+        const cell = cellsState[index];
+        if (!cell) return;
+        cell.code = cell.template;
+        cell.output = "Output will appear here.";
+        saveCodeCells();
+        pendingFocusCellId = cellId;
+        renderCodeCells();
+      });
+      cellElement.querySelector("[data-add-below]").addEventListener("click", () => {
+        const newCell = {
+          id: createId(),
+          label: "Code cell",
+          title: "New code cell",
+          template: "# write your code here\n",
+          code: "# write your code here\n",
+          output: "Output will appear here.",
+        };
+        cellsState.splice(index + 1, 0, newCell);
+        saveCodeCells();
+        pendingFocusCellId = newCell.id;
+        renderCodeCells();
+      });
+      cellElement.querySelector("[data-duplicate-cell]").addEventListener("click", () => {
+        const cell = cellsState[index];
+        if (!cell) return;
+        const clone = {
+          ...cell,
+          id: createId(),
+          output: "Output will appear here.",
+        };
+        cellsState.splice(index + 1, 0, clone);
+        saveCodeCells();
+        pendingFocusCellId = clone.id;
+        renderCodeCells();
+      });
+      cellElement.querySelector("[data-delete-cell]").addEventListener("click", () => {
+        if (cellsState.length === 1) {
+          const cell = cellsState[0];
+          cell.code = cell.template;
+          cell.output = "Output will appear here.";
+        } else {
+          cellsState.splice(index, 1);
+        }
+        saveCodeCells();
+        renderCodeCells();
+      });
+      cellElement.querySelector("[data-split-cell]").addEventListener("click", () => {
+        const editor = getEditor(cellId);
+        const cell = cellsState[index];
+        if (!editor || !cell) return;
+        const code = editor.getValue();
+        const cursor = editor.getCursorPosition();
+        const splitIndex = editor.session.doc.positionToIndex(cursor, 0);
+        const before = code.slice(0, splitIndex).replace(/\s+$/, "");
+        const after = code.slice(splitIndex).replace(/^\s+/, "");
+        cell.code = before || "# write your code here\n";
+        cell.output = "Output will appear here.";
+        const newCell = {
+          id: createId(),
+          label: cell.label,
+          title: `${cell.title} (continued)`,
+          template: after || "# write your code here\n",
+          code: after || "# write your code here\n",
+          output: "Output will appear here.",
+        };
+        cellsState.splice(index + 1, 0, newCell);
+        saveCodeCells();
+        pendingFocusCellId = newCell.id;
+        renderCodeCells();
+      });
+    });
+
+    initializeEditors();
+  };
+
+  const hydrateResponses = () => {
+    const payload = loadResponses();
+    container.querySelectorAll("[data-response]").forEach((field) => {
+      field.value = payload[field.dataset.response] || "";
+      field.addEventListener("input", persistResponses);
+    });
+  };
+
+  const renderScenario = (name, data) => {
+    const scenario = data[name];
+    if (!scenario) return;
+
+    scenarioSummary.textContent = scenarioCopy[name] || "";
+
+    datasetPlot.innerHTML = buildScatter({
+      points: scenario.dataset,
+      title: `${scenario.title} dataset`,
+      colorForPoint: (point) => ({
+        fill: palette[point.label] || palette[0],
+        radius: 4.8
+      }),
+      legendMarkup: `
+        <div class="activity-legend">
+          <span><i style="background:${palette[0]}"></i>group 0</span>
+          <span><i style="background:${palette[1]}"></i>group 1</span>
+        </div>
+      `
+    });
+
+    const maxDifficulty = Math.max(...scenario.difficulty.map((point) => point.difficulty));
+    difficultyPlot.innerHTML = buildScatter({
+      points: scenario.difficulty,
+      title: `${scenario.title} difficulty map`,
+      colorForPoint: (point) => {
+        const strength = maxDifficulty > 0 ? point.difficulty / maxDifficulty : 0;
+        const hue = 40 - strength * 28;
+        const light = 84 - strength * 36;
+        return {
+          fill: `hsl(${hue} 82% ${light}%)`,
+          radius: 4.5 + strength * 3
+        };
+      },
+      legendMarkup: `
+        <div class="activity-legend">
+          <span><i style="background:hsl(40 82% 84%)"></i>lower disagreement</span>
+          <span><i style="background:hsl(12 82% 48%)"></i>higher disagreement</span>
+        </div>
+      `
+    });
+
+    metricsTable.innerHTML = scenario.metrics
+      .map(
+        (row) => `
+          <tr>
+            <th>${modelLabels[row.model] || row.model}</th>
+            <td>${formatNumber(row.ari, 3)}</td>
+            <td>${formatNumber(row.silhouette, 3)}</td>
+            <td>${formatNumber(row.calinski_harabasz, 1)}</td>
+            <td>${formatNumber(row.davies_bouldin, 3)}</td>
+          </tr>
+        `
+      )
+      .join("");
+
+    const topARI = [...scenario.metrics].sort((a, b) => (b.ari || 0) - (a.ari || 0))[0];
+    const topSilhouette = [...scenario.metrics].sort((a, b) => (b.silhouette || 0) - (a.silhouette || 0))[0];
+    const hardPoints = scenario.difficulty.filter((point) => point.difficulty > maxDifficulty * 0.85).length;
+
+    metricsSummary.textContent = `${modelLabels[topARI.model] || topARI.model} leads on ARI, while ${
+      modelLabels[topSilhouette.model] || topSilhouette.model
+    } has the highest silhouette. This is the tension participants should explain.`;
+
+    difficultySummary.textContent = `${hardPoints} points sit in the highest-disagreement band for this scenario. Use them to discuss why aggregate metrics can miss local ambiguity.`;
+  };
+
+  fetch(source)
+    .then((response) => response.json())
+    .then((data) => {
+      activityData = data;
+      renderScenario(select.value, data);
+      select.addEventListener("change", () => renderScenario(select.value, data));
+    })
+    .catch(() => {
+      scenarioSummary.textContent = "The interactive payload could not be loaded.";
+    });
+
+  hydrateResponses();
+  loadCodeCells();
+  renderCodeCells();
+  if (localRuntimeBases.length) {
+    checkLocalRuntime().then((available) => {
+      runtimeStatus.textContent = available
+        ? "Local Poetry runtime detected. Code cells will use the full workshop environment, including birt-gd."
+        : "Local Poetry runtime not detected. Code cells will use browser mode until the bridge is started.";
+    });
+  } else {
+    runtimeStatus.textContent = "Browser mode is active for the published site. Local Poetry runtime detection is only enabled in local development.";
+  }
+
+  addCellButton.addEventListener("click", () => {
+    const newCell = {
+      id: createId(),
+      label: "Code cell",
+      title: "New code cell",
+      template: "# write your code here\n",
+      code: "# write your code here\n",
+      output: "Output will appear here.",
+    };
+    cellsState.push(newCell);
+    saveCodeCells();
+    pendingFocusCellId = newCell.id;
+    renderCodeCells();
+  });
+
+  resetButton.addEventListener("click", () => {
+    container.querySelectorAll("[data-response]").forEach((field) => {
+      field.value = "";
+    });
+    window.localStorage.removeItem(storageKey);
+    saveStatus.textContent = "Responses cleared for this browser.";
+  });
+})();
+</script>

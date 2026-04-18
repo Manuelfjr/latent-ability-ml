@@ -1,5 +1,7 @@
 *.lock
 *.codex
+.DS_Store
+_site/
 .ipynb_checkpoints/
 __pycache__/
 .pytest_cache/
