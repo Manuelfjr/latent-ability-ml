@@ -4,9 +4,7 @@
   url: /readme/
 - title: Roadmap
   url: /roadmap/
-- title: Authors
-  url: /authors/
-- title: Section 1
+- title: Unsupervised Evaluation
   children:
     - title: Overview
       url: /section-1/
@@ -14,7 +12,7 @@
       url: /section-1-activity/
     - title: Answer
       url: /section-1-answer/
-- title: Section 2
+- title: Binary IRT and 2PL
   children:
     - title: Overview
       url: /section-2/
@@ -22,7 +20,7 @@
       url: /section-2-activity/
     - title: Answer
       url: /section-2-answer/
-- title: Section 3
+- title: Beta4-IRT and CLAIRE
   children:
     - title: Overview
       url: /section-3/
@@ -32,5 +30,7 @@
       url: /section-3-activity/
     - title: Answer
       url: /section-3-answer/
-- title: Contact Me
+- title: Authors
+  url: /authors/
+- title: Contact me
   url: /contact/

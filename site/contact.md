@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Contact Me
+title: Contact me
 eyebrow: Contact
 lead: For questions about the workshop material, repository organization, or the notebooks, feel free to get in touch.
 permalink: /contact/
