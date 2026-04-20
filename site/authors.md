@@ -8,7 +8,7 @@ permalink: /authors/
 
 <div class="authors-grid">
   <div class="author-card">
-    <img src="{{ '/assets/author_rbcp.png' | relative_url }}" alt="Ricardo Prudêncio" class="author-photo" />
+    <img src="{{ '/assets/author_rbcp_v2.png' | relative_url }}" alt="Ricardo Prudêncio" class="author-photo" />
     <div class="author-name">Ricardo Prudêncio</div>
     <div class="author-role">
       Professor at UFPE

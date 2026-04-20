@@ -9,9 +9,21 @@
     <link rel="apple-touch-icon" href="/latent-ability-ml/assets/icon_bristol.png" />
     <meta property="og:title" content="Activity | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
-    <meta property="og:image" content="http://localhost:4000/latent-ability-ml/assets/icon_bristol.png" />
+    <meta property="og:image" content="https://manuelfjr.github.io/latent-ability-ml/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
     <link rel="stylesheet" href="/latent-ability-ml/assets/css/style.css" />
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
   </head>
   <body>
     <div class="site-shell">
@@ -288,6 +300,14 @@
           <img src="/latent-ability-ml/assets/logo_kunumi.png" alt="Instituto Kunumi" class="corner-logo corner-logo-kunumi" />
         </a>
       </div>
+
+      <div class="image-lightbox" id="image-lightbox" aria-hidden="true">
+        <div class="image-lightbox__frame">
+          <button class="image-lightbox__close" id="image-lightbox-close" type="button" aria-label="Close image preview">×</button>
+          <img class="image-lightbox__img" id="image-lightbox-img" alt="" />
+          <div class="image-lightbox__card" id="image-lightbox-card"></div>
+        </div>
+      </div>
     </div>
     <script>
       (() => {
@@ -527,6 +547,78 @@
           .catch(() => {
             searchIndex = [];
           });
+      })();
+
+      (() => {
+        const lightbox = document.getElementById("image-lightbox");
+        const lightboxImg = document.getElementById("image-lightbox-img");
+        const lightboxCard = document.getElementById("image-lightbox-card");
+        const closeButton = document.getElementById("image-lightbox-close");
+        const imageTargets = document.querySelectorAll("main.content figure img");
+        const authorCards = document.querySelectorAll("main.content .author-card");
+        if (!lightbox || !lightboxImg || !lightboxCard || !closeButton || (!imageTargets.length && !authorCards.length)) return;
+
+        const close = () => {
+          lightbox.classList.remove("is-open");
+          lightbox.setAttribute("aria-hidden", "true");
+          lightboxImg.removeAttribute("src");
+          lightboxImg.removeAttribute("alt");
+          lightboxImg.classList.remove("is-hidden");
+          lightboxCard.innerHTML = "";
+          lightboxCard.classList.remove("is-open");
+        };
+
+        imageTargets.forEach((img) => {
+          img.addEventListener("click", () => {
+            lightboxCard.innerHTML = "";
+            lightboxCard.classList.remove("is-open");
+            lightboxImg.classList.remove("is-hidden");
+            lightboxImg.src = img.currentSrc || img.src;
+            lightboxImg.alt = img.alt || "";
+            lightbox.classList.add("is-open");
+            lightbox.setAttribute("aria-hidden", "false");
+          });
+        });
+
+        authorCards.forEach((card) => {
+          const img = card.querySelector("img");
+          if (!img) return;
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("role", "button");
+          card.setAttribute("aria-label", img.alt || "Open author photo");
+
+          const openCard = () => {
+            lightboxImg.classList.add("is-hidden");
+            lightboxImg.removeAttribute("src");
+            lightboxImg.removeAttribute("alt");
+            lightboxCard.innerHTML = card.outerHTML;
+            const clonedCard = lightboxCard.querySelector(".author-card");
+            if (clonedCard) {
+              clonedCard.removeAttribute("tabindex");
+              clonedCard.removeAttribute("role");
+              clonedCard.removeAttribute("aria-label");
+            }
+            lightboxCard.classList.add("is-open");
+            lightbox.classList.add("is-open");
+            lightbox.setAttribute("aria-hidden", "false");
+          };
+
+          card.addEventListener("click", openCard);
+          card.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openCard();
+            }
+          });
+        });
+
+        closeButton.addEventListener("click", close);
+        lightbox.addEventListener("click", (event) => {
+          if (event.target === lightbox) close();
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") close();
+        });
       })();
     </script>
   </body>
