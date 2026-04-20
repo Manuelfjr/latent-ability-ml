@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Answer | Latent Ability</title>
     <meta name="description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
-    <link rel="icon" type="image/png" href="/assets/icon_bristol.png" />
-    <link rel="apple-touch-icon" href="/assets/icon_bristol.png" />
+    <link rel="icon" type="image/png" href="/latent-ability-ml/assets/icon_bristol.png" />
+    <link rel="apple-touch-icon" href="/latent-ability-ml/assets/icon_bristol.png" />
     <meta property="og:title" content="Answer | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
-    <meta property="og:image" content="http://localhost:4000/assets/icon_bristol.png" />
+    <meta property="og:image" content="http://localhost:4000/latent-ability-ml/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
-    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/latent-ability-ml/assets/css/style.css" />
   </head>
   <body>
     <div class="site-shell">
@@ -20,7 +20,7 @@
           <div class="sidebar-brand-top">
             <a href="https://www.bristol.ac.uk/" target="_blank" rel="noreferrer">
               <img
-                src="/assets/icon_bristol.png"
+                src="/latent-ability-ml/assets/icon_bristol.png"
                 alt="University of Bristol"
                 class="sidebar-logo"
               />
@@ -42,7 +42,7 @@
           <div class="nav-group">
             
             <a
-              href="/"
+              href="/latent-ability-ml/"
               class="nav-link"
             >
               Home
@@ -55,7 +55,7 @@
           <div class="nav-group">
             
             <a
-              href="/readme/"
+              href="/latent-ability-ml/readme/"
               class="nav-link"
             >
               Guide
@@ -68,7 +68,7 @@
           <div class="nav-group">
             
             <a
-              href="/roadmap/"
+              href="/latent-ability-ml/roadmap/"
               class="nav-link"
             >
               Roadmap
@@ -87,21 +87,21 @@
               <div class="nav-children">
                 
                 <a
-                  href="/section-1/"
+                  href="/latent-ability-ml/section-1/"
                   class="nav-sublink"
                 >
                   Overview
                 </a>
                 
                 <a
-                  href="/section-1-activity/"
+                  href="/latent-ability-ml/section-1-activity/"
                   class="nav-sublink"
                 >
                   Activity
                 </a>
                 
                 <a
-                  href="/section-1-answer/"
+                  href="/latent-ability-ml/section-1-answer/"
                   class="nav-sublink active"
                 >
                   Answer
@@ -123,21 +123,21 @@
               <div class="nav-children">
                 
                 <a
-                  href="/section-2/"
+                  href="/latent-ability-ml/section-2/"
                   class="nav-sublink"
                 >
                   Overview
                 </a>
                 
                 <a
-                  href="/section-2-activity/"
+                  href="/latent-ability-ml/section-2-activity/"
                   class="nav-sublink"
                 >
                   Activity
                 </a>
                 
                 <a
-                  href="/section-2-answer/"
+                  href="/latent-ability-ml/section-2-answer/"
                   class="nav-sublink"
                 >
                   Answer
@@ -159,28 +159,28 @@
               <div class="nav-children">
                 
                 <a
-                  href="/section-3/"
+                  href="/latent-ability-ml/section-3/"
                   class="nav-sublink"
                 >
                   Overview
                 </a>
                 
                 <a
-                  href="/section-3-extra/"
+                  href="/latent-ability-ml/section-3-extra/"
                   class="nav-sublink"
                 >
                   Extra
                 </a>
                 
                 <a
-                  href="/section-3-activity/"
+                  href="/latent-ability-ml/section-3-activity/"
                   class="nav-sublink"
                 >
                   Activity
                 </a>
                 
                 <a
-                  href="/section-3-answer/"
+                  href="/latent-ability-ml/section-3-answer/"
                   class="nav-sublink"
                 >
                   Answer
@@ -196,7 +196,7 @@
           <div class="nav-group">
             
             <a
-              href="/authors/"
+              href="/latent-ability-ml/authors/"
               class="nav-link"
             >
               Authors
@@ -209,7 +209,7 @@
           <div class="nav-group">
             
             <a
-              href="/contact/"
+              href="/latent-ability-ml/contact/"
               class="nav-link"
             >
               Contact me
@@ -269,17 +269,17 @@
 </ul>
 
 <div class="button-row">
-  <a class="button secondary" href="/section-1/">Back to section</a>
+  <a class="button secondary" href="/latent-ability-ml/section-1/">Back to section</a>
 </div>
 
       </main>
 
       <div class="corner-logos" aria-label="Institutional logos">
         <a href="https://portal.cin.ufpe.br/" target="_blank" rel="noreferrer">
-          <img src="/assets/logo_ufpe.png" alt="UFPE" class="corner-logo corner-logo-ufpe" />
+          <img src="/latent-ability-ml/assets/logo_ufpe.png" alt="UFPE" class="corner-logo corner-logo-ufpe" />
         </a>
         <a href="https://www.kunuminst.org/en" target="_blank" rel="noreferrer">
-          <img src="/assets/logo_kunumi.png" alt="Instituto Kunumi" class="corner-logo corner-logo-kunumi" />
+          <img src="/latent-ability-ml/assets/logo_kunumi.png" alt="Instituto Kunumi" class="corner-logo corner-logo-kunumi" />
         </a>
       </div>
     </div>
@@ -510,7 +510,7 @@
           highlightQuery(initialQuery);
         }
 
-        fetch("/search.json")
+        fetch("/latent-ability-ml/search.json")
           .then((response) => response.json())
           .then((data) => {
             searchIndex = Array.isArray(data) ? data : [];
