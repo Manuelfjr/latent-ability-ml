@@ -84,7 +84,7 @@ For the hard-moons case, the most difficult instances reach a difficulty proxy a
   <figcaption>Darker points mark the region where agreement drops and instance difficulty rises. Difficulty is local, not uniform across the dataset.</figcaption>
 </figure>
 
-That is the conceptual step the audience should take away from this section. The problem is not merely that one model has a better score than another. The deeper issue is that some instances are structurally harder, and those hard instances are precisely where evaluation becomes more informative.
+The problem is not merely that one model has a better score than another. The deeper issue is that some instances are structurally harder, and those hard instances are precisely where evaluation becomes more informative.
 
 ## From Aggregate Evaluation to Item Difficulty
 

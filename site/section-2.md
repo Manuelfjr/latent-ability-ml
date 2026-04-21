@@ -81,7 +81,7 @@ What matters here is not the exact decimal in each cell, but the pattern. As abi
 
 ## Why this matters for the rest of the workshop
 
-At this point, the audience has enough language to reinterpret the problem from Section 1. Once we move beyond a single dataset-level score, evaluation becomes a relationship between respondents and items. Ability is no longer just “who scored higher.” Difficulty is no longer just “which dataset felt hard.” Discrimination tells us whether an item actually helps to order the respondents.
+Once we move beyond a single dataset-level score, evaluation becomes a relationship between respondents and items. Ability is no longer just “who scored higher.” Difficulty is no longer just “which dataset felt hard.” Discrimination tells us whether an item actually helps to order the respondents.
 
 That prepares the transition to the final section. Logistic ICCs are excellent for binary intuition, but many AI evaluation settings are not naturally binary. Agreement values, proportions, and bounded continuous responses require a richer model family. That is where Beta4-IRT enters the story, and where CLAIRE turns agreement into a latent-evaluation workflow.
 

@@ -41,7 +41,7 @@ The important idea is that ability and difficulty remain bounded in the unit int
 
 ## Beta4 curves can reverse direction when discrimination changes sign
 
-The notebook first visualizes Beta4 curves under different discrimination regimes. This is where the audience should notice that Beta4 is richer than the logistic family used in the binary case. Positive discrimination produces the familiar increasing behavior. Negative discrimination flips the local ranking logic.
+The notebook first visualizes Beta4 curves under different discrimination regimes. Positive discrimination produces the familiar increasing behavior. Negative discrimination flips the local ranking logic.
 
 <figure>
   <img src="{{ '/assets/section-3-beta4-signs.svg' | relative_url }}" alt="Beta4 item characteristic curves under positive and negative discrimination." />
