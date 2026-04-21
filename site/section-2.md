@@ -15,7 +15,7 @@ permalink: /section-2/
 
 The first section ended with a simple but important tension: aggregate scores tell us something, but they do not tell us which instances are truly informative. Section 2 gives that intuition a formal language. Instead of speaking only about a model score, we begin to speak about latent ability on one side and item properties on the other.
 
-In the binary IRT setting, each response is treated as success or failure. That could be a correct answer, a solved item, or any binary outcome that distinguishes stronger and weaker respondents. The central question becomes probabilistic: given a respondent with latent ability \(\theta_i\) and an item with latent parameters, what is the probability of success?
+In the binary IRT setting, each response is treated as success or failure. That could be a correct answer, a solved item, or any binary outcome that distinguishes stronger and weaker respondents. The central question becomes probabilistic: given a respondent with latent ability <span class="math-inline">&theta;<sub>i</sub></span> and an item with latent parameters, what is the probability of success?
 
 <div class="notice">
   The conceptual move of this section is to stop thinking of all items as equivalent. Some items are easy, some are hard, and some are far better than others at separating weaker and stronger respondents.

@@ -7,13 +7,15 @@ permalink: /section-1-answer/
 ---
 
 <div class="notice">
-  This answer page is intentionally kept as a release-later page. You can enable or enrich it after the 30-minute activity window.
+  This page links to the worked answer notebook for Section 1.
 </div>
 
 ## Planned Notebook
 
-- Answer notebook: `01_99_answer.ipynb`
+- Answer notebook: `01_02_answer.ipynb`
 
 <div class="button-row">
+  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_02_answer.ipynb">Open answer notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/01_02_answer.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
   <a class="button secondary" href="{{ '/section-1/' | relative_url }}">Back to section</a>
 </div>

@@ -52,7 +52,7 @@ This is the first conceptual bridge to CLAIRE. If responses are bounded proporti
 
 ## Simulating a bounded response matrix before touching CLAIRE
 
-Before moving to clustering, the notebook constructs a synthetic latent-ability experiment. Abilities $\theta_i$ are sampled from a Beta distribution, difficulties $\delta_j$ are sampled from another Beta distribution, and discriminations $a_j$ are sampled from a Gaussian law. These sampled parameters are then used to generate a bounded response matrix $p_{ij}$.
+Before moving to clustering, the notebook constructs a synthetic latent-ability experiment. Abilities <span class="math-inline">&theta;<sub>i</sub></span> are sampled from a Beta distribution, difficulties <span class="math-inline">&delta;<sub>j</sub></span> are sampled from another Beta distribution, and discriminations <span class="math-inline">a<sub>j</sub></span> are sampled from a Gaussian law. These sampled parameters are then used to generate a bounded response matrix $p_{ij}$.
 
 In the notebook this is stated explicitly as
 
@@ -103,6 +103,23 @@ This is the right place to say explicitly what changes relative to a standard su
 ## The response matrix is built from agreement
 
 That transformation is the decisive move in CLAIRE. Instead of registering whether a model was correct on an item, each response records how much the model agrees with the rest of the pool on that item. The matrix is therefore no longer a correctness table in the usual sense. It is a structured agreement table.
+
+Formally, let <span class="math-inline">P = {p<sub>ij</sub>}</span><sub>M × N</sub> denote the response matrix, with <span class="math-inline">M</span> clustering models and <span class="math-inline">N</span> instances. Each entry <span class="math-inline">p<sub>ij</sub></span> is the normalized agreement of model <span class="math-inline">i</span> on instance <span class="math-inline">j</span>. To define it, the notebook uses the same pairwise logic that appears in the paper: for another model <span class="math-inline">i′ ≠ i</span> and another instance <span class="math-inline">j′ ≠ j</span>, we write an agreement indicator
+
+$$
+c_{i,i'}^{j,j'} = \begin{cases}
+1, & \text{if models } i \text{ and } i' \text{ agree about whether instances } j \text{ and } j' \text{ belong together or apart}, \\
+0, & \text{otherwise}.
+\end{cases}
+$$
+
+and then define
+
+$$
+p_{ij} = \frac{1}{(M-1)(N-1)} \sum_{i' \neq i} \sum_{j' \neq j} c_{i,i'}^{j,j'}.
+$$
+
+This means that every response in CLAIRE is a proportion of pairwise agreement, not a binary correctness label. In the workshop code, that exact construction is carried out by the `TransformPairwise` class before the Beta4 model is fitted.
 
 Once this agreement matrix exists, Beta4-IRT can be fitted to it exactly as before. The interpretation then shifts naturally:
 

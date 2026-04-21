@@ -19,5 +19,6 @@ permalink: /section-1-activity/
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_01_activities.ipynb">Open activity notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/01_01_activities.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
   <a class="button secondary" href="{{ '/section-1/' | relative_url }}">Back to section</a>
 </div>
