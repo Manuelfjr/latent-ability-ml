@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Section 4 | Latent Ability</title>
+    <title>References | Latent Ability</title>
     <meta name="description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
     <link rel="icon" type="image/png" href="/latent-ability-ml/assets/icon_bristol.png" />
     <link rel="apple-touch-icon" href="/latent-ability-ml/assets/icon_bristol.png" />
-    <meta property="og:title" content="Section 4 | Latent Ability" />
+    <meta property="og:title" content="References | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
     <meta property="og:image" content="http://localhost:4000/latent-ability-ml/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
@@ -200,15 +200,15 @@
           
           <div class="nav-group">
             
-            <details class="nav-disclosure" open>
-              <summary class="nav-link nav-summary active">
+            <details class="nav-disclosure">
+              <summary class="nav-link nav-summary">
                 Unsupervised Evaluation
               </summary>
               <div class="nav-children">
                 
                 <a
                   href="/latent-ability-ml/section-4/"
-                  class="nav-sublink active"
+                  class="nav-sublink"
                 >
                   Overview
                 </a>
@@ -281,7 +281,7 @@
             
             <a
               href="/latent-ability-ml/references/"
-              class="nav-link"
+              class="nav-link active"
             >
               References
             </a>
@@ -349,147 +349,73 @@
           <div class="page-search-suggestions" id="page-search-suggestions" role="listbox" aria-label="Search suggestions"></div>
         </div>
         
-        <div class="eyebrow">Unsupervised Evaluation</div>
+        <div class="eyebrow">Bibliography</div>
         
-        <h1>Section 4</h1>
+        <h1>References</h1>
         
-        <p class="lead">Aggregate evaluation is useful, but it can hide that some clustering instances are consistently harder than others.</p>
+        <p class="lead">Selected references for the workshop, organized around item response theory, AI evaluation, Beta4-IRT, clustering evaluation, and CLAIRE.</p>
         
-        <div class="button-row">
-  <a class="button" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/04_00_unsupervised_evaluation_toy_problems.ipynb">Open guided notebook</a>
-  <a class="button secondary" href="/latent-ability-ml/section-4-activity/">Go to activity</a>
-</div>
+        <p>This page gathers the main references behind the workshop. The list is not meant to be exhaustive. Instead, it is organized as a compact academic guide to the literature that directly supports the conceptual and practical path of the material.</p>
 
-<h2 id="unsupervised-evaluation-and-instance-difficulty">Unsupervised evaluation and instance difficulty</h2>
+<h2 id="foundational-item-response-theory">Foundational Item Response Theory</h2>
 
-<p>Clustering is often evaluated through aggregate metrics. This is a useful starting point, but it is not the whole story. A single score can summarize the behavior of a model over the entire dataset while hiding that some regions are trivial and others are genuinely ambiguous.</p>
+<p>These references provide the classical psychometric background for the workshop. They are especially useful for understanding the meanings of <code class="language-plaintext highlighter-rouge">ability</code>, <code class="language-plaintext highlighter-rouge">difficulty</code>, <code class="language-plaintext highlighter-rouge">discrimination</code>, and the logic of item characteristic curves.</p>
 
-<p>That is the central idea of this section. We begin with a clean clustering problem, move to a harder geometric structure, compare the aggregate metrics, and then shift the attention to the instances where model agreement starts to break down. By the time we do that, the audience is no longer surprised by the move toward local structure, because the earlier sections have already taught the habit of asking where difficulty lives.</p>
+<ul>
+  <li>Embretson, S. E., &amp; Reise, S. P. (2000). <em>Item Response Theory for Psychologists</em>. Lawrence Erlbaum Associates.</li>
+  <li>de Ayala, R. J. (2009). <em>The Theory and Practice of Item Response Theory</em>. Guilford Press.</li>
+  <li>Thissen, D., &amp; Wainer, H. (Eds.). (2001). <em>Test Scoring</em>. Lawrence Erlbaum Associates.</li>
+</ul>
 
-<div class="notice">
-  The goal of this section is to make one point very clear: evaluation should not stop at a dataset-level summary when the difficulty is not uniformly distributed across the instances.
-</div>
+<h2 id="item-response-theory-in-artificial-intelligence">Item Response Theory in Artificial Intelligence</h2>
 
-<h2 id="a-first-visual-baseline">A first visual baseline</h2>
+<p>This article is one of the main bridges between psychometrics and AI evaluation. It is a central reference for the workshop because it shows how IRT can be used to analyze machine learning classifiers at the level of individual instances rather than only through aggregate scores.</p>
 
-<p>We start with an easy toy problem. The two groups are well separated, compact, and visually stable. In this situation, the intuitive notion of a good clustering and the numerical evaluation are aligned.</p>
+<ul>
+  <li>Martínez-Plumed, F., Prudêncio, R. B. C., Martínez-Usó, A., &amp; Hernández-Orallo, J. (2019). <em>Item response theory in AI: Analysing machine learning classifiers at the instance level</em>. <em>Artificial Intelligence, 271</em>, 18-42. DOI: <a href="https://doi.org/10.1016/j.artint.2018.09.004">10.1016/j.artint.2018.09.004</a></li>
+</ul>
 
-<figure>
-  <img src="/latent-ability-ml/assets/section-1-easy.svg" alt="Easy toy clustering problem with two clearly separated groups." />
-  <figcaption>A clean baseline: two well-separated groups with very little room for ambiguity.</figcaption>
-</figure>
+<h2 id="beta-family-irt-and-beta4-irt">Beta-Family IRT and Beta4-IRT</h2>
 
-<p>This first figure matters because it establishes what an uncomplicated case looks like. The groups are so clean that different clustering models have little room to disagree in meaningful ways. That is exactly the kind of dataset on which average metrics are honest and sufficient. If everything is stable geometrically, a single number per model can often summarize the story without much distortion.</p>
+<p>The workshop sections on bounded responses build on the idea that not every meaningful response is binary. The reference below is the direct paper behind the <code class="language-plaintext highlighter-rouge">Beta4-IRT</code> part of the workshop, while the software reference records the implementation used in the activities and backend.</p>
 
-<h2 id="aggregate-metrics-behave-well-on-the-easy-problem">Aggregate metrics behave well on the easy problem</h2>
+<ul>
+  <li>Ferreira-Junior, M., Reinaldo, J. T., Lima Neto, E. A., &amp; Prudêncio, R. B. (2023). <em>β4-IRT: A new β3-IRT with enhanced discrimination estimation</em>. <em>arXiv preprint</em>. DOI: <a href="https://doi.org/10.48550/arXiv.2303.17731">10.48550/arXiv.2303.17731</a></li>
+  <li>Ferreira Junior, M. (2025). <em>birt-gd</em> (Version 0.1.49) [Software]. PyPI. Available at: <a href="https://pypi.org/project/birt-gd/0.1.49/">https://pypi.org/project/birt-gd/0.1.49/</a></li>
+  <li>Source code for the implementation used throughout the workshop: <a href="https://github.com/Manuelfjr/birt-gd">https://github.com/Manuelfjr/birt-gd</a></li>
+</ul>
 
-<table>
-  <thead>
-    <tr>
-      <th>Model</th>
-      <th style="text-align: right">ARI</th>
-      <th style="text-align: right">Silhouette</th>
-      <th style="text-align: right">Calinski-Harabasz</th>
-      <th style="text-align: right">Davies-Bouldin</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Agglomerative</td>
-      <td style="text-align: right">1.000</td>
-      <td style="text-align: right">0.767</td>
-      <td style="text-align: right">2308.063</td>
-      <td style="text-align: right">0.329</td>
-    </tr>
-    <tr>
-      <td>K-means</td>
-      <td style="text-align: right">1.000</td>
-      <td style="text-align: right">0.767</td>
-      <td style="text-align: right">2308.063</td>
-      <td style="text-align: right">0.329</td>
-    </tr>
-    <tr>
-      <td>Spectral</td>
-      <td style="text-align: right">1.000</td>
-      <td style="text-align: right">0.767</td>
-      <td style="text-align: right">2308.063</td>
-      <td style="text-align: right">0.329</td>
-    </tr>
-  </tbody>
-</table>
+<h2 id="clustering-evaluation-background">Clustering Evaluation Background</h2>
 
-<p>This table is useful precisely because it is boring. All three methods agree, and all three metrics tell the same story. That is not a weakness. It is the correct behavior for a clean dataset. The section uses this baseline to make a stronger contrast later: when the geometry becomes more complicated, the evaluation story stops being so uniform.</p>
+<p>The unsupervised part of the workshop discusses why common clustering measures are useful but limited. The references below are included because they help situate the move from classical internal or external indices toward agreement-based latent evaluation.</p>
 
-<h2 id="making-the-geometry-harder">Making the geometry harder</h2>
+<ul>
+  <li>Rousseeuw, P. J. (1987). <em>Silhouettes: A graphical aid to the interpretation and validation of cluster analysis</em>. <em>Journal of Computational and Applied Mathematics, 20</em>, 53-65. DOI: <a href="https://doi.org/10.1016/0377-0427(87)90125-7">10.1016/0377-0427(87)90125-7</a></li>
+  <li>Davies, D. L., &amp; Bouldin, D. W. (1979). <em>A cluster separation measure</em>. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence, 1</em>(2), 224-227. DOI: <a href="https://doi.org/10.1109/TPAMI.1979.4766909">10.1109/TPAMI.1979.4766909</a></li>
+  <li>Halkidi, M., Batistakis, Y., &amp; Vazirgiannis, M. (2001). <em>On clustering validation techniques</em>. <em>Journal of Intelligent Information Systems, 17</em>, 107-145. DOI: <a href="https://doi.org/10.1023/A:1012801612483">10.1023/A:1012801612483</a></li>
+</ul>
 
-<p>Now we move to a more difficult scenario. The data are no longer organized as two simple compact groups. The structure is curved, noisier, and more sensitive to the assumptions of the clustering model.</p>
+<h2 id="claire-and-agreement-based-evaluation">CLAIRE and Agreement-Based Evaluation</h2>
 
-<figure>
-  <img src="/latent-ability-ml/assets/section-1-hard.svg" alt="Harder toy clustering problem with moon-shaped groups." />
-  <figcaption>A harder geometric structure: global separation still exists, but local ambiguity becomes much more important.</figcaption>
-</figure>
+<p>The final section of the workshop is anchored in CLAIRE, where the central evaluative signal is no longer correctness but structured agreement across clustering models. This paper is the main research reference for the last part of the workshop.</p>
 
-<p>This figure changes the whole tone of the section. The dataset is still interpretable, but now there are multiple plausible local readings. Some models are better aligned with curved structure, while others prefer compact partitions. The important point is that difficulty is no longer a vague impression. It is rooted in the geometry.</p>
+<ul>
+  <li>Ferreira-Junior, M., Lima Neto, E. A., Ferreira, M. R. P., Silva Filho, T. M., &amp; Prudêncio, R. B. C. (2025). <em>CLAIRE: clustering evaluation based on item response theory and model agreement</em>. <em>Machine Learning, 114</em>(11), 256. DOI: <a href="https://doi.org/10.1007/s10994-025-06911-0">10.1007/s10994-025-06911-0</a></li>
+</ul>
 
-<h2 id="the-table-becomes-more-interesting">The table becomes more interesting</h2>
+<h2 id="how-these-references-map-to-the-workshop">How These References Map to the Workshop</h2>
 
-<table>
-  <thead>
-    <tr>
-      <th>Model</th>
-      <th style="text-align: right">ARI</th>
-      <th style="text-align: right">Silhouette</th>
-      <th style="text-align: right">Calinski-Harabasz</th>
-      <th style="text-align: right">Davies-Bouldin</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Spectral</td>
-      <td style="text-align: right">0.722</td>
-      <td style="text-align: right">0.398</td>
-      <td style="text-align: right">299.124</td>
-      <td style="text-align: right">0.930</td>
-    </tr>
-    <tr>
-      <td>K-means</td>
-      <td style="text-align: right">0.235</td>
-      <td style="text-align: right">0.485</td>
-      <td style="text-align: right">472.211</td>
-      <td style="text-align: right">0.773</td>
-    </tr>
-    <tr>
-      <td>Agglomerative</td>
-      <td style="text-align: right">0.194</td>
-      <td style="text-align: right">0.476</td>
-      <td style="text-align: right">453.296</td>
-      <td style="text-align: right">0.776</td>
-    </tr>
-  </tbody>
-</table>
+<p>The workshop is not organized as a literature review, but the sequence of sections follows a clear bibliographic logic:</p>
 
-<p>This is the moment when average metrics stop being enough. Different metrics reward different structural properties, so the table now becomes a site of tension rather than consensus. Spectral clustering looks best under ARI because it stays closer to the teaching labels. K-means and agglomerative clustering appear more favorable under silhouette and the other compactness-style metrics. The section deliberately slows down here, because this is where many real evaluation problems become conceptually messy.</p>
+<ol>
+  <li>the opening sections rely on classical IRT references to define the latent quantities carefully;</li>
+  <li>the supervised-evaluation section is connected to the AI use of IRT through Martínez-Plumed et al. (2019);</li>
+  <li>the bounded-response section builds directly on <code class="language-plaintext highlighter-rouge">β4-IRT</code>;</li>
+  <li>the clustering sections begin with classical validation measures before moving beyond them;</li>
+  <li>the final step reaches <code class="language-plaintext highlighter-rouge">CLAIRE</code>, where agreement-based response matrices allow latent analysis in unsupervised evaluation.</li>
+</ol>
 
-<p>The question is no longer just which model has the highest number. The question becomes: what structural property is each metric rewarding, and where in the dataset is that reward coming from?</p>
-
-<h2 id="where-are-the-hard-instances">Where are the hard instances?</h2>
-
-<p>The notebook answers that question by estimating difficulty through agreement across clustering models. If the models treat an instance consistently, it is easier. If the models diverge on it, the instance is harder.</p>
-
-<figure>
-  <img src="/latent-ability-ml/assets/section-1-difficulty.svg" alt="Agreement-based difficulty map for the harder clustering scenario." />
-  <figcaption>Difficulty is local, not uniform across the dataset.</figcaption>
-</figure>
-
-<p>This is the conceptual center of the section. The hard instances are not spread everywhere. They are concentrated in the region where the geometry itself invites disagreement. Once that becomes visible, the earlier conflict in the metrics table is easier to understand. The metrics were not merely disagreeing abstractly; they were responding differently to a specific local structure in the dataset.</p>
-
-<p>That is why the section is so important for the final CLAIRE material. It makes agreement visible as a meaningful signal in its own right. Before we ever turn agreement into a response matrix, we have already learned to see it as evidence about instance difficulty.</p>
-
-<h2 id="why-this-section-now-matters-for-claire">Why this section now matters for CLAIRE</h2>
-
-<p>This section comes after Beta4 on purpose. The room already knows how latent difficulty and discrimination can be estimated from bounded responses. The unsupervised setting now supplies the geometric and agreement-based intuition that CLAIRE will turn into a response matrix in the final section.</p>
-
-<p>In that sense, this section is the last conceptual bridge of the workshop. It combines the local reading habit from the supervised case, the latent language from IRT, and the bounded-response flexibility from Beta4, then hands all of that to CLAIRE in the form of agreement-based evaluation.</p>
+<p>For that reason, the references above are best read not as isolated citations but as the conceptual scaffold of the workshop itself.</p>
 
       </main>
 
