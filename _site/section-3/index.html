@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Section 3 | Latent Ability</title>
     <meta name="description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
-    <link rel="icon" type="image/png" href="/latent-ability-ml/assets/icon_bristol.png" />
-    <link rel="apple-touch-icon" href="/latent-ability-ml/assets/icon_bristol.png" />
+    <link rel="icon" type="image/png" href="/assets/icon_bristol.png" />
+    <link rel="apple-touch-icon" href="/assets/icon_bristol.png" />
     <meta property="og:title" content="Section 3 | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
-    <meta property="og:image" content="https://manuelfjr.github.io/latent-ability-ml/assets/icon_bristol.png" />
+    <meta property="og:image" content="http://127.0.0.1:4000/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
-    <link rel="stylesheet" href="/latent-ability-ml/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/style.css" />
     <script>
       window.MathJax = {
         tex: {
@@ -32,7 +32,7 @@
           <div class="sidebar-brand-top">
             <a href="https://www.bristol.ac.uk/" target="_blank" rel="noreferrer">
               <img
-                src="/latent-ability-ml/assets/icon_bristol.png"
+                src="/assets/icon_bristol.png"
                 alt="University of Bristol"
                 class="sidebar-logo"
               />
@@ -54,7 +54,7 @@
           <div class="nav-group">
             
             <a
-              href="/latent-ability-ml/"
+              href="/"
               class="nav-link"
             >
               Home
@@ -67,7 +67,7 @@
           <div class="nav-group">
             
             <a
-              href="/latent-ability-ml/readme/"
+              href="/readme/"
               class="nav-link"
             >
               Guide
@@ -80,7 +80,7 @@
           <div class="nav-group">
             
             <a
-              href="/latent-ability-ml/roadmap/"
+              href="/roadmap/"
               class="nav-link"
             >
               Roadmap
@@ -99,21 +99,21 @@
               <div class="nav-children">
                 
                 <a
-                  href="/latent-ability-ml/section-1/"
+                  href="/section-1/"
                   class="nav-sublink"
                 >
                   Overview
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-1-activity/"
+                  href="/section-1-activity/"
                   class="nav-sublink"
                 >
                   Activity
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-1-answer/"
+                  href="/section-1-answer/"
                   class="nav-sublink"
                 >
                   Answer
@@ -135,21 +135,21 @@
               <div class="nav-children">
                 
                 <a
-                  href="/latent-ability-ml/section-2/"
+                  href="/section-2/"
                   class="nav-sublink"
                 >
                   Overview
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-2-activity/"
+                  href="/section-2-activity/"
                   class="nav-sublink"
                 >
                   Activity
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-2-answer/"
+                  href="/section-2-answer/"
                   class="nav-sublink"
                 >
                   Answer
@@ -171,28 +171,28 @@
               <div class="nav-children">
                 
                 <a
-                  href="/latent-ability-ml/section-3/"
+                  href="/section-3/"
                   class="nav-sublink active"
                 >
                   Overview
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-3-extra/"
+                  href="/section-3-extra/"
                   class="nav-sublink"
                 >
                   Extra
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-3-activity/"
+                  href="/section-3-activity/"
                   class="nav-sublink"
                 >
                   Activity
                 </a>
                 
                 <a
-                  href="/latent-ability-ml/section-3-answer/"
+                  href="/section-3-answer/"
                   class="nav-sublink"
                 >
                   Answer
@@ -208,7 +208,7 @@
           <div class="nav-group">
             
             <a
-              href="/latent-ability-ml/authors/"
+              href="/authors/"
               class="nav-link"
             >
               Authors
@@ -221,7 +221,7 @@
           <div class="nav-group">
             
             <a
-              href="/latent-ability-ml/contact/"
+              href="/contact/"
               class="nav-link"
             >
               Contact me
@@ -272,8 +272,8 @@
         
         <div class="button-row">
   <a class="button" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/03_00_beta4_and_claire.ipynb">Open guided notebook</a>
-  <a class="button secondary" href="/latent-ability-ml/section-3-activity/">Go to activity</a>
-  <a class="button secondary" href="/latent-ability-ml/section-3-extra/">Open extra analysis</a>
+  <a class="button secondary" href="/section-3-activity/">Go to activity</a>
+  <a class="button secondary" href="/section-3-extra/">Open extra analysis</a>
 </div>
 
 <h2 id="from-binary-intuition-to-bounded-responses">From binary intuition to bounded responses</h2>
@@ -304,7 +304,7 @@
 <p>The notebook first visualizes Beta4 curves under different discrimination regimes. Positive discrimination produces the familiar increasing behavior. Negative discrimination flips the local ranking logic.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-beta4-signs.svg" alt="Beta4 item characteristic curves under positive and negative discrimination." />
+  <img src="/assets/section-3-beta4-signs.svg" alt="Beta4 item characteristic curves under positive and negative discrimination." />
   <figcaption>Beta4 keeps the latent-response interpretation of IRT, but its bounded formulation allows richer curve behavior than the usual logistic view.</figcaption>
 </figure>
 
@@ -325,23 +325,23 @@
 <p>The first thing to inspect is the generating sample itself. In the notebook, model abilities come from a Beta law, item difficulties come from another Beta law, and discriminations come from a Gaussian distribution centered at 1. Looking at the sampled values before fitting the model helps the room separate two questions: what was generated, and what Beta4 manages to recover from the resulting response matrix.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-sim-distributions.svg" alt="Sampled distributions of theta, delta, and a in the synthetic Beta4 experiment." />
+  <img src="/assets/section-3-sim-distributions.svg" alt="Sampled distributions of theta, delta, and a in the synthetic Beta4 experiment." />
   <figcaption>The synthetic experiment starts by sampling model ability, item difficulty, and item discrimination from the distributions declared in the notebook. These sampled values are the reference against which the fitted parameters are later compared.</figcaption>
 </figure>
 
 <div class="grid-2">
   <figure>
-    <img src="/latent-ability-ml/assets/section-3-sim-abilities.svg" alt="Estimated ability against the generating ability in the synthetic Beta4 simulation." />
+    <img src="/assets/section-3-sim-abilities.svg" alt="Estimated ability against the generating ability in the synthetic Beta4 simulation." />
     <figcaption>Estimated abilities align with the generating ability values, so the latent scale can be interpreted before we move to agreement-based data.</figcaption>
   </figure>
   <figure>
-    <img src="/latent-ability-ml/assets/section-3-sim-difficulties.svg" alt="Estimated difficulty against the generating difficulty in the synthetic Beta4 simulation." />
+    <img src="/assets/section-3-sim-difficulties.svg" alt="Estimated difficulty against the generating difficulty in the synthetic Beta4 simulation." />
     <figcaption>The same recovery logic appears for difficulty: the estimates follow the true item positions rather than drifting arbitrarily.</figcaption>
   </figure>
 </div>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-sim-discriminations.svg" alt="Estimated discrimination against the generating discrimination in the synthetic Beta4 simulation." />
+  <img src="/assets/section-3-sim-discriminations.svg" alt="Estimated discrimination against the generating discrimination in the synthetic Beta4 simulation." />
   <figcaption>Discrimination is the hardest parameter to read intuitively, so this recovery plot matters: Beta4 is not only estimating a bounded location, it is also recovering how informative each item is.</figcaption>
 </figure>
 
@@ -352,7 +352,7 @@
 <p>The first CLAIRE example in the notebook is intentionally easy to read visually. A synthetic dataset with three clusters is generated so that the room can see immediately that different clustering models may impose different partitions over the same geometry.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-toy-problem.svg" alt="Three-cluster toy problem used in the CLAIRE walkthrough." />
+  <img src="/assets/section-3-toy-problem.svg" alt="Three-cluster toy problem used in the CLAIRE walkthrough." />
   <figcaption>The CLAIRE workflow starts with a controlled three-cluster problem so that model agreement can be inspected before moving to the latent estimation step.</figcaption>
 </figure>
 
@@ -388,7 +388,7 @@
 <p>After fitting Beta4 to the agreement matrix, the notebook compares the resulting latent abilities with familiar external and internal clustering metrics. The value of this comparison is not that all metrics should collapse to the same ranking. The value is that latent ability reorganizes the metric picture.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-correlation-heatmap.svg" alt="Correlation heatmap relating latent ability to classical clustering metrics." />
+  <img src="/assets/section-3-correlation-heatmap.svg" alt="Correlation heatmap relating latent ability to classical clustering metrics." />
   <figcaption>Latent ability relates to classical metrics, but it does not reduce to any single one of them. It captures how a model behaves on the difficult part of the agreement landscape.</figcaption>
 </figure>
 
@@ -399,7 +399,7 @@
 <p>The next plot places the latent quantities back on the dataset itself. Instances are colored by difficulty and sized by discrimination, so the geometry of the problem becomes a latent landscape rather than a single average score.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-difficulty-map.svg" alt="Instances colored by difficulty and sized by discrimination in the CLAIRE toy problem." />
+  <img src="/assets/section-3-difficulty-map.svg" alt="Instances colored by difficulty and sized by discrimination in the CLAIRE toy problem." />
   <figcaption>The latent view turns the dataset into a map: some instances attract stable agreement, some create uncertainty, and some are especially useful for separating stronger and weaker models.</figcaption>
 </figure>
 
@@ -410,7 +410,7 @@
 <p>The notebook closes the main CLAIRE path by comparing the expected response curves of the easiest and most difficult instances. This is a compact way to show that the latent quantities are not decorative labels attached after the fact. They imply genuinely different response behavior.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-icc-extremes.svg" alt="ICC comparison between the easiest and most difficult instances in the CLAIRE toy problem." />
+  <img src="/assets/section-3-icc-extremes.svg" alt="ICC comparison between the easiest and most difficult instances in the CLAIRE toy problem." />
   <figcaption>The easiest and most difficult instances produce markedly different response profiles, making the latent interpretation visible again at the curve level.</figcaption>
 </figure>
 
@@ -421,7 +421,7 @@
 <p>The extra notebook <code class="language-plaintext highlighter-rouge">03_01</code> exists because negative discrimination is easy to mention and much harder to interpret. There, the agreement structure is perturbed directly in a controlled region of the data so that the workshop can inspect what happens when some items begin to work against the expected ranking logic.</p>
 
 <figure>
-  <img src="/latent-ability-ml/assets/section-3-negative-discrimination.svg" alt="Negative discrimination after direct partition perturbation in the extra notebook." />
+  <img src="/assets/section-3-negative-discrimination.svg" alt="Negative discrimination after direct partition perturbation in the extra notebook." />
   <figcaption>By perturbing a localized region of the agreement structure, the extra notebook shows how negative discrimination can emerge as a concrete geometric phenomenon rather than as a mysterious parameter estimate.</figcaption>
 </figure>
 
@@ -447,10 +447,10 @@
 
       <div class="corner-logos" aria-label="Institutional logos">
         <a href="https://portal.cin.ufpe.br/" target="_blank" rel="noreferrer">
-          <img src="/latent-ability-ml/assets/logo_ufpe.png" alt="UFPE" class="corner-logo corner-logo-ufpe" />
+          <img src="/assets/logo_ufpe.png" alt="UFPE" class="corner-logo corner-logo-ufpe" />
         </a>
         <a href="https://www.kunuminst.org/en" target="_blank" rel="noreferrer">
-          <img src="/latent-ability-ml/assets/logo_kunumi.png" alt="Instituto Kunumi" class="corner-logo corner-logo-kunumi" />
+          <img src="/assets/logo_kunumi.png" alt="Instituto Kunumi" class="corner-logo corner-logo-kunumi" />
         </a>
       </div>
 
@@ -689,7 +689,7 @@
           highlightQuery(initialQuery);
         }
 
-        fetch("/latent-ability-ml/search.json")
+        fetch("/search.json")
           .then((response) => response.json())
           .then((data) => {
             searchIndex = Array.isArray(data) ? data : [];
@@ -781,8 +781,8 @@
       const widgets = Array.from(document.querySelectorAll('.browser-notebook'));
       if (!widgets.length) return;
 
-      const defaultRuntimeApiUrls = Array.isArray(["https://manuelfjr-latent-ability-backend.hf.space"])
-        ? ["https://manuelfjr-latent-ability-backend.hf.space"]
+      const defaultRuntimeApiUrls = Array.isArray(["http://127.0.0.1:8765"])
+        ? ["http://127.0.0.1:8765"]
         : [];
 
       const tabSessionStorageKey = 'browser-notebook:tab-session-id';
@@ -840,6 +840,13 @@
 
 
       const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/$/, '');
+
+      const describeBackendTarget = (baseUrl) => {
+        const normalized = normalizeBaseUrl(baseUrl).toLowerCase();
+        if (!normalized) return 'BACKEND';
+        if (normalized.includes('127.0.0.1') || normalized.includes('localhost')) return 'LOCAL';
+        return 'CLOUD';
+      };
 
       const fetchJson = async (url, options = {}) => {
         const response = await fetch(url, {
@@ -1184,7 +1191,7 @@ exec(module_source, module.__dict__)
             try {
               currentRuntime = await initializeBackend(force);
               runtimeReady = true;
-              setStatus(`Connected to notebook backend at ${currentRuntime.baseUrl}.`, 'ready');
+              setStatus(`Connected to ${describeBackendTarget(currentRuntime.baseUrl)} backend.`, 'ready');
               return currentRuntime;
             } catch (backendError) {
               console.warn('Notebook backend unavailable; falling back to browser runtime.', backendError);
@@ -1285,7 +1292,7 @@ exec(module_source, module.__dict__)
             setStatus(result && result.success === false
               ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
               : runtime.kind === 'backend'
-                ? `Cell executed through backend ${runtime.baseUrl}.`
+                ? `Cell executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
                 : 'Cell executed in the browser runtime.', result && result.success === false ? 'error' : 'ready');
           } catch (error) {
             const output = cellEl.querySelector('.browser-notebook__output');

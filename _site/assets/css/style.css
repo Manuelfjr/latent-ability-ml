@@ -215,8 +215,9 @@ a:hover {
 
 .content {
   position: relative;
+  width: min(1480px, calc(100vw - 112px));
+  max-width: 1480px;
   padding: 36px 40px 56px;
-  max-width: 980px;
 }
 
 .page-search {
@@ -772,6 +773,13 @@ figcaption {
 .corner-logo-kunumi {
   width: 124px;
   transform: translateY(5px);
+}
+
+@media (max-width: 1440px) {
+  .content {
+    width: min(1240px, calc(100vw - 88px));
+    max-width: 1240px;
+  }
 }
 
 @media (max-width: 960px) {
