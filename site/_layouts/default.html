@@ -524,6 +524,13 @@
 
       const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/$/, '');
 
+      const describeBackendTarget = (baseUrl) => {
+        const normalized = normalizeBaseUrl(baseUrl).toLowerCase();
+        if (!normalized) return 'BACKEND';
+        if (normalized.includes('127.0.0.1') || normalized.includes('localhost')) return 'LOCAL';
+        return 'CLOUD';
+      };
+
       const fetchJson = async (url, options = {}) => {
         const response = await fetch(url, {
           headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
@@ -867,7 +874,7 @@ exec(module_source, module.__dict__)
             try {
               currentRuntime = await initializeBackend(force);
               runtimeReady = true;
-              setStatus(`Connected to notebook backend at ${currentRuntime.baseUrl}.`, 'ready');
+              setStatus(`Connected to ${describeBackendTarget(currentRuntime.baseUrl)} backend.`, 'ready');
               return currentRuntime;
             } catch (backendError) {
               console.warn('Notebook backend unavailable; falling back to browser runtime.', backendError);
@@ -968,7 +975,7 @@ exec(module_source, module.__dict__)
             setStatus(result && result.success === false
               ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
               : runtime.kind === 'backend'
-                ? `Cell executed through backend ${runtime.baseUrl}.`
+                ? `Cell executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
                 : 'Cell executed in the browser runtime.', result && result.success === false ? 'error' : 'ready');
           } catch (error) {
             const output = cellEl.querySelector('.browser-notebook__output');
