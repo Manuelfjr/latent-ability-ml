@@ -7,4 +7,5 @@ theme: null
 permalink: pretty
 repo_url: https://github.com/manuelfjr/latent-ability-ml
 
-notebook_runtime_api_urls: []
+notebook_runtime_api_urls:
+  - "https://manuelfjr-latent-ability-backend.hf.space"
