@@ -2,24 +2,24 @@
 layout: default
 title: Activity
 eyebrow: Activity Notebook
-lead: Participants create or adapt a clustering scenario and inspect how aggregate metrics can mask hard instances.
+lead: Participants create a toy supervised dataset, compare a small model pool, and inspect which examples remain difficult.
 permalink: /section-1-activity/
 ---
 
 ## Browser Lab
 
-This page now includes executable Python cells directly in the site. Students can edit code, add new cells, delete cells, import the workshop helpers, and work through the activity without leaving the page.
+This page includes executable Python cells directly in the site. Students can edit code, add new cells, delete cells, import the workshop helpers, and work through the activity without leaving the page.
 
 ## Notebook
 
 - Activity notebook: `01_01_activities.ipynb`
-- Goal: analyze a synthetic clustering scenario with a more instance-aware perspective
+- Goal: connect supervised metrics to local example difficulty
 
 ## What Participants Should Do
 
-- create or adapt a toy clustering dataset;
-- compare clustering models;
-- inspect hard instances rather than relying only on summary metrics.
+- create or adapt a toy classification dataset;
+- compare several supervised models;
+- inspect which examples stay ambiguous or disagreement-prone.
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_01_activities.ipynb">Open activity notebook</a>
@@ -31,45 +31,18 @@ This page now includes executable Python cells directly in the site. Students ca
   <script type="application/json" class="browser-notebook__seed">
 {
   "title": "Section 1 browser notebook",
-  "lead": "Run clustering experiments directly in the page, then compare model-level metrics with item-level difficulty.",
-  "packages": [
-    "numpy",
-    "pandas",
-    "matplotlib",
-    "scipy",
-    "scikit-learn",
-    "micropip"
-  ],
-  "micropipPackages": [
-    "seaborn"
-  ],
+  "lead": "Compare supervised models directly in the page, then inspect the examples that stay difficult.",
+  "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
+  "micropipPackages": ["seaborn"],
   "pythonFiles": [
-    {
-      "url": "{{ '/assets/python/utils/transform.py' | relative_url }}",
-      "path": "utils/transform.py"
-    },
-    {
-      "url": "{{ '/assets/python/utils/handson.py' | relative_url }}",
-      "path": "utils/handson.py"
-    }
+    {"url": "{{ '/assets/python/utils/transform.py' | relative_url }}", "path": "utils/transform.py"},
+    {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
   "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, utils.handson, and utils.transform.",
   "cells": [
-    {
-      "label": "Task 1",
-      "lead": "Create or adapt a toy clustering dataset.",
-      "code": "# answer\n"
-    },
-    {
-      "label": "Task 2",
-      "lead": "Compare clustering models on the dataset.",
-      "code": "# answer\n"
-    },
-    {
-      "label": "Task 3",
-      "lead": "Inspect hard instances through agreement rather than only aggregate metrics.",
-      "code": "# answer\n"
-    }
+    {"label": "Task 1", "lead": "Create or adapt a toy classification dataset.", "code": "# answer\n"},
+    {"label": "Task 2", "lead": "Evaluate a small pool of supervised models on your dataset.", "code": "# answer\n"},
+    {"label": "Task 3", "lead": "Inspect example-level difficulty or disagreement and discuss where the hard cases are.", "code": "# answer\n"}
   ]
 }
   </script>

@@ -4,7 +4,7 @@
   url: /readme/
 - title: Roadmap
   url: /roadmap/
-- title: Unsupervised Evaluation
+- title: Supervised Evaluation
   children:
     - title: Overview
       url: /section-1/
@@ -20,16 +20,32 @@
       url: /section-2-activity/
     - title: Answer
       url: /section-2-answer/
-- title: Beta4-IRT and CLAIRE
+- title: Beta4-IRT
   children:
     - title: Overview
       url: /section-3/
-    - title: Extra
-      url: /section-3-extra/
     - title: Activity
       url: /section-3-activity/
     - title: Answer
       url: /section-3-answer/
+- title: Unsupervised Evaluation
+  children:
+    - title: Overview
+      url: /section-4/
+    - title: Activity
+      url: /section-4-activity/
+    - title: Answer
+      url: /section-4-answer/
+- title: CLAIRE
+  children:
+    - title: Overview
+      url: /section-5/
+    - title: Extra
+      url: /section-5-extra/
+    - title: Activity
+      url: /section-5-activity/
+    - title: Answer
+      url: /section-5-answer/
 - title: Authors
   url: /authors/
 - title: Contact me

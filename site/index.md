@@ -6,14 +6,14 @@ lead: A browsable workshop site for the latent-ability-aware evaluation material
 permalink: /
 ---
 
-The workshop is organized as a progression from unsupervised evaluation to binary IRT, and then to Beta4-IRT and CLAIRE. This site was designed to make navigation easier during the session, especially for participants who need a cleaner entry point than the repository root.
+The workshop now progresses through five connected stages: supervised evaluation, binary IRT, Beta4-IRT, unsupervised evaluation, and finally CLAIRE. The site mirrors that sequence so participants can move from intuition to latent modeling and then to agreement-based evaluation without leaving the workshop environment.
 
 ## Workshop Structure
 
 <div class="card-grid">
   <div class="card">
     <h3>Section 1</h3>
-    <p>Unsupervised evaluation and the limitation of treating all instances as equally difficult.</p>
+    <p>Supervised evaluation, compact metric tables, and example-level difficulty.</p>
     <div class="button-row">
       <a class="button" href="{{ '/section-1/' | relative_url }}">Open section</a>
       <a class="button secondary" href="{{ '/section-1-activity/' | relative_url }}">Open activity</a>
@@ -29,19 +29,49 @@ The workshop is organized as a progression from unsupervised evaluation to binar
   </div>
   <div class="card">
     <h3>Section 3</h3>
-    <p>Beta4-IRT, CLAIRE, agreement-based response matrices, and item-level inspection.</p>
+    <p>Beta4-IRT for bounded responses, synthetic recovery, and latent quantities beyond the binary case.</p>
     <div class="button-row">
       <a class="button" href="{{ '/section-3/' | relative_url }}">Open section</a>
       <a class="button secondary" href="{{ '/section-3-activity/' | relative_url }}">Open activity</a>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Section 4</h3>
+    <p>Unsupervised evaluation and the limitation of treating all clustering instances as equally difficult.</p>
+    <div class="button-row">
+      <a class="button" href="{{ '/section-4/' | relative_url }}">Open section</a>
+      <a class="button secondary" href="{{ '/section-4-activity/' | relative_url }}">Open activity</a>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Section 5</h3>
+    <p>CLAIRE, agreement-based response matrices, and latent evaluation of clustering models.</p>
+    <div class="button-row">
+      <a class="button" href="{{ '/section-5/' | relative_url }}">Open section</a>
+      <a class="button secondary" href="{{ '/section-5-activity/' | relative_url }}">Open activity</a>
     </div>
   </div>
 </div>
 
 ## Suggested Rhythm
 
-- `15 minutes` of theory per section
-- `15 minutes` of guided hands-on explanation per section
-- `30 minutes` of participant activity per section
+A more realistic way to run this workshop in a `3-hour` slot is to group the material into three larger blocks:
+
+1. `Section 1` on its own: supervised evaluation and example difficulty.
+2. `Sections 2 and 3` together: binary IRT first, then Beta4-IRT as the bounded-response extension.
+3. `Sections 4 and 5` together: unsupervised evaluation first, then CLAIRE as the agreement-based latent framework.
+
+For each block, keep the same classroom cadence:
+
+- `15 minutes` of theory
+- `15 minutes` of guided hands-on explanation
+- `30 minutes` of participant activity
+
+That gives:
+
+- `1 hour` for Section 1
+- `1 hour` for Sections 2 and 3 together
+- `1 hour` for Sections 4 and 5 together
 
 Total estimated duration: `3 hours`.
 

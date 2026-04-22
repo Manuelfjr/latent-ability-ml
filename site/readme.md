@@ -13,15 +13,18 @@ This project contains the full material for a hands-on workshop on latent-abilit
 ## Main Message
 
 - aggregate metrics are useful, but incomplete;
-- they usually treat all instances as if they were equally difficult;
-- latent-variable models help us separate model ability from item difficulty;
-- this leads naturally to richer analyses such as Beta4-IRT and CLAIRE.
+- even in supervised settings, local example difficulty matters;
+- IRT makes ability, difficulty, and discrimination explicit;
+- Beta4-IRT extends that logic to bounded responses;
+- CLAIRE turns model agreement into a latent-evaluation workflow for clustering.
 
 ## Main Sections
 
-1. Unsupervised evaluation and the limitation of weighting all instances equally.
+1. Supervised evaluation and example-level difficulty.
 2. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation.
-3. Beta4-IRT and CLAIRE as a latent-ability-aware framework for model evaluation.
+3. Beta4-IRT for bounded responses and synthetic recovery checks.
+4. Unsupervised evaluation and the limitation of weighting clustering instances equally.
+5. CLAIRE as an agreement-based latent-evaluation framework.
 
 ## Full Guide
 

@@ -2,15 +2,9 @@
 layout: default
 title: Answer
 eyebrow: Answer Notebook
-lead: This page is reserved for the worked answer of Section 1 and can be released after the participant activity window.
+lead: This page links to the worked answer notebook for Section 1.
 permalink: /section-1-answer/
 ---
-
-<div class="notice">
-  This page links to the worked answer notebook for Section 1.
-</div>
-
-## Planned Notebook
 
 - Answer notebook: `01_02_answer.ipynb`
 

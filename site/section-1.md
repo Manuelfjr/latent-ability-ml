@@ -1,104 +1,89 @@
 ---
 layout: default
 title: Section 1
-eyebrow: Unsupervised Evaluation
-lead: Aggregate evaluation is useful, but it can hide that some instances are consistently harder than others.
+eyebrow: Supervised Evaluation
+lead: Before latent-variable modeling, we begin with a familiar setting and ask which examples remain genuinely hard even when labels are available.
 permalink: /section-1/
 ---
 
 <div class="button-row">
-  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_00_unsupervised_evaluation_toy_problems.ipynb">Open guided notebook</a>
+  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb">Open guided notebook</a>
   <a class="button secondary" href="{{ '/section-1-activity/' | relative_url }}">Go to activity</a>
 </div>
 
-## Unsupervised evaluation and instance difficulty
+## Supervised evaluation and example difficulty
 
-Clustering is often evaluated through aggregate metrics. This is a useful starting point, but it is not the whole story. A single score can summarize the behavior of a model over the entire dataset while hiding that some regions are trivial and others are genuinely ambiguous.
+The workshop opens in the most comfortable possible setting: we have labels, we have familiar supervised models, and we have the usual summary metrics that everyone already knows how to read. That is deliberate. The first section is not trying to surprise the audience with a new model. It is trying to change the habit of reading evaluation.
 
-That is the central idea of this opening section. We begin with a clean clustering problem, move to a harder geometric structure, compare the aggregate metrics, and then shift the attention to the instances where model agreement starts to break down.
+In many machine-learning workflows, a table of average scores is treated as the end of the discussion. If one model achieves the highest accuracy or the highest F1 score, the analysis often stops there. But average scores describe what happened after everything has already been pooled together. They do not tell us whether the mistakes are concentrated in one narrow region, whether two models disagree on the same examples, or whether a few particularly ambiguous examples are doing most of the analytical work.
+
+That is the intellectual shift of this opening section: even in a supervised setting, evaluation becomes more interesting when we ask not only *which model did better on average?* but also *which examples remain difficult, and why?*
 
 <div class="notice">
-  The goal of this section is to make one point very clear: evaluation should not stop at a dataset-level summary when the difficulty is not uniformly distributed across the instances.
+  The goal of this section is to establish a baseline intuition that will be used throughout the workshop: difficulty is often local. A model can look strong globally and still hesitate repeatedly in the same small region of the data.
 </div>
 
-## A first visual baseline
+## A small dataset makes the geometry visible
 
-We start with an easy toy problem. The two groups are well separated, compact, and visually stable. In this situation, the intuitive notion of a good clustering and the numerical evaluation are aligned.
+We begin with a compact two-dimensional classification problem so that the audience can read the geometry directly before looking at any metrics. That matters pedagogically because the visual structure comes first: some parts of the space are clean and stable, while others sit near the class frontier and invite uncertainty.
 
 <figure>
-  <img src="{{ '/assets/section-1-easy.svg' | relative_url }}" alt="Easy toy clustering problem with two clearly separated groups." />
-  <figcaption>A clean baseline: two well-separated groups with very little room for ambiguity.</figcaption>
+  <img src="{{ '/assets/section-1-supervised.svg' | relative_url }}" alt="Toy supervised classification problem with two classes." />
+  <figcaption>A simple supervised setting is enough to show that some regions are clean and others are genuinely ambiguous.</figcaption>
 </figure>
 
-In a case like this, it is reasonable to expect that several clustering models will recover essentially the same partition. If the models all agree, then the evaluation should look simple as well.
+The figure is not just decorative. It immediately suggests a hypothesis: if two classes overlap or come close in a narrow band of the feature space, that is where the interesting evaluation story should live. Far from the boundary, many models will behave similarly. Near the boundary, small differences in inductive bias, regularization, or local neighborhood structure can produce visibly different decisions.
 
-## Aggregate metrics behave well on the easy problem
+That is why the section starts with a geometry the room can see. Before we ask the models what is hard, we let the data suggest where difficulty is likely to arise.
 
-That expectation is confirmed by the metrics summary for the easy-blobs scenario.
+## A metrics table is still useful, but it is not enough
 
-| Model | ARI | Silhouette | Calinski-Harabasz | Davies-Bouldin |
+The guided notebook compares a small pool of classifiers on the same dataset.
+
+| Model | Accuracy | Balanced Accuracy | F1 | Mean Difficulty Proxy |
 | --- | ---: | ---: | ---: | ---: |
-| Agglomerative | 1.000 | 0.767 | 2308.063 | 0.329 |
-| K-means | 1.000 | 0.767 | 2308.063 | 0.329 |
-| Spectral | 1.000 | 0.767 | 2308.063 | 0.329 |
+| Knn | 0.990 | 0.988 | 0.988 | 0.037 |
+| Logistic Regression | 0.990 | 0.988 | 0.988 | 0.093 |
+| Decision Tree | 0.979 | 0.977 | 0.976 | 0.011 |
 
-The table is almost too clean, and that is exactly why it works as an opening example. Every metric tells the same story. The models recover the same structure, and there is no real tension between geometric intuition and numerical evaluation.
+At first glance, the table suggests that the story is almost finished. Two models are extremely strong and nearly tied, while the decision tree is slightly behind. But this is exactly where the section asks the audience to slow down. If the table is read too quickly, it encourages a ranking mindset: first place, second place, third place. If it is read carefully, it raises a deeper question: how can models with nearly identical average scores still express different uncertainty profiles over the examples?
 
-## Making the geometry harder
+The answer is that the table compresses heterogeneous local behavior into a single line per model. Logistic regression can be cautious in one region, KNN can be more decisive there, and the tree can make harder local commitments. None of that is visible in the summary alone. The table is useful, but it is only a compression of a much richer pattern.
 
-Now we move to a more difficult scenario. The data are no longer organized as two simple compact groups. The structure is curved, noisier, and more sensitive to the assumptions of the clustering model.
+This is the first major lesson of the workshop. Average metrics are not wrong. They are incomplete.
 
-<figure>
-  <img src="{{ '/assets/section-1-hard.svg' | relative_url }}" alt="Harder toy clustering problem with moon-shaped groups." />
-  <figcaption>A harder geometric structure: global separation still exists, but local ambiguity becomes much more important.</figcaption>
-</figure>
+## Example difficulty appears when models hesitate or disagree
 
-This is the first real tension of the section. A model can still produce a partition that looks globally plausible while making very different local decisions from another model.
-
-## The table becomes more interesting
-
-Once the geometry becomes harder, the aggregate metrics stop agreeing so easily.
-
-| Model | ARI | Silhouette | Calinski-Harabasz | Davies-Bouldin |
-| --- | ---: | ---: | ---: | ---: |
-| Spectral | 0.722 | 0.398 | 299.124 | 0.930 |
-| K-means | 0.235 | 0.485 | 472.211 | 0.773 |
-| Agglomerative | 0.194 | 0.476 | 453.296 | 0.776 |
-
-This table should be read slowly.
-
-`ARI` says that spectral clustering is much closer to the teaching labels. But `silhouette`, `Calinski-Harabasz`, and `Davies-Bouldin` all paint a more favorable picture for K-means and agglomerative clustering. So the question is no longer just which model has the highest score. The more interesting question becomes: what structural property is each metric rewarding?
-
-This is the point where aggregate evaluation starts to show its limits. The metrics are still useful, but they are no longer sufficient to explain the whole problem.
-
-## Where are the hard instances?
-
-The notebook answers that question by stopping at the instance level. Instead of summarizing only at the model level, it estimates difficulty through agreement across clustering models. If the models tend to assign the same instance in consistent ways, the item is easier. If the models diverge on that point, the item is harder.
-
-For the easy-blobs case, model agreement is effectively perfect and the difficulty proxy collapses to zero. That is consistent with the first figure and the first table.
-
-For the hard-moons case, the most difficult instances reach a difficulty proxy around `0.654`. They are not spread uniformly across the dataset. They concentrate in the region where the curved geometry is most ambiguous for the competing clustering assumptions.
+The next move in the notebook is to aggregate behavior per example. Instead of asking only which model scored highest, we ask which examples stay near the decision boundary, provoke disagreement across the model pool, or repeatedly attract lower confidence.
 
 <figure>
-  <img src="{{ '/assets/section-1-difficulty.svg' | relative_url }}" alt="Agreement-based difficulty map for the harder clustering scenario." />
-  <figcaption>Darker points mark the region where agreement drops and instance difficulty rises. Difficulty is local, not uniform across the dataset.</figcaption>
+  <img src="{{ '/assets/section-1-supervised-difficulty.svg' | relative_url }}" alt="Example difficulty proxy and model disagreement in the toy supervised dataset." />
+  <figcaption>Difficulty is local: the ambiguous examples cluster in a region of the feature space rather than being spread uniformly across the dataset.</figcaption>
 </figure>
 
-The problem is not merely that one model has a better score than another. The deeper issue is that some instances are structurally harder, and those hard instances are precisely where evaluation becomes more informative.
+This figure is where the section becomes conceptually important. The difficult examples are not scattered uniformly across the data as if difficulty were just random noise. They concentrate. That concentration is what makes the notion analytically useful. It tells us that difficulty is not merely an afterthought attached to isolated mistakes. It is a structural property of a region.
 
-## From Aggregate Evaluation to Item Difficulty
+Once the audience sees that concentration, a more mature reading of evaluation becomes possible. We no longer say only that a classifier achieved a certain score. We can say that a classifier performed well overall, but the real tension of the problem lives in a narrow zone where several examples are systematically less stable. That kind of statement is richer, more faithful to the geometry, and much closer to the kinds of questions that latent-variable models are designed to formalize.
 
-By the end of the notebook, the room should already be ready for the next section. Once we accept that:
+## Why this section has to come first
 
-- different metrics reward different properties;
-- model rankings can change across scenarios;
-- some instances are systematically harder than others;
+The first section does not yet introduce latent ability, item difficulty, or discrimination as formal parameters. But it prepares all three ideas informally.
 
-then we need a richer language than a single dataset-level score. That language is introduced next through Item Response Theory, where model ability and item difficulty become explicit parts of the evaluation framework.
+A strong model is one that behaves well not only on easy examples but also near the ambiguous region. A hard example is one that repeatedly attracts hesitation, disagreement, or unstable classification behavior. And an informative example is one whose response pattern reveals something meaningful about differences between models.
+
+Those are already the ingredients of the language that comes next. IRT does not appear out of nowhere in Section 2. It arrives as a disciplined way of naming distinctions that the room has already started to notice here.
+
+## Reading this section as a transition
+
+By the end of the section, the audience should be ready to accept three claims.
+
+First, evaluation should not stop at a single aggregate number. Second, local difficulty is often more revealing than global ranking alone. Third, some examples are especially valuable because they separate stronger and weaker models more clearly than others.
+
+That is exactly the bridge into IRT. Once those claims feel natural in a supervised setting, the transition to latent ability, item difficulty, and item discrimination becomes much smoother. The next section simply turns these qualitative observations into a probabilistic language.
 
 ## Questions That Organize the Section
 
-- Why do all models look identical in the easy scenario?
-- Why does spectral clustering dominate on `ARI` while K-means looks stronger on `silhouette` and `Davies-Bouldin` in the hard scenario?
-- Which geometric assumption is each metric implicitly rewarding?
-- Why is it important to know where the hard instances are, instead of only reading the final score table?
+- Why is it still useful to inspect example-level difficulty even when labels are available?
+- What do average metrics hide about the geometry of the problem?
+- Why do ambiguity and disagreement tend to concentrate in a region rather than spread uniformly across the dataset?
+- How does this prepare the transition to IRT?
