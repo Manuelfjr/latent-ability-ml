@@ -43,6 +43,10 @@ This page now includes executable Python cells directly in the site. The browser
   "micropipPackages": [
     "seaborn"
   ],
+  "runtimeApiUrls": [
+    "http://127.0.0.1:8765",
+    "http://localhost:8765"
+  ],
   "pythonFiles": [
     {
       "url": "{{ '/assets/python/utils/transform.py' | relative_url }}",

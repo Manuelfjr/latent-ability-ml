@@ -1,0 +1,12 @@
+.git
+.gitignore
+.venv
+__pycache__
+.pytest_cache
+.ruff_cache
+_site
+site/_site
+docs
+assets
+README.md
+poetry.lock

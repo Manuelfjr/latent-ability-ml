@@ -1,0 +1,2990 @@
+<!DOCTYPE html>
+<!-- saved from url=(0065)https://manuelfjr.github.io/latent-ability-ml/section-3-activity/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style id="ace-github-dark">.ace-github-dark .ace_gutter {
+  background: #24292e;
+  color: #7388b5
+}
+
+.ace-github-dark .ace_print-margin {
+  width: 1px;
+  background: #00204b
+}
+
+.ace-github-dark {
+  background-color: #24292e;
+  color: #FFFFFF
+}
+
+.ace-github-dark .ace_constant.ace_other,
+.ace-github-dark .ace_cursor {
+  color: #FFFFFF
+}
+
+.ace-github-dark .ace_marker-layer .ace_selection {
+  background: #003F8E
+}
+
+.ace-github-dark.ace_multiselect .ace_selection.ace_start {
+  box-shadow: 0 0 3px 0px #24292e;
+}
+
+.ace-github-dark .ace_marker-layer .ace_step {
+  background: rgb(127, 111, 19)
+}
+
+.ace-github-dark .ace_marker-layer .ace_bracket {
+  margin: -1px 0 0 -1px;
+  border: 1px solid #404F7D
+}
+
+.ace-github-dark .ace_marker-layer .ace_active-line {
+  background: #00346E
+}
+
+.ace-github-dark .ace_gutter-active-line {
+  background-color: #24292e
+}
+
+.ace-github-dark .ace_marker-layer .ace_selected-word {
+  border: 1px solid #003F8E
+}
+
+.ace-github-dark .ace_invisible {
+  color: #404F7D
+}
+
+.ace-github-dark .ace_keyword,
+.ace-github-dark .ace_meta,
+.ace-github-dark .ace_storage,
+.ace-github-dark .ace_storage.ace_type,
+.ace-github-dark .ace_support.ace_type {
+  color: #ff7b72
+}
+
+.ace-github-dark .ace_keyword.ace_operator {
+  color: #79c0ff
+}
+
+.ace-github-dark .ace_constant.ace_character,
+.ace-github-dark .ace_constant.ace_language,
+.ace-github-dark .ace_constant.ace_numeric,
+.ace-github-dark .ace_keyword.ace_other.ace_unit,
+.ace-github-dark .ace_support.ace_constant,
+.ace-github-dark .ace_variable.ace_parameter {
+  color: #FFC58F
+}
+
+.ace-github-dark .ace_invalid {
+  color: #FFFFFF;
+  background-color: #F99DA5
+}
+
+.ace-github-dark .ace_invalid.ace_deprecated {
+  color: #FFFFFF;
+  background-color: #ff7b72
+}
+
+.ace-github-dark .ace_fold {
+  background-color: #BBDAFF;
+  border-color: #FFFFFF
+}
+
+.ace-github-dark .ace_entity.ace_name.ace_function,
+.ace-github-dark .ace_support.ace_function,
+.ace-github-dark .ace_variable {
+  color: #BBDAFF
+}
+
+.ace-github-dark .ace_support.ace_class,
+.ace-github-dark .ace_support.ace_type {
+  color: #FFEEAD
+}
+
+.ace-github-dark .ace_heading,
+.ace-github-dark .ace_markup.ace_heading,
+.ace-github-dark .ace_string {
+  color: #9fcef6
+}
+
+.ace-github-dark .ace_entity.ace_name.ace_tag,
+.ace-github-dark .ace_entity.ace_other.ace_attribute-name,
+.ace-github-dark .ace_meta.ace_tag,
+.ace-github-dark .ace_string.ace_regexp,
+.ace-github-dark .ace_variable {
+  color: #FF9DA4
+}
+
+.ace-github-dark .ace_comment {
+  color: #7285B7
+}
+
+.ace-github-dark .ace_indent-guide {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWNgYGBgYJDzqfwPAANXAeNsiA+ZAAAAAElFTkSuQmCC) right repeat-y
+}
+
+.ace-github-dark .ace_indent-guide-active {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQIW2PQ1dX9zzBz5sz/ABCcBFFentLlAAAAAElFTkSuQmCC) right repeat-y;
+}
+
+.ace-github-dark .ace_constant.ace_buildin {
+  color: #0086B3;
+}
+
+.ace-github-dark .ace_variable.ace_language {
+  color: #ffffff;
+}
+  
+/*# sourceURL=ace/css/ace-github-dark */</style><style id="autocompletion.css">
+.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
+    background-color: #CAD6FA;
+    z-index: 1;
+}
+.ace_dark.ace_editor.ace_autocomplete .ace_marker-layer .ace_active-line {
+    background-color: #3a674e;
+}
+.ace_editor.ace_autocomplete .ace_line-hover {
+    border: 1px solid #abbffe;
+    margin-top: -1px;
+    background: rgba(233,233,253,0.4);
+    position: absolute;
+    z-index: 2;
+}
+.ace_dark.ace_editor.ace_autocomplete .ace_line-hover {
+    border: 1px solid rgba(109, 150, 13, 0.8);
+    background: rgba(58, 103, 78, 0.62);
+}
+.ace_completion-meta {
+    opacity: 0.5;
+    margin-left: 0.9em;
+}
+.ace_completion-message {
+    margin-left: 0.9em;
+    color: blue;
+}
+.ace_editor.ace_autocomplete .ace_completion-highlight{
+    color: #2d69c7;
+}
+.ace_dark.ace_editor.ace_autocomplete .ace_completion-highlight{
+    color: #93ca12;
+}
+.ace_editor.ace_autocomplete {
+    width: 300px;
+    z-index: 200000;
+    border: 1px lightgray solid;
+    position: fixed;
+    box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+    line-height: 1.4;
+    background: #fefefe;
+    color: #111;
+}
+.ace_dark.ace_editor.ace_autocomplete {
+    border: 1px #484747 solid;
+    box-shadow: 2px 3px 5px rgba(0, 0, 0, 0.51);
+    line-height: 1.4;
+    background: #25282c;
+    color: #c1c1c1;
+}
+.ace_autocomplete .ace_text-layer  {
+    width: calc(100% - 8px);
+}
+.ace_autocomplete .ace_line {
+    display: flex;
+    align-items: center;
+}
+.ace_autocomplete .ace_line > * {
+    min-width: 0;
+    flex: 0 0 auto;
+}
+.ace_autocomplete .ace_line .ace_ {
+    flex: 0 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.ace_autocomplete .ace_completion-spacer {
+    flex: 1;
+}
+.ace_autocomplete.ace_loading:after  {
+    content: "";
+    position: absolute;
+    top: 0px;
+    height: 2px;
+    width: 8%;
+    background: blue;
+    z-index: 100;
+    animation: ace_progress 3s infinite linear;
+    animation-delay: 300ms;
+    transform: translateX(-100%) scaleX(1);
+}
+@keyframes ace_progress {
+    0% { transform: translateX(-100%) scaleX(1) }
+    50% { transform: translateX(625%) scaleX(2) } 
+    100% { transform: translateX(1500%) scaleX(3) } 
+}
+@media (prefers-reduced-motion) {
+    .ace_autocomplete.ace_loading:after {
+        transform: translateX(625%) scaleX(2);
+        animation: none;
+     }
+}
+
+/*# sourceURL=ace/css/autocompletion.css */</style><style id="snippets.css">
+.ace_snippet-marker {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: rgba(194, 193, 208, 0.09);
+    border: 1px dotted rgba(211, 208, 235, 0.62);
+    position: absolute;
+}
+/*# sourceURL=ace/css/snippets.css */</style><style id="error_marker.css">
+    .error_widget_wrapper {
+        background: inherit;
+        color: inherit;
+        border:none
+    }
+    .error_widget {
+        border-top: solid 2px;
+        border-bottom: solid 2px;
+        margin: 5px 0;
+        padding: 10px 40px;
+        white-space: pre-wrap;
+    }
+    .error_widget.ace_error, .error_widget_arrow.ace_error{
+        border-color: #ff5a5a
+    }
+    .error_widget.ace_warning, .error_widget_arrow.ace_warning{
+        border-color: #F1D817
+    }
+    .error_widget.ace_info, .error_widget_arrow.ace_info{
+        border-color: #5a5a5a
+    }
+    .error_widget.ace_ok, .error_widget_arrow.ace_ok{
+        border-color: #5aaa5a
+    }
+    .error_widget_arrow {
+        position: absolute;
+        border: solid 5px;
+        border-top-color: transparent!important;
+        border-right-color: transparent!important;
+        border-left-color: transparent!important;
+        top: -5px;
+    }
+
+/*# sourceURL=ace/css/error_marker.css */</style><style id="ace-tm">.ace-tm .ace_gutter {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.ace-tm .ace_print-margin {
+  width: 1px;
+  background: #e8e8e8;
+}
+
+.ace-tm .ace_fold {
+    background-color: #6B72E6;
+}
+
+.ace-tm {
+  background-color: #FFFFFF;
+  color: black;
+}
+
+.ace-tm .ace_cursor {
+  color: black;
+}
+        
+.ace-tm .ace_invisible {
+  color: rgb(191, 191, 191);
+}
+
+.ace-tm .ace_storage,
+.ace-tm .ace_keyword {
+  color: blue;
+}
+
+.ace-tm .ace_constant {
+  color: rgb(197, 6, 11);
+}
+
+.ace-tm .ace_constant.ace_buildin {
+  color: rgb(88, 72, 246);
+}
+
+.ace-tm .ace_constant.ace_language {
+  color: rgb(88, 92, 246);
+}
+
+.ace-tm .ace_constant.ace_library {
+  color: rgb(6, 150, 14);
+}
+
+.ace-tm .ace_invalid {
+  background-color: rgba(255, 0, 0, 0.1);
+  color: red;
+}
+
+.ace-tm .ace_support.ace_function {
+  color: rgb(60, 76, 114);
+}
+
+.ace-tm .ace_support.ace_constant {
+  color: rgb(6, 150, 14);
+}
+
+.ace-tm .ace_support.ace_type,
+.ace-tm .ace_support.ace_class {
+  color: rgb(109, 121, 222);
+}
+
+.ace-tm .ace_keyword.ace_operator {
+  color: rgb(104, 118, 135);
+}
+
+.ace-tm .ace_string {
+  color: rgb(3, 106, 7);
+}
+
+.ace-tm .ace_comment {
+  color: rgb(76, 136, 107);
+}
+
+.ace-tm .ace_comment.ace_doc {
+  color: rgb(0, 102, 255);
+}
+
+.ace-tm .ace_comment.ace_doc.ace_tag {
+  color: rgb(128, 159, 191);
+}
+
+.ace-tm .ace_constant.ace_numeric {
+  color: rgb(0, 0, 205);
+}
+
+.ace-tm .ace_variable {
+  color: rgb(49, 132, 149);
+}
+
+.ace-tm .ace_xml-pe {
+  color: rgb(104, 104, 91);
+}
+
+.ace-tm .ace_entity.ace_name.ace_function {
+  color: #0000A2;
+}
+
+
+.ace-tm .ace_heading {
+  color: rgb(12, 7, 255);
+}
+
+.ace-tm .ace_list {
+  color:rgb(185, 6, 144);
+}
+
+.ace-tm .ace_meta.ace_tag {
+  color:rgb(0, 22, 142);
+}
+
+.ace-tm .ace_string.ace_regex {
+  color: rgb(255, 0, 0)
+}
+
+.ace-tm .ace_marker-layer .ace_selection {
+  background: rgb(181, 213, 255);
+}
+.ace-tm.ace_multiselect .ace_selection.ace_start {
+  box-shadow: 0 0 3px 0px white;
+}
+.ace-tm .ace_marker-layer .ace_step {
+  background: rgb(252, 255, 0);
+}
+
+.ace-tm .ace_marker-layer .ace_stack {
+  background: rgb(164, 229, 101);
+}
+
+.ace-tm .ace_marker-layer .ace_bracket {
+  margin: -1px 0 0 -1px;
+  border: 1px solid rgb(192, 192, 192);
+}
+
+.ace-tm .ace_marker-layer .ace_active-line {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.ace-tm .ace_gutter-active-line {
+    background-color : #dcdcdc;
+}
+
+.ace-tm .ace_marker-layer .ace_selected-word {
+  background: rgb(250, 250, 255);
+  border: 1px solid rgb(200, 200, 250);
+}
+
+.ace-tm .ace_indent-guide {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAE0lEQVQImWP4////f4bLly//BwAmVgd1/w11/gAAAABJRU5ErkJggg==") right repeat-y;
+}
+
+.ace-tm .ace_indent-guide-active {
+  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAAAZSURBVHjaYvj///9/hivKyv8BAAAA//8DACLqBhbvk+/eAAAAAElFTkSuQmCC") right repeat-y;
+}
+
+/*# sourceURL=ace/css/ace-tm */</style><style id="ace_editor.css">
+.ace_br1 {border-top-left-radius    : 3px;}
+.ace_br2 {border-top-right-radius   : 3px;}
+.ace_br3 {border-top-left-radius    : 3px; border-top-right-radius:    3px;}
+.ace_br4 {border-bottom-right-radius: 3px;}
+.ace_br5 {border-top-left-radius    : 3px; border-bottom-right-radius: 3px;}
+.ace_br6 {border-top-right-radius   : 3px; border-bottom-right-radius: 3px;}
+.ace_br7 {border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px;}
+.ace_br8 {border-bottom-left-radius : 3px;}
+.ace_br9 {border-top-left-radius    : 3px; border-bottom-left-radius:  3px;}
+.ace_br10{border-top-right-radius   : 3px; border-bottom-left-radius:  3px;}
+.ace_br11{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-left-radius:  3px;}
+.ace_br12{border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}
+.ace_br13{border-top-left-radius    : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}
+.ace_br14{border-top-right-radius   : 3px; border-bottom-right-radius: 3px; border-bottom-left-radius:  3px;}
+.ace_br15{border-top-left-radius    : 3px; border-top-right-radius:    3px; border-bottom-right-radius: 3px; border-bottom-left-radius: 3px;}
+
+
+.ace_editor {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Source Code Pro', 'source-code-pro', monospace;
+    direction: ltr;
+    text-align: left;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    forced-color-adjust: none;
+}
+
+.ace_scroller {
+    position: absolute;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    background-color: inherit;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: text;
+}
+
+.ace_content {
+    position: absolute;
+    box-sizing: border-box;
+    min-width: 100%;
+    contain: style size layout;
+    font-variant-ligatures: no-common-ligatures;
+}
+
+.ace_keyboard-focus:focus {
+    box-shadow: inset 0 0 0 2px #5E9ED6;
+    outline: none;
+}
+
+.ace_dragging .ace_scroller:before{
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    content: '';
+    background: rgba(250, 250, 250, 0.01);
+    z-index: 1000;
+}
+.ace_dragging.ace_dark .ace_scroller:before{
+    background: rgba(0, 0, 0, 0.01);
+}
+
+.ace_gutter {
+    position: absolute;
+    overflow : hidden;
+    width: auto;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    cursor: default;
+    z-index: 4;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    contain: style size layout;
+}
+
+.ace_gutter-active-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.ace_scroller.ace_scroll-left:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    box-shadow: 17px 0 16px -16px rgba(0, 0, 0, 0.4) inset;
+    pointer-events: none;
+}
+
+.ace_gutter-cell, .ace_gutter-cell_svg-icons {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding-left: 19px;
+    padding-right: 6px;
+    background-repeat: no-repeat;
+}
+
+.ace_gutter-cell_svg-icons .ace_gutter_annotation {
+    margin-left: -14px;
+    float: left;
+}
+
+.ace_gutter-cell .ace_gutter_annotation {
+    margin-left: -19px;
+    float: left;
+}
+
+.ace_gutter-cell.ace_error, .ace_icon.ace_error, .ace_icon.ace_error_fold, .ace_gutter-cell.ace_security, .ace_icon.ace_security, .ace_icon.ace_security_fold {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABOFBMVEX/////////QRswFAb/Ui4wFAYwFAYwFAaWGAfDRymzOSH/PxswFAb/SiUwFAYwFAbUPRvjQiDllog5HhHdRybsTi3/Tyv9Tir+Syj/UC3////XurebMBIwFAb/RSHbPx/gUzfdwL3kzMivKBAwFAbbvbnhPx66NhowFAYwFAaZJg8wFAaxKBDZurf/RB6mMxb/SCMwFAYwFAbxQB3+RB4wFAb/Qhy4Oh+4QifbNRcwFAYwFAYwFAb/QRzdNhgwFAYwFAbav7v/Uy7oaE68MBK5LxLewr/r2NXewLswFAaxJw4wFAbkPRy2PyYwFAaxKhLm1tMwFAazPiQwFAaUGAb/QBrfOx3bvrv/VC/maE4wFAbRPBq6MRO8Qynew8Dp2tjfwb0wFAbx6eju5+by6uns4uH9/f36+vr/GkHjAAAAYnRSTlMAGt+64rnWu/bo8eAA4InH3+DwoN7j4eLi4xP99Nfg4+b+/u9B/eDs1MD1mO7+4PHg2MXa347g7vDizMLN4eG+Pv7i5evs/v79yu7S3/DV7/498Yv24eH+4ufQ3Ozu/v7+y13sRqwAAADLSURBVHjaZc/XDsFgGIBhtDrshlitmk2IrbHFqL2pvXf/+78DPokj7+Fz9qpU/9UXJIlhmPaTaQ6QPaz0mm+5gwkgovcV6GZzd5JtCQwgsxoHOvJO15kleRLAnMgHFIESUEPmawB9ngmelTtipwwfASilxOLyiV5UVUyVAfbG0cCPHig+GBkzAENHS0AstVF6bacZIOzgLmxsHbt2OecNgJC83JERmePUYq8ARGkJx6XtFsdddBQgZE2nPR6CICZhawjA4Fb/chv+399kfR+MMMDGOQAAAABJRU5ErkJggg==");
+    background-repeat: no-repeat;
+    background-position: 2px center;
+}
+
+.ace_gutter-cell.ace_warning, .ace_icon.ace_warning, .ace_icon.ace_warning_fold {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAmVBMVEX///8AAAD///8AAAAAAABPSzb/5sAAAAB/blH/73z/ulkAAAAAAAD85pkAAAAAAAACAgP/vGz/rkDerGbGrV7/pkQICAf////e0IsAAAD/oED/qTvhrnUAAAD/yHD/njcAAADuv2r/nz//oTj/p064oGf/zHAAAAA9Nir/tFIAAAD/tlTiuWf/tkIAAACynXEAAAAAAAAtIRW7zBpBAAAAM3RSTlMAABR1m7RXO8Ln31Z36zT+neXe5OzooRDfn+TZ4p3h2hTf4t3k3ucyrN1K5+Xaks52Sfs9CXgrAAAAjklEQVR42o3PbQ+CIBQFYEwboPhSYgoYunIqqLn6/z8uYdH8Vmdnu9vz4WwXgN/xTPRD2+sgOcZjsge/whXZgUaYYvT8QnuJaUrjrHUQreGczuEafQCO/SJTufTbroWsPgsllVhq3wJEk2jUSzX3CUEDJC84707djRc5MTAQxoLgupWRwW6UB5fS++NV8AbOZgnsC7BpEAAAAABJRU5ErkJggg==");
+    background-repeat: no-repeat;
+    background-position: 2px center;
+}
+
+.ace_gutter-cell.ace_info, .ace_icon.ace_info, .ace_gutter-cell.ace_hint, .ace_icon.ace_hint {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAAJ0Uk5TAAB2k804AAAAPklEQVQY02NgIB68QuO3tiLznjAwpKTgNyDbMegwisCHZUETUZV0ZqOquBpXj2rtnpSJT1AEnnRmL2OgGgAAIKkRQap2htgAAAAASUVORK5CYII=");
+    background-repeat: no-repeat;
+    background-position: 2px center;
+}
+
+.ace_dark .ace_gutter-cell.ace_info, .ace_dark .ace_icon.ace_info, .ace_dark .ace_gutter-cell.ace_hint, .ace_dark .ace_icon.ace_hint {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQBAMAAADt3eJSAAAAJFBMVEUAAAChoaGAgIAqKiq+vr6tra1ZWVmUlJSbm5s8PDxubm56enrdgzg3AAAAAXRSTlMAQObYZgAAAClJREFUeNpjYMAPdsMYHegyJZFQBlsUlMFVCWUYKkAZMxZAGdxlDMQBAG+TBP4B6RyJAAAAAElFTkSuQmCC");
+}
+
+.ace_icon_svg.ace_error {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxNiI+CjxnIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlPSJyZWQiIHNoYXBlLXJlbmRlcmluZz0iZ2VvbWV0cmljUHJlY2lzaW9uIj4KPGNpcmNsZSBmaWxsPSJub25lIiBjeD0iOCIgY3k9IjgiIHI9IjciIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPGxpbmUgeDE9IjExIiB5MT0iNSIgeDI9IjUiIHkyPSIxMSIvPgo8bGluZSB4MT0iMTEiIHkxPSIxMSIgeDI9IjUiIHkyPSI1Ii8+CjwvZz4KPC9zdmc+");
+    background-color: crimson;
+}
+.ace_icon_svg.ace_security {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjAgMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8ZyBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZT0iZGFya29yYW5nZSIgZmlsbD0ibm9uZSIgc2hhcGUtcmVuZGVyaW5nPSJnZW9tZXRyaWNQcmVjaXNpb24iPgogICAgICAgIDxwYXRoIGNsYXNzPSJzdHJva2UtbGluZWpvaW4tcm91bmQiIGQ9Ik04IDE0LjgzMDdDOCAxNC44MzA3IDIgMTIuOTA0NyAyIDguMDg5OTJWMy4yNjU0OEM1LjMxIDMuMjY1NDggNy45ODk5OSAxLjM0OTE4IDcuOTg5OTkgMS4zNDkxOEM3Ljk4OTk5IDEuMzQ5MTggMTAuNjkgMy4yNjU0OCAxNCAzLjI2NTQ4VjguMDg5OTJDMTQgMTIuOTA0NyA4IDE0LjgzMDcgOCAxNC44MzA3WiIvPgogICAgICAgIDxwYXRoIGQ9Ik0yIDguMDg5OTJWMy4yNjU0OEM1LjMxIDMuMjY1NDggNy45ODk5OSAxLjM0OTE4IDcuOTg5OTkgMS4zNDkxOCIvPgogICAgICAgIDxwYXRoIGQ9Ik0xMy45OSA4LjA4OTkyVjMuMjY1NDhDMTAuNjggMy4yNjU0OCA4IDEuMzQ5MTggOCAxLjM0OTE4Ii8+CiAgICAgICAgPHBhdGggY2xhc3M9InN0cm9rZS1saW5lam9pbi1yb3VuZCIgZD0iTTggNFY5Ii8+CiAgICAgICAgPHBhdGggY2xhc3M9InN0cm9rZS1saW5lam9pbi1yb3VuZCIgZD0iTTggMTBWMTIiLz4KICAgIDwvZz4KPC9zdmc+");
+    background-color: crimson;
+}
+.ace_icon_svg.ace_warning {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxNiI+CjxnIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlPSJkYXJrb3JhbmdlIiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiI+Cjxwb2x5Z29uIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiIHBvaW50cz0iOCAxIDE1IDE1IDEgMTUgOCAxIi8+CjxyZWN0IHg9IjgiIHk9IjEyIiB3aWR0aD0iMC4wMSIgaGVpZ2h0PSIwLjAxIi8+CjxsaW5lIHgxPSI4IiB5MT0iNiIgeDI9IjgiIHkyPSIxMCIvPgo8L2c+Cjwvc3ZnPg==");
+    background-color: darkorange;
+}
+.ace_icon_svg.ace_info {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxNiI+CjxnIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlPSJibHVlIiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiI+CjxjaXJjbGUgZmlsbD0ibm9uZSIgY3g9IjgiIGN5PSI4IiByPSI3IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjxwb2x5bGluZSBwb2ludHM9IjggMTEgOCA4Ii8+Cjxwb2x5bGluZSBwb2ludHM9IjkgOCA2IDgiLz4KPGxpbmUgeDE9IjEwIiB5MT0iMTEiIHgyPSI2IiB5Mj0iMTEiLz4KPHJlY3QgeD0iOCIgeT0iNSIgd2lkdGg9IjAuMDEiIGhlaWdodD0iMC4wMSIvPgo8L2c+Cjwvc3ZnPg==");
+    background-color: royalblue;
+}
+.ace_icon_svg.ace_hint {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjAgMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgICA8ZyBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZT0ic2lsdmVyIiBmaWxsPSJub25lIiBzaGFwZS1yZW5kZXJpbmc9Imdlb21ldHJpY1ByZWNpc2lvbiI+CiAgICAgICAgPHBhdGggY2xhc3M9InN0cm9rZS1saW5lam9pbi1yb3VuZCIgZD0iTTYgMTRIMTAiLz4KICAgICAgICA8cGF0aCBkPSJNOCAxMUg5QzkgOS40NzAwMiAxMiA4LjU0MDAyIDEyIDUuNzYwMDJDMTIuMDIgNC40MDAwMiAxMS4zOSAzLjM2MDAyIDEwLjQzIDIuNjcwMDJDOSAxLjY0MDAyIDcuMDAwMDEgMS42NDAwMiA1LjU3MDAxIDIuNjcwMDJDNC42MTAwMSAzLjM2MDAyIDMuOTggNC40MDAwMiA0IDUuNzYwMDJDNCA4LjU0MDAyIDcuMDAwMDEgOS40NzAwMiA3LjAwMDAxIDExSDhaIi8+CiAgICA8L2c+Cjwvc3ZnPg==");
+    background-color: silver;
+}
+
+.ace_icon_svg.ace_error_fold {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMCAxNiIgZmlsbD0ibm9uZSI+CiAgPHBhdGggZD0ibSAxOC45Mjk4NTEsNy44Mjk4MDc2IGMgMC4xNDYzNTMsNi4zMzc0NjA0IC02LjMyMzE0Nyw3Ljc3Nzg0NDQgLTcuNDc3OTEyLDcuNzc3ODQ0NCAtMi4xMDcyNzI2LC0wLjEyODc1IDUuMTE3Njc4LDAuMzU2MjQ5IDUuMDUxNjk4LC03Ljg3MDA2MTggLTAuNjA0NjcyLC04LjAwMzk3MzQ5IC03LjA3NzI3MDYsLTcuNTYzMTE4OSAtNC44NTczLC03LjQzMDM5NTU2IDEuNjA2LC0wLjExNTE0MjI1IDYuODk3NDg1LDEuMjYyNTQ1OTYgNy4yODM1MTQsNy41MjI2MTI5NiB6IiBmaWxsPSJjcmltc29uIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0ibSA4LjExNDc1NjIsMi4wNTI5ODI4IGMgMy4zNDkxNjk4LDAgNi4wNjQxMzI4LDIuNjc2ODYyNyA2LjA2NDEzMjgsNS45Nzg5NTMgMCwzLjMwMjExMjIgLTIuNzE0OTYzLDUuOTc4OTIwMiAtNi4wNjQxMzI4LDUuOTc4OTIwMiAtMy4zNDkxNDczLDAgLTYuMDY0MTc3MiwtMi42NzY4MDggLTYuMDY0MTc3MiwtNS45Nzg5MjAyIDAuMDA1MzksLTMuMjk5ODg2MSAyLjcxNzI2NTYsLTUuOTczNjQwOCA2LjA2NDE3NzIsLTUuOTc4OTUzIHogbSAwLC0xLjczNTgyNzE5IGMgLTQuMzIxNDgzNiwwIC03LjgyNDc0MDM4LDMuNDU0MDE4NDkgLTcuODI0NzQwMzgsNy43MTQ3ODAxOSAwLDQuMjYwNzI4MiAzLjUwMzI1Njc4LDcuNzE0NzQ1MiA3LjgyNDc0MDM4LDcuNzE0NzQ1MiA0LjMyMTQ0OTgsMCA3LjgyNDY5OTgsLTMuNDU0MDE3IDcuODI0Njk5OCwtNy43MTQ3NDUyIDAsLTIuMDQ2MDkxNCAtMC44MjQzOTIsLTQuMDA4MzY3MiAtMi4yOTE3NTYsLTUuNDU1MTc0NiBDIDEyLjE4MDIyNSwxLjEyOTk2NDggMTAuMTkwMDEzLDAuMzE3MTU1NjEgOC4xMTQ3NTYyLDAuMzE3MTU1NjEgWiBNIDYuOTM3NDU2Myw4LjI0MDU5ODUgNC42NzE4Njg1LDEwLjQ4NTg1MiA2LjAwODY4MTQsMTEuODc2NzI4IDguMzE3MDAzNSw5LjYwMDc5MTEgMTAuNjI1MzM3LDExLjg3NjcyOCAxMS45NjIxMzgsMTAuNDg1ODUyIDkuNjk2NTUwOCw4LjI0MDU5ODUgMTEuOTYyMTM4LDYuMDA2ODA2NiAxMC41NzMyNDYsNC42Mzc0MzM1IDguMzE3MDAzNSw2Ljg3MzQyOTcgNi4wNjA3NjA3LDQuNjM3NDMzNSA0LjY3MTg2ODUsNi4wMDY4MDY2IFoiIGZpbGw9ImNyaW1zb24iIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=");
+    background-color: crimson;
+}
+.ace_icon_svg.ace_security_fold {
+    -webkit-mask-image: url("data:image/svg+xml;base64,CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2aWV3Qm94PSIwIDAgMTcgMTQiIGZpbGw9Im5vbmUiPgogICAgPHBhdGggZD0iTTEwLjAwMDEgMTMuNjk5MkMxMC4wMDAxIDEzLjY5OTIgMTEuOTI0MSAxMy40NzYzIDEzIDEyLjY5OTJDMTQuNDEzOSAxMS42NzgxIDE2IDEwLjUgMTYuMTI1MSA2LjgxMTI2VjIuNTg5ODdDMTYuMTI1MSAyLjU0NzY4IDE2LjEyMjEgMi41MDYxOSAxNi4xMTY0IDIuNDY1NTlWMS43MTQ4NUgxNS4yNDE0TDE1LjIzMDcgMS43MTQ4NEwxNC42MjUxIDEuNjk5MjJWNi44MTEyM0MxNC42MjUxIDguNTEwNjEgMTQuNjI1MSA5LjQ2NDYxIDEyLjc4MjQgMTEuNzIxQzEyLjE1ODYgMTIuNDg0OCAxMC4wMDAxIDEzLjY5OTIgMTAuMDAwMSAxMy42OTkyWiIgZmlsbD0iY3JpbXNvbiIgc3Ryb2tlLXdpZHRoPSIyIi8+CiAgICA8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTcuMzM2MDkgMC4zNjc0NzVDNy4wMzIxNCAwLjE1MjY1MiA2LjYyNTQ4IDAuMTUzNjE0IDYuMzIyNTMgMC4zNjk5OTdMNi4zMDg2OSAwLjM3OTU1NEM2LjI5NTUzIDAuMzg4NTg4IDYuMjczODggMC40MDMyNjYgNi4yNDQxNyAwLjQyMjc4OUM2LjE4NDcxIDAuNDYxODYgNi4wOTMyMSAwLjUyMDE3MSA1Ljk3MzEzIDAuNTkxMzczQzUuNzMyNTEgMC43MzQwNTkgNS4zNzk5IDAuOTI2ODY0IDQuOTQyNzkgMS4xMjAwOUM0LjA2MTQ0IDEuNTA5NyAyLjg3NTQxIDEuODgzNzcgMS41ODk4NCAxLjg4Mzc3SDAuNzE0ODQ0VjIuNzU4NzdWNi45ODAxNUMwLjcxNDg0NCA5LjQ5Mzc0IDIuMjg4NjYgMTEuMTk3MyAzLjcwMjU0IDEyLjIxODVDNC40MTg0NSAxMi43MzU1IDUuMTI4NzQgMTMuMTA1MyA1LjY1NzMzIDEzLjM0NTdDNS45MjI4NCAxMy40NjY0IDYuMTQ1NjYgMTMuNTU1OSA2LjMwNDY1IDEzLjYxNjFDNi4zODQyMyAxMy42NDYyIDYuNDQ4MDUgMTMuNjY5IDYuNDkzNDkgMTMuNjg0OEM2LjUxNjIyIDEzLjY5MjcgNi41MzQzOCAxMy42OTg5IDYuNTQ3NjQgMTMuNzAzM0w2LjU2MzgyIDEzLjcwODdMNi41NjkwOCAxMy43MTA0TDYuNTcwOTkgMTMuNzExTDYuODM5ODQgMTMuNzUzM0w2LjU3MjQyIDEzLjcxMTVDNi43NDYzMyAxMy43NjczIDYuOTMzMzUgMTMuNzY3MyA3LjEwNzI3IDEzLjcxMTVMNy4xMDg3IDEzLjcxMUw3LjExMDYxIDEzLjcxMDRMNy4xMTU4NyAxMy43MDg3TDcuMTMyMDUgMTMuNzAzM0M3LjE0NTMxIDEzLjY5ODkgNy4xNjM0NiAxMy42OTI3IDcuMTg2MTkgMTMuNjg0OEM3LjIzMTY0IDEzLjY2OSA3LjI5NTQ2IDEzLjY0NjIgNy4zNzUwMyAxMy42MTYxQzcuNTM0MDMgMTMuNTU1OSA3Ljc1Njg1IDEzLjQ2NjQgOC4wMjIzNiAxMy4zNDU3QzguNTUwOTUgMTMuMTA1MyA5LjI2MTIzIDEyLjczNTUgOS45NzcxNSAxMi4yMTg1QzExLjM5MSAxMS4xOTczIDEyLjk2NDggOS40OTM3NyAxMi45NjQ4IDYuOTgwMThWMi43NTg4QzEyLjk2NDggMi43MTY2IDEyLjk2MTkgMi42NzUxMSAxMi45NTYxIDIuNjM0NTFWMS44ODM3N0gxMi4wODExQzEyLjA3NzUgMS44ODM3NyAxMi4wNzQgMS44ODM3NyAxMi4wNzA0IDEuODgzNzdDMTAuNzk3OSAxLjg4MDA0IDkuNjE5NjIgMS41MTEwMiA4LjczODk0IDEuMTI0ODZDOC43MzUzNCAxLjEyMzI3IDguNzMxNzQgMS4xMjE2OCA4LjcyODE0IDEuMTIwMDlDOC4yOTEwMyAwLjkyNjg2NCA3LjkzODQyIDAuNzM0MDU5IDcuNjk3NzkgMC41OTEzNzNDNy41Nzc3MiAwLjUyMDE3MSA3LjQ4NjIyIDAuNDYxODYgNy40MjY3NiAwLjQyMjc4OUM3LjM5NzA1IDAuNDAzMjY2IDcuMzc1MzkgMC4zODg1ODggNy4zNjIyNCAwLjM3OTU1NEw3LjM0ODk2IDAuMzcwMzVDNy4zNDg5NiAwLjM3MDM1IDcuMzQ4NDcgMC4zNzAwMiA3LjM0NTYzIDAuMzc0MDU0TDcuMzM3NzkgMC4zNjg2NTlMNy4zMzYwOSAwLjM2NzQ3NVpNOC4wMzQ3MSAyLjcyNjkxQzguODYwNCAzLjA5MDYzIDkuOTYwNjYgMy40NjMwOSAxMS4yMDYxIDMuNTg5MDdWNi45ODAxNUgxMS4yMTQ4QzExLjIxNDggOC42Nzk1MyAxMC4xNjM3IDkuOTI1MDcgOC45NTI1NCAxMC43OTk4QzguMzU1OTUgMTEuMjMwNiA3Ljc1Mzc0IDExLjU0NTQgNy4yOTc5NiAxMS43NTI3QzcuMTE2NzEgMTEuODM1MSA2Ljk2MDYyIDExLjg5OTYgNi44Mzk4NCAxMS45NDY5QzYuNzE5MDYgMTEuODk5NiA2LjU2Mjk3IDExLjgzNTEgNi4zODE3MyAxMS43NTI3QzUuOTI1OTUgMTEuNTQ1NCA1LjMyMzczIDExLjIzMDYgNC43MjcxNSAxMC43OTk4QzMuNTE2MDMgOS45MjUwNyAyLjQ2NDg0IDguNjc5NTUgMi40NjQ4NCA2Ljk4MDE4VjMuNTg5MDlDMy43MTczOCAzLjQ2MjM5IDQuODIzMDggMy4wODYzOSA1LjY1MDMzIDIuNzIwNzFDNi4xNDIyOCAyLjUwMzI0IDYuNTQ0ODUgMi4yODUzNyA2LjgzMjU0IDIuMTE2MjRDNy4xMjE4MSAyLjI4NTM1IDcuNTI3IDIuNTAzNTIgOC4wMjE5NiAyLjcyMTMxQzguMDI2MiAyLjcyMzE3IDguMDMwNDUgMi43MjUwNCA4LjAzNDcxIDIuNzI2OTFaTTUuOTY0ODQgMy40MDE0N1Y3Ljc3NjQ3SDcuNzE0ODRWMy40MDE0N0g1Ljk2NDg0Wk01Ljk2NDg0IDEwLjQwMTVWOC42NTE0N0g3LjcxNDg0VjEwLjQwMTVINS45NjQ4NFoiIGZpbGw9ImNyaW1zb24iIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=");
+    background-color: crimson;
+}
+.ace_icon_svg.ace_warning_fold {
+    -webkit-mask-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMTYiIHZpZXdCb3g9IjAgMCAyMCAxNiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZmlsbC1ydWxlPSJldmVub2RkIiBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGQ9Ik0xNC43NzY5IDE0LjczMzdMOC42NTE5MiAyLjQ4MzY5QzguMzI5NDYgMS44Mzg3NyA3LjQwOTEzIDEuODM4NzcgNy4wODY2NyAyLjQ4MzY5TDAuOTYxNjY5IDE0LjczMzdDMC42NzA3NzUgMTUuMzE1NSAxLjA5MzgzIDE2IDEuNzQ0MjkgMTZIMTMuOTk0M0MxNC42NDQ4IDE2IDE1LjA2NzggMTUuMzE1NSAxNC43NzY5IDE0LjczMzdaTTMuMTYwMDcgMTQuMjVMNy44NjkyOSA0LjgzMTU2TDEyLjU3ODUgMTQuMjVIMy4xNjAwN1pNOC43NDQyOSAxMS42MjVWMTMuMzc1SDYuOTk0MjlWMTEuNjI1SDguNzQ0MjlaTTYuOTk0MjkgMTAuNzVWNy4yNUg4Ljc0NDI5VjEwLjc1SDYuOTk0MjlaIiBmaWxsPSIjRUM3MjExIi8+CjxwYXRoIGQ9Ik0xMS4xOTkxIDIuOTUyMzhDMTAuODgwOSAyLjMxNDY3IDEwLjM1MzcgMS44MDUyNiA5LjcwNTUgMS41MDlMMTEuMDQxIDEuMDY5NzhDMTEuNjg4MyAwLjk0OTgxNCAxMi4zMzcgMS4yNzI2MyAxMi42MzE3IDEuODYxNDFMMTcuNjEzNiAxMS44MTYxQzE4LjM1MjcgMTMuMjkyOSAxNy41OTM4IDE1LjA4MDQgMTYuMDE4IDE1LjU3NDVDMTYuNDA0NCAxNC40NTA3IDE2LjMyMzEgMTMuMjE4OCAxNS43OTI0IDEyLjE1NTVMMTEuMTk5MSAyLjk1MjM4WiIgZmlsbD0iI0VDNzIxMSIvPgo8L3N2Zz4=");
+    background-color: darkorange;
+}
+
+.ace_scrollbar {
+    contain: strict;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 6;
+}
+
+.ace_scrollbar-inner {
+    position: absolute;
+    cursor: text;
+    left: 0;
+    top: 0;
+}
+
+.ace_scrollbar-v{
+    overflow-x: hidden;
+    overflow-y: scroll;
+    top: 0;
+}
+
+.ace_scrollbar-h {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    left: 0;
+}
+
+.ace_print-margin {
+    position: absolute;
+    height: 100%;
+}
+
+.ace_text-input {
+    position: absolute;
+    z-index: 0;
+    width: 0.5em;
+    height: 1em;
+    opacity: 0;
+    background: transparent;
+    -moz-appearance: none;
+    appearance: none;
+    border: none;
+    resize: none;
+    outline: none;
+    overflow: hidden;
+    font: inherit;
+    padding: 0 1px;
+    margin: 0 -1px;
+    contain: strict;
+    -ms-user-select: text;
+    -moz-user-select: text;
+    -webkit-user-select: text;
+    user-select: text;
+    /*with `pre-line` chrome inserts &nbsp; instead of space*/
+    white-space: pre!important;
+}
+.ace_text-input.ace_composition {
+    background: transparent;
+    color: inherit;
+    z-index: 1000;
+    opacity: 1;
+}
+.ace_composition_placeholder { color: transparent }
+.ace_composition_marker { 
+    border-bottom: 1px solid;
+    position: absolute;
+    border-radius: 0;
+    margin-top: 1px;
+}
+
+[ace_nocontext=true] {
+    transform: none!important;
+    filter: none!important;
+    clip-path: none!important;
+    mask : none!important;
+    contain: none!important;
+    perspective: none!important;
+    mix-blend-mode: initial!important;
+    z-index: auto;
+}
+
+.ace_layer {
+    z-index: 1;
+    position: absolute;
+    overflow: hidden;
+    /* workaround for chrome bug https://github.com/ajaxorg/ace/issues/2312*/
+    word-wrap: normal;
+    white-space: pre;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    /* setting pointer-events: auto; on node under the mouse, which changes
+        during scroll, will break mouse wheel scrolling in Safari */
+    pointer-events: none;
+}
+
+.ace_gutter-layer {
+    position: relative;
+    width: auto;
+    text-align: right;
+    pointer-events: auto;
+    height: 1000000px;
+    contain: style size layout;
+}
+
+.ace_text-layer {
+    font: inherit !important;
+    position: absolute;
+    height: 1000000px;
+    width: 1000000px;
+    contain: style size layout;
+}
+
+.ace_text-layer > .ace_line, .ace_text-layer > .ace_line_group {
+    contain: style size layout;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.ace_hidpi .ace_text-layer,
+.ace_hidpi .ace_gutter-layer,
+.ace_hidpi .ace_content,
+.ace_hidpi .ace_gutter {
+    contain: strict;
+}
+.ace_hidpi .ace_text-layer > .ace_line, 
+.ace_hidpi .ace_text-layer > .ace_line_group {
+    contain: strict;
+}
+
+.ace_cjk {
+    display: inline-block;
+    text-align: center;
+}
+
+.ace_cursor-layer {
+    z-index: 4;
+}
+
+.ace_cursor {
+    z-index: 4;
+    position: absolute;
+    box-sizing: border-box;
+    border-left: 2px solid;
+    /* workaround for smooth cursor repaintng whole screen in chrome */
+    transform: translatez(0);
+}
+
+.ace_multiselect .ace_cursor {
+    border-left-width: 1px;
+}
+
+.ace_slim-cursors .ace_cursor {
+    border-left-width: 1px;
+}
+
+.ace_overwrite-cursors .ace_cursor {
+    border-left-width: 0;
+    border-bottom: 1px solid;
+}
+
+.ace_hidden-cursors .ace_cursor {
+    opacity: 0.2;
+}
+
+.ace_hasPlaceholder .ace_hidden-cursors .ace_cursor {
+    opacity: 0;
+}
+
+.ace_smooth-blinking .ace_cursor {
+    transition: opacity 0.18s;
+}
+
+.ace_animate-blinking .ace_cursor {
+    animation-duration: 1000ms;
+    animation-timing-function: step-end;
+    animation-name: blink-ace-animate;
+    animation-iteration-count: infinite;
+}
+
+.ace_animate-blinking.ace_smooth-blinking .ace_cursor {
+    animation-duration: 1000ms;
+    animation-timing-function: ease-in-out;
+    animation-name: blink-ace-animate-smooth;
+}
+    
+@keyframes blink-ace-animate {
+    from, to { opacity: 1; }
+    60% { opacity: 0; }
+}
+
+@keyframes blink-ace-animate-smooth {
+    from, to { opacity: 1; }
+    45% { opacity: 1; }
+    60% { opacity: 0; }
+    85% { opacity: 0; }
+}
+
+.ace_marker-layer .ace_step, .ace_marker-layer .ace_stack {
+    position: absolute;
+    z-index: 3;
+}
+
+.ace_marker-layer .ace_selection {
+    position: absolute;
+    z-index: 5;
+}
+
+.ace_marker-layer .ace_bracket {
+    position: absolute;
+    z-index: 6;
+}
+
+.ace_marker-layer .ace_error_bracket {
+    position: absolute;
+    border-bottom: 1px solid #DE5555;
+    border-radius: 0;
+}
+
+.ace_marker-layer .ace_active-line {
+    position: absolute;
+    z-index: 2;
+}
+
+.ace_marker-layer .ace_selected-word {
+    position: absolute;
+    z-index: 4;
+    box-sizing: border-box;
+}
+
+.ace_line .ace_fold {
+    box-sizing: border-box;
+
+    display: inline-block;
+    height: 11px;
+    margin-top: -2px;
+    vertical-align: middle;
+
+    background-image:
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJpJREFUeNpi/P//PwOlgAXGYGRklAVSokD8GmjwY1wasKljQpYACtpCFeADcHVQfQyMQAwzwAZI3wJKvCLkfKBaMSClBlR7BOQikCFGQEErIH0VqkabiGCAqwUadAzZJRxQr/0gwiXIal8zQQPnNVTgJ1TdawL0T5gBIP1MUJNhBv2HKoQHHjqNrA4WO4zY0glyNKLT2KIfIMAAQsdgGiXvgnYAAAAASUVORK5CYII="),
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA3CAYAAADNNiA5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACJJREFUeNpi+P//fxgTAwPDBxDxD078RSX+YeEyDFMCIMAAI3INmXiwf2YAAAAASUVORK5CYII=");
+    background-repeat: no-repeat, repeat-x;
+    background-position: center center, top left;
+    color: transparent;
+
+    border: 1px solid black;
+    border-radius: 2px;
+
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.ace_dark .ace_fold {
+}
+
+.ace_fold:hover{
+    background-image:
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAJCAYAAADU6McMAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJpJREFUeNpi/P//PwOlgAXGYGRklAVSokD8GmjwY1wasKljQpYACtpCFeADcHVQfQyMQAwzwAZI3wJKvCLkfKBaMSClBlR7BOQikCFGQEErIH0VqkabiGCAqwUadAzZJRxQr/0gwiXIal8zQQPnNVTgJ1TdawL0T5gBIP1MUJNhBv2HKoQHHjqNrA4WO4zY0glyNKLT2KIfIMAAQsdgGiXvgnYAAAAASUVORK5CYII="),
+        url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAA3CAYAAADNNiA5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAACBJREFUeNpi+P//fz4TAwPDZxDxD5X4i5fLMEwJgAADAEPVDbjNw87ZAAAAAElFTkSuQmCC");
+}
+
+.ace_tooltip {
+    background-color: #f5f5f5;
+    border: 1px solid gray;
+    border-radius: 1px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    color: black;
+    max-width: 100%;
+    padding: 3px 4px;
+    position: fixed;
+    z-index: 999999;
+    box-sizing: border-box;
+    cursor: default;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    line-height: normal;
+    font-style: normal;
+    font-weight: normal;
+    letter-spacing: normal;
+    pointer-events: none;
+    overflow: auto;
+    max-width: min(60em, 66vw);
+    overscroll-behavior: contain;
+}
+.ace_tooltip pre {
+    white-space: pre-wrap;
+}
+
+.ace_tooltip.ace_dark {
+    background-color: #636363;
+    color: #fff;
+}
+
+.ace_tooltip:focus {
+    outline: 1px solid #5E9ED6;
+}
+
+.ace_icon {
+    display: inline-block;
+    width: 18px;
+    vertical-align: top;
+}
+
+.ace_icon_svg {
+    display: inline-block;
+    width: 12px;
+    vertical-align: top;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 12px;
+    -webkit-mask-position: center;
+}
+
+.ace_folding-enabled > .ace_gutter-cell, .ace_folding-enabled > .ace_gutter-cell_svg-icons {
+    padding-right: 13px;
+}
+
+.ace_fold-widget {
+    box-sizing: border-box;
+
+    margin: 0 -12px 0 1px;
+    display: none;
+    width: 11px;
+    vertical-align: top;
+
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAANElEQVR42mWKsQ0AMAzC8ixLlrzQjzmBiEjp0A6WwBCSPgKAXoLkqSot7nN3yMwR7pZ32NzpKkVoDBUxKAAAAABJRU5ErkJggg==");
+    background-repeat: no-repeat;
+    background-position: center;
+
+    border-radius: 3px;
+    
+    border: 1px solid transparent;
+    cursor: pointer;
+}
+
+.ace_folding-enabled .ace_fold-widget {
+    display: inline-block;   
+}
+
+.ace_fold-widget.ace_end {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAANElEQVR42m3HwQkAMAhD0YzsRchFKI7sAikeWkrxwScEB0nh5e7KTPWimZki4tYfVbX+MNl4pyZXejUO1QAAAABJRU5ErkJggg==");
+}
+
+.ace_fold-widget.ace_closed {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAGCAYAAAAG5SQMAAAAOUlEQVR42jXKwQkAMAgDwKwqKD4EwQ26sSOkVWjgIIHAzPiCgaqiqnJHZnKICBERHN194O5b9vbLuAVRL+l0YWnZAAAAAElFTkSuQmCCXA==");
+}
+
+.ace_fold-widget:hover {
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
+}
+
+.ace_fold-widget:active {
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+}
+/**
+ * Dark version for fold widgets
+ */
+.ace_dark .ace_fold-widget {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHklEQVQIW2P4//8/AzoGEQ7oGCaLLAhWiSwB146BAQCSTPYocqT0AAAAAElFTkSuQmCC");
+}
+.ace_dark .ace_fold-widget.ace_end {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAH0lEQVQIW2P4//8/AxQ7wNjIAjDMgC4AxjCVKBirIAAF0kz2rlhxpAAAAABJRU5ErkJggg==");
+}
+.ace_dark .ace_fold-widget.ace_closed {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAMAAAAFCAYAAACAcVaiAAAAHElEQVQIW2P4//+/AxAzgDADlOOAznHAKgPWAwARji8UIDTfQQAAAABJRU5ErkJggg==");
+}
+.ace_dark .ace_fold-widget:hover {
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.ace_dark .ace_fold-widget:active {
+    box-shadow: 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+.ace_inline_button {
+    border: 1px solid lightgray;
+    display: inline-block;
+    margin: -1px 8px;
+    padding: 0 5px;
+    pointer-events: auto;
+    cursor: pointer;
+}
+.ace_inline_button:hover {
+    border-color: gray;
+    background: rgba(200,200,200,0.2);
+    display: inline-block;
+    pointer-events: auto;
+}
+
+.ace_fold-widget.ace_invalid {
+    background-color: #FFB4B4;
+    border-color: #DE5555;
+}
+
+.ace_fade-fold-widgets .ace_fold-widget {
+    transition: opacity 0.4s ease 0.05s;
+    opacity: 0;
+}
+
+.ace_fade-fold-widgets:hover .ace_fold-widget {
+    transition: opacity 0.05s ease 0.05s;
+    opacity:1;
+}
+
+.ace_underline {
+    text-decoration: underline;
+}
+
+.ace_bold {
+    font-weight: bold;
+}
+
+.ace_nobold .ace_bold {
+    font-weight: normal;
+}
+
+.ace_italic {
+    font-style: italic;
+}
+
+
+.ace_error-marker {
+    background-color: rgba(255, 0, 0,0.2);
+    position: absolute;
+    z-index: 9;
+}
+
+.ace_highlight-marker {
+    background-color: rgba(255, 255, 0,0.2);
+    position: absolute;
+    z-index: 8;
+}
+
+.ace_mobile-menu {
+    position: absolute;
+    line-height: 1.5;
+    border-radius: 4px;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    background: white;
+    box-shadow: 1px 3px 2px grey;
+    border: 1px solid #dcdcdc;
+    color: black;
+}
+.ace_dark > .ace_mobile-menu {
+    background: #333;
+    color: #ccc;
+    box-shadow: 1px 3px 2px grey;
+    border: 1px solid #444;
+
+}
+.ace_mobile-button {
+    padding: 2px;
+    cursor: pointer;
+    overflow: hidden;
+}
+.ace_mobile-button:hover {
+    background-color: #eee;
+    opacity:1;
+}
+.ace_mobile-button:active {
+    background-color: #ddd;
+}
+
+.ace_placeholder {
+    position: relative;
+    font-family: arial;
+    transform: scale(0.9);
+    transform-origin: left;
+    white-space: pre;
+    opacity: 0.7;
+    margin: 0 10px;
+    z-index: 1;
+}
+
+.ace_ghost_text {
+    opacity: 0.5;
+    font-style: italic;
+}
+
+.ace_ghost_text_container > div {
+    white-space: pre;
+}
+
+.ghost_text_line_wrapped::after {
+    content: "↩";
+    position: absolute;
+}
+
+.ace_lineWidgetContainer.ace_ghost_text {
+    margin: 0px 4px
+}
+
+.ace_screenreader-only {
+    position:absolute;
+    left:-10000px;
+    top:auto;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+}
+
+.ace_hidden_token {
+    display: none;
+}
+/*# sourceURL=ace/css/ace_editor.css */</style><style id="ace_scrollbar.css">.ace_editor>.ace_sb-v div, .ace_editor>.ace_sb-h div{
+  position: absolute;
+  background: rgba(128, 128, 128, 0.6);
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  border: 1px solid #bbb;
+  border-radius: 2px;
+  z-index: 8;
+}
+.ace_editor>.ace_sb-v, .ace_editor>.ace_sb-h {
+  position: absolute;
+  z-index: 6;
+  background: none;
+  overflow: hidden!important;
+}
+.ace_editor>.ace_sb-v {
+  z-index: 6;
+  right: 0;
+  top: 0;
+  width: 12px;
+}
+.ace_editor>.ace_sb-v div {
+  z-index: 8;
+  right: 0;
+  width: 100%;
+}
+.ace_editor>.ace_sb-h {
+  bottom: 0;
+  left: 0;
+  height: 12px;
+}
+.ace_editor>.ace_sb-h div {
+  bottom: 0;
+  height: 100%;
+}
+.ace_editor>.ace_sb_grabbed {
+  z-index: 8;
+  background: #000;
+}
+/*# sourceURL=ace/css/ace_scrollbar.css */</style>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Activity | Latent Ability</title>
+    <meta name="description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning.">
+    <link rel="icon" type="image/png" href="./Activity _ Latent Ability_files/icon_bristol.png">
+    <link rel="apple-touch-icon" href="./Activity _ Latent Ability_files/icon_bristol.png">
+    <meta property="og:title" content="Activity | Latent Ability">
+    <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning.">
+    <meta property="og:image" content="https://manuelfjr.github.io/latent-ability-ml/assets/icon_bristol.png">
+    <meta property="og:type" content="website">
+    <link rel="stylesheet" href="./Activity _ Latent Ability_files/style.css">
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        },
+        svg: {
+          fontCache: 'global'
+        }
+      };
+    </script>
+    <script defer="" src="./Activity _ Latent Ability_files/tex-svg.js"></script>
+  <script src="./Activity _ Latent Ability_files/ace.js" async="" data-runtime-src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.2/src-min-noconflict/ace.js" data-loaded="true"></script><script src="./Activity _ Latent Ability_files/pyodide.js" async="" data-runtime-src="https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js" data-loaded="true"></script><style type="text/css">.CtxtMenu_InfoClose {  top:.2em; right:.2em;}
+.CtxtMenu_InfoContent {  overflow:auto; text-align:left; font-size:80%;  padding:.4em .6em; border:1px inset; margin:1em 0px;  max-height:20em; max-width:30em; background-color:#EEEEEE;  white-space:normal;}
+.CtxtMenu_Info.CtxtMenu_MousePost {outline:none;}
+.CtxtMenu_Info {  position:fixed; left:50%; width:auto; text-align:center;  border:3px outset; padding:1em 2em; background-color:#DDDDDD;  color:black;  cursor:default; font-family:message-box; font-size:120%;  font-style:normal; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 15px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius:15px;               /* Safari and Chrome */  -moz-border-radius:15px;                  /* Firefox */  -khtml-border-radius:15px;                /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color="gray", Positive="true"); /* IE */}
+</style><style type="text/css">.CtxtMenu_MenuClose {  position:absolute;  cursor:pointer;  display:inline-block;  border:2px solid #AAA;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  font-family: "Courier New", Courier;  font-size:24px;  color:#F0F0F0}
+.CtxtMenu_MenuClose span {  display:block; background-color:#AAA; border:1.5px solid;  border-radius:18px;  -webkit-border-radius: 18px;             /* Safari and Chrome */  -moz-border-radius: 18px;                /* Firefox */  -khtml-border-radius: 18px;              /* Konqueror */  line-height:0;  padding:8px 0 6px     /* may need to be browser-specific */}
+.CtxtMenu_MenuClose:hover {  color:white!important;  border:2px solid #CCC!important}
+.CtxtMenu_MenuClose:hover span {  background-color:#CCC!important}
+.CtxtMenu_MenuClose:hover:focus {  outline:none}
+</style><style type="text/css">.CtxtMenu_Menu {  position:absolute;  background-color:white;  color:black;  width:auto; padding:5px 0px;  border:1px solid #CCCCCC; margin:0; cursor:default;  font: menu; text-align:left; text-indent:0; text-transform:none;  line-height:normal; letter-spacing:normal; word-spacing:normal;  word-wrap:normal; white-space:nowrap; float:none; z-index:201;  border-radius: 5px;                     /* Opera 10.5 and IE9 */  -webkit-border-radius: 5px;             /* Safari and Chrome */  -moz-border-radius: 5px;                /* Firefox */  -khtml-border-radius: 5px;              /* Konqueror */  box-shadow:0px 10px 20px #808080;         /* Opera 10.5 and IE9 */  -webkit-box-shadow:0px 10px 20px #808080; /* Safari 3 & Chrome */  -moz-box-shadow:0px 10px 20px #808080;    /* Forefox 3.5 */  -khtml-box-shadow:0px 10px 20px #808080;  /* Konqueror */}
+.CtxtMenu_MenuItem {  padding: 1px 2em;  background:transparent;}
+.CtxtMenu_MenuArrow {  position:absolute; right:.5em; padding-top:.25em; color:#666666;  font-family: null; font-size: .75em}
+.CtxtMenu_MenuActive .CtxtMenu_MenuArrow {color:white}
+.CtxtMenu_MenuArrow.CtxtMenu_RTL {left:.5em; right:auto}
+.CtxtMenu_MenuCheck {  position:absolute; left:.7em;  font-family: null}
+.CtxtMenu_MenuCheck.CtxtMenu_RTL { right:.7em; left:auto }
+.CtxtMenu_MenuRadioCheck {  position:absolute; left: .7em;}
+.CtxtMenu_MenuRadioCheck.CtxtMenu_RTL {  right: .7em; left:auto}
+.CtxtMenu_MenuInputBox {  padding-left: 1em; right:.5em; color:#666666;  font-family: null;}
+.CtxtMenu_MenuInputBox.CtxtMenu_RTL {  left: .1em;}
+.CtxtMenu_MenuComboBox {  left:.1em; padding-bottom:.5em;}
+.CtxtMenu_MenuSlider {  left: .1em;}
+.CtxtMenu_SliderValue {  position:absolute; right:.1em; padding-top:.25em; color:#333333;  font-size: .75em}
+.CtxtMenu_SliderBar {  outline: none; background: #d3d3d3}
+.CtxtMenu_MenuLabel {  padding: 1px 2em 3px 1.33em;  font-style:italic}
+.CtxtMenu_MenuRule {  border-top: 1px solid #DDDDDD;  margin: 4px 3px;}
+.CtxtMenu_MenuDisabled {  color:GrayText}
+.CtxtMenu_MenuActive {  background-color: #606872;  color: white;}
+.CtxtMenu_MenuDisabled:focus {  background-color: #E8E8E8}
+.CtxtMenu_MenuLabel:focus {  background-color: #E8E8E8}
+.CtxtMenu_ContextMenu:focus {  outline:none}
+.CtxtMenu_ContextMenu .CtxtMenu_MenuItem:focus {  outline:none}
+.CtxtMenu_SelectionMenu {  position:relative; float:left;  border-bottom: none; -webkit-box-shadow:none; -webkit-border-radius:0px; }
+.CtxtMenu_SelectionItem {  padding-right: 1em;}
+.CtxtMenu_Selection {  right: 40%; width:50%; }
+.CtxtMenu_SelectionBox {  padding: 0em; max-height:20em; max-width: none;  background-color:#FFFFFF;}
+.CtxtMenu_SelectionDivider {  clear: both; border-top: 2px solid #000000;}
+.CtxtMenu_Menu .CtxtMenu_MenuClose {  top:-10px; left:-10px}
+</style><style id="MJX-SVG-styles">
+mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+  min-height: 1px;
+  min-width: 1px;
+}
+
+mjx-container[jax="SVG"] > svg a {
+  fill: blue;
+  stroke: blue;
+}
+
+mjx-assistive-mml {
+  position: absolute !important;
+  top: 0px;
+  left: 0px;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 1px 0px 0px 0px !important;
+  border: 0px !important;
+  display: block !important;
+  width: auto !important;
+  overflow: hidden !important;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+mjx-assistive-mml[display="block"] {
+  width: 100% !important;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][display="true"][width="full"] {
+  display: flex;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line], svg[data-table] > g > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame], svg[data-table] > g > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed, svg[data-table] > g > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted, svg[data-table] > g > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > g > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"] path[data-c], mjx-container[jax="SVG"] use[data-c] {
+  stroke-width: 3;
+}
+</style><script src="./Activity _ Latent Ability_files/ext-language_tools.js" async="" data-runtime-src="https://cdn.jsdelivr.net/npm/ace-builds@1.36.2/src-min-noconflict/ext-language_tools.js" data-loaded="true"></script><script src="./Activity _ Latent Ability_files/mode-python.js"></script><script src="./Activity _ Latent Ability_files/theme-github_dark.js"></script></head>
+  <body>
+    <div class="site-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-top">
+            <a href="https://www.bristol.ac.uk/" target="_blank" rel="noreferrer">
+              <img src="./Activity _ Latent Ability_files/icon_bristol.png" alt="University of Bristol" class="sidebar-logo">
+            </a>
+            <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+          <div class="sidebar-title">Latent Ability</div>
+          <div class="sidebar-subtitle">Latent-Ability Evaluation in Machine Learning</div>
+        </div>
+
+        <nav class="sidebar-nav" aria-label="Workshop navigation">
+          
+          
+          
+          <div class="nav-group">
+            
+            <a href="https://manuelfjr.github.io/latent-ability-ml/" class="nav-link">
+              Home
+            </a>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <a href="https://manuelfjr.github.io/latent-ability-ml/readme/" class="nav-link">
+              Guide
+            </a>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <a href="https://manuelfjr.github.io/latent-ability-ml/roadmap/" class="nav-link">
+              Roadmap
+            </a>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <details class="nav-disclosure">
+              <summary class="nav-link nav-summary">
+                Unsupervised Evaluation
+              </summary>
+              <div class="nav-children">
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-1/" class="nav-sublink">
+                  Overview
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-1-activity/" class="nav-sublink">
+                  Activity
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-1-answer/" class="nav-sublink">
+                  Answer
+                </a>
+                
+              </div>
+            </details>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <details class="nav-disclosure">
+              <summary class="nav-link nav-summary">
+                Binary IRT and 2PL
+              </summary>
+              <div class="nav-children">
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-2/" class="nav-sublink">
+                  Overview
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-2-activity/" class="nav-sublink">
+                  Activity
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-2-answer/" class="nav-sublink">
+                  Answer
+                </a>
+                
+              </div>
+            </details>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <details class="nav-disclosure" open="">
+              <summary class="nav-link nav-summary active">
+                Beta4-IRT and CLAIRE
+              </summary>
+              <div class="nav-children">
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-3/" class="nav-sublink">
+                  Overview
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-3-extra/" class="nav-sublink">
+                  Extra
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-3-activity/" class="nav-sublink active">
+                  Activity
+                </a>
+                
+                <a href="https://manuelfjr.github.io/latent-ability-ml/section-3-answer/" class="nav-sublink">
+                  Answer
+                </a>
+                
+              </div>
+            </details>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <a href="https://manuelfjr.github.io/latent-ability-ml/authors/" class="nav-link">
+              Authors
+            </a>
+            
+          </div>
+          
+          
+          
+          <div class="nav-group">
+            
+            <a href="https://manuelfjr.github.io/latent-ability-ml/contact/" class="nav-link">
+              Contact me
+            </a>
+            
+          </div>
+          
+        </nav>
+
+        <div class="sidebar-footer">
+          sic <span class="sidebar-footer-dot">•</span> parvis <span class="sidebar-footer-dot">•</span> magna
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="page-search" aria-label="Search this page">
+          <form class="page-search-form" onsubmit="return false;">
+            <button class="page-search-button" type="button" id="page-search-button" aria-label="Search this page">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10.5 4a6.5 6.5 0 1 0 4.03 11.6l4.43 4.44 1.41-1.42-4.43-4.43A6.5 6.5 0 0 0 10.5 4Zm0 2a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9Z"></path>
+              </svg>
+            </button>
+            <input id="page-search-input" class="page-search-input" type="search" placeholder="Search this page" aria-label="Search this page">
+            <button class="page-search-clear" type="button" id="page-search-clear" aria-label="Clear search">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M18.3 5.71 12 12l6.3 6.29-1.42 1.42L10.59 13.4 4.29 19.7 2.88 18.3 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3Z"></path>
+              </svg>
+            </button>
+          </form>
+          <div class="page-search-suggestions" id="page-search-suggestions" role="listbox" aria-label="Search suggestions"></div>
+        </div>
+        
+        <div class="eyebrow">Activity Notebook</div>
+        
+        <h1>Activity</h1>
+        
+        <p class="lead">Participants generate a synthetic dataset, build the response matrix, inspect Beta4-style quantities, and connect the workflow back to CLAIRE.</p>
+        
+        <h2 id="browser-lab">Browser Lab</h2>
+
+<p>This page now includes executable Python cells directly in the site. The browser lab loads the pure-Python workshop helpers, including <code class="language-plaintext highlighter-rouge">TransformPairwise</code>, so students can build response matrices and explore Beta4-style quantities inside GitHub Pages itself. For the full <code class="language-plaintext highlighter-rouge">birt-gd</code> training pipeline, keep the Colab notebook as the companion environment.</p>
+
+<h2 id="notebook">Notebook</h2>
+
+<ul>
+  <li>Activity notebook: <code class="language-plaintext highlighter-rouge">03_02_activities.ipynb</code></li>
+  <li>Goal: inspect the individual item and connect the practical workflow back to the theory</li>
+</ul>
+
+<h2 id="what-participants-should-do">What Participants Should Do</h2>
+
+<ul>
+  <li>generate a synthetic dataset;</li>
+  <li>produce the response matrix;</li>
+  <li>inspect ability, difficulty, discrimination, and ICCs.</li>
+</ul>
+
+<div class="button-row">
+  <a class="button" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/03_02_activities.ipynb">Open activity notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/03_02_activities.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
+  <a class="button secondary" href="https://manuelfjr.github.io/latent-ability-ml/section-3/">Back to section</a>
+</div>
+
+<div class="browser-notebook" data-notebook-id="section-3-activity">
+          <div class="browser-notebook__eyebrow">Notebook mode</div>
+          <div class="browser-notebook__title-row">
+            <div>
+              <h2>Section 3 browser notebook</h2>
+              <p class="browser-notebook__lead">Work through the full CLAIRE activity sequence in the page: synthetic data, model pool, response matrix, Beta4-style summaries, and item-level inspection.</p>
+            </div>
+          </div>
+          <div class="browser-notebook__note">The browser notebook supports the pure-Python workshop helpers, including TransformPairwise and the CLAIRE-style response-matrix utilities. The full birt-gd package is not available here because it imports TensorFlow at module import time. Use the Colab notebook for the complete Beta4 training pipeline.</div>
+          <div class="browser-notebook__status is-error" data-notebook-status="">The selected cell raised an error. Review the traceback below and keep iterating.</div>
+          <div class="browser-notebook__toolbar">
+            <div class="browser-notebook__toolbar-actions">
+              <button class="button tiny" type="button" data-action="add-cell">Add cell</button>
+              <button class="button tiny secondary" type="button" data-action="run-all">Run all</button>
+              <button class="button tiny ghost" type="button" data-action="reset-notebook">Reset notebook</button>
+            </div>
+            <div class="browser-notebook__toolbar-meta">Use <code>Shift+Enter</code> to run the current cell.</div>
+          </div>
+          <div class="browser-notebook__cells" data-notebook-cells=""><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-lnltoat">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 1</p>
+                  <p class="browser-notebook__cell-lead">Generate a synthetic dataset with medium to high variability.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 42px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 1</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-lbs4q5b">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 2</p>
+                  <p class="browser-notebook__cell-lead">Train a pool of clustering models with different inductive biases.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 42px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 2</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-trsh9gl">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 3</p>
+                  <p class="browser-notebook__cell-lead">Generate the CLAIRE response matrix from agreement.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 42px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 3</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-zk6fjhf">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 4</p>
+                  <p class="browser-notebook__cell-lead">Prepare the Beta4-IRT training step and inspect what will be fitted.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 42px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 4</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-cmbcuk3">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 5</p>
+                  <p class="browser-notebook__cell-lead">Compare latent-aware summaries with standard clustering metrics.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 42px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 5</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-ftvtnmb">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 6</p>
+                  <p class="browser-notebook__cell-lead">Inspect item difficulties and locate the hardest instances.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 42px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 6</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-peqed93">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 7</p>
+                  <p class="browser-notebook__cell-lead">Select representative items and compare their agreement profiles.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 525px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(56px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 52px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 52px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 42px;">3<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 63px;">4<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 84px;">5<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 105px;">6<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 126px;">7<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 147px;">8<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 168px;">9<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 189px;">10<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="false" style="height: 21px; top: 210px;">11<span class="ace_fold-widget ace_start ace_open" role="button" tabindex="-1" aria-label="Toggle code folding, rows 11 through 12" aria-expanded="true" title="Fold code" style="height: 21px; display: inline-block;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 231px;">12<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 252px;">13<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 273px;">14<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 294px;">15<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 315px;">16<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 336px;">17<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 357px;">18<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 378px;">19<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 399px;">20<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 420px;">21<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 441px;">22<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 462px;">23<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 483px;">24<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 504px;">25<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 52px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 743px; height: 567px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 42px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 63px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># from birt import Beta4</span></div></div><div class="ace_line_group" style="height: 21px; top: 84px;"><div class="ace_line" style="height: 21px;"><span class="ace_keyword">import</span> <span class="ace_identifier">numpy</span> <span class="ace_keyword">as</span> <span class="ace_identifier">np</span></div></div><div class="ace_line_group" style="height: 21px; top: 105px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 126px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">n</span><span class="ace_punctuation">,</span> <span class="ace_identifier">m</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_constant ace_numeric">100</span><span class="ace_punctuation">,</span> <span class="ace_constant ace_numeric">10</span></div></div><div class="ace_line_group" style="height: 21px; top: 147px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 168px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">pij</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">np</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">zeros</span><span class="ace_paren ace_lparen">((</span><span class="ace_identifier">n</span><span class="ace_punctuation">,</span> <span class="ace_identifier">m</span><span class="ace_paren ace_rparen">))</span></div></div><div class="ace_line_group" style="height: 21px; top: 189px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 210px;"><div class="ace_line" style="height: 21px;"><span class="ace_keyword">for</span> <span class="ace_identifier">i</span> <span class="ace_keyword">in</span> <span class="ace_support ace_function">range</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">m</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation">:</span></div></div><div class="ace_line_group" style="height: 21px; top: 231px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">pij</span><span class="ace_paren ace_lparen">[</span><span class="ace_punctuation">:,</span> <span class="ace_identifier">i</span><span class="ace_paren ace_rparen">]</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">np</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">random</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">beta</span><span class="ace_paren ace_lparen">(</span><span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span> <span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span> <span class="ace_identifier">size</span><span class="ace_keyword ace_operator">=</span><span class="ace_identifier">n</span><span class="ace_paren ace_rparen">)</span></div></div><div class="ace_line_group" style="height: 21px; top: 252px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">pij</span></div></div><div class="ace_line_group" style="height: 21px; top: 273px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># birt = Beta4(</span></div></div><div class="ace_line_group" style="height: 21px; top: 294px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     learning_rate=1,</span></div></div><div class="ace_line_group" style="height: 21px; top: 315px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     epochs=10_000,</span></div></div><div class="ace_line_group" style="height: 21px; top: 336px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     n_respondents=pij.shape[1],</span></div></div><div class="ace_line_group" style="height: 21px; top: 357px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     n_items=pij.shape[0],</span></div></div><div class="ace_line_group" style="height: 21px; top: 378px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     n_inits=1000,</span></div></div><div class="ace_line_group" style="height: 21px; top: 399px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     n_workers=1,</span></div></div><div class="ace_line_group" style="height: 21px; top: 420px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     random_seed=1,</span></div></div><div class="ace_line_group" style="height: 21px; top: 441px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     tol=10**(-8),</span></div></div><div class="ace_line_group" style="height: 21px; top: 462px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment">#     set_priors=True</span></div></div><div class="ace_line_group" style="height: 21px; top: 483px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># )</span></div></div><div class="ace_line_group" style="height: 21px; top: 504px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># birt.fit(pij)</span></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 525px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 525px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 52px; right: 0px; width: 743px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 743px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 7</div>
+              </div>
+              <div class="browser-notebook__output"><pre>[[0.57927685 0.73540132 0.7136821  0.65978257 0.1127154  0.61468453
+  0.44022251 0.36612229 0.2036872  0.9729988 ]
+ [0.04082413 0.36894667 0.42493198 0.72368498 0.80859042 0.83651983
+  0.29120625 0.3320064  0.10940691 0.41517854]
+ [0.39977025 0.46012931 0.84228749 0.31273173 0.37329783 0.43740201
+  0.80678376 0.76209303 0.75081876 0.98966766]
+ [0.64988605 0.3621015  0.51156968 0.12510107 0.7113309  0.57350379
+  0.9639439  0.34912143 0.92355997 0.30678437]
+ [0.98314195 0.87919913 0.89737844 0.94020413 0.38283763 0.01097176
+  0.80936426 0.95924267 0.97219071 0.17686578]
+ [0.91910286 0.10636562 0.49547861 0.97730707 0.19666394 0.92868159
+  0.24436551 0.75721112 0.3282948  0.20236225]
+ [0.904403   0.39537205 0.61081547 0.76963793 0.99628664 0.53484677
+  0.41898482 0.28187934 0.32231499 0.21697238]
+ [0.01171801 0.55454285 0.14096526 0.45957799 0.25377661 0.86524115
+  0.34135908 0.85701689 0.04989627 0.91142222]
+ [0.08367172 0.30248188 0.22655378 0.9667921  0.64380589 0.19971721
+  0.80601977 0.24863779 0.54563596 0.41490021]
+ [0.62029256 0.36587755 0.10755631 0.09624846 0.60560018 0.50587897
+  0.53826059 0.25954854 0.0960914  0.5108939 ]
+ [0.39424401 0.44229021 0.95568113 0.79108878 0.603537   0.13509087
+  0.59499765 0.92558299 0.27968095 0.04132872]
+ [0.98855852 0.44336021 0.87056152 0.20114181 0.35815368 0.99534386
+  0.85067788 0.3719274  0.89122451 0.90485782]
+ [0.48905802 0.09316896 0.02922859 0.12930284 0.02499835 0.9394112
+  0.17931203 0.45066877 0.56467728 0.89670572]
+ [0.34852431 0.35110605 0.89200097 0.05774623 0.11866708 0.52652982
+  0.98093476 0.74232445 0.45828286 0.72973134]
+ [0.04968145 0.31355195 0.24900841 0.076263   0.24651816 0.59763076
+  0.16083589 0.08899001 0.51086982 0.14670035]
+ [0.98741895 0.42231609 0.81860644 0.97902495 0.06556703 0.95796483
+  0.27924395 0.73553515 0.86558807 0.55892772]
+ [0.22900602 0.99479954 0.86599357 0.30780599 0.89615101 0.88607477
+  0.91694306 0.64752555 0.83799003 0.44370197]
+ [0.79072742 0.90678259 0.72571913 0.6406242  0.27821273 0.12701427
+  0.77141575 0.0506615  0.94071544 0.45458132]
+ [0.70408131 0.80015531 0.96632884 0.80026918 0.22558038 0.15244554
+  0.99471336 0.490879   0.23012966 0.49501717]
+ [0.7251022  0.70533615 0.38759372 0.68584872 0.973792   0.88977519
+  0.07170368 0.16877459 0.02873027 0.25895759]
+ [0.17095943 0.25179992 0.59385795 0.14910894 0.51548326 0.53567242
+  0.24594293 0.3443325  0.29019339 0.76024534]
+ [0.91293557 0.66424026 0.66425554 0.19365588 0.38810094 0.03650831
+  0.14165484 0.59409103 0.37064832 0.29127818]
+ [0.80848378 0.83763641 0.02961364 0.16513243 0.43433935 0.77147105
+  0.46215798 0.91348653 0.32019041 0.54803612]
+ [0.32176245 0.71460088 0.73576501 0.59203507 0.20747486 0.09392226
+  0.87801104 0.92458271 0.83323541 0.15986855]
+ [0.60263568 0.82004168 0.05173166 0.03377635 0.26548101 0.0880681
+  0.80506429 0.23670089 0.17266029 0.8042231 ]
+ [0.69258429 0.04610218 0.03130111 0.4092636  0.71555351 0.7039752
+  0.12187177 0.37411526 0.63142407 0.32536954]
+ [0.22923758 0.06615064 0.60913931 0.65538487 0.8625506  0.98217132
+  0.42687335 0.13694736 0.54647694 0.63676094]
+ [0.54561866 0.43262423 0.14455906 0.28493313 0.28254484 0.19613097
+  0.46931917 0.70374462 0.04314839 0.26091755]
+ [0.79090848 0.24116796 0.94849721 0.73776026 0.00931142 0.12763481
+  0.97766824 0.99796668 0.12500358 0.47401146]
+ [0.63843106 0.47051827 0.59426207 0.04370348 0.15500415 0.56021781
+  0.89651314 0.87765767 0.54196022 0.46215575]
+ [0.10650908 0.3845677  0.03113749 0.19011263 0.08536513 0.17735526
+  0.50884984 0.28473128 0.44615562 0.81577632]
+ [0.46856345 0.50495789 0.39688195 0.7612172  0.37490485 0.28204146
+  0.66780124 0.98903217 0.38905788 0.2124889 ]
+ [0.30766217 0.7867989  0.21855943 0.70234419 0.14801427 0.2585205
+  0.64087331 0.97740571 0.30611129 0.36743102]
+ [0.23019326 0.38441233 0.05002096 0.16551506 0.26945216 0.75212525
+  0.12169456 0.36101987 0.36494361 0.11542699]
+ [0.79810453 0.48728537 0.39196298 0.35870505 0.4231513  0.79858363
+  0.14215182 0.94589075 0.3361835  0.58132876]
+ [0.16407463 0.64750509 0.79554201 0.24120023 0.79697102 0.00690654
+  0.96296865 0.12382786 0.98197014 0.38878437]
+ [0.12636856 0.34195028 0.62228283 0.93917001 0.03089583 0.42094569
+  0.71184185 0.66221992 0.12230218 0.47192711]
+ [0.54994124 0.4597155  0.11535205 0.61184917 0.00795127 0.28510511
+  0.90326315 0.97740837 0.41090838 0.94439808]
+ [0.14753222 0.65669263 0.53743954 0.60508372 0.62085423 0.019403
+  0.70422362 0.49146051 0.71977089 0.72059436]
+ [0.28464544 0.36804717 0.26539812 0.97724928 0.78678966 0.6925193
+  0.3951278  0.81640636 0.3969982  0.52719622]
+ [0.2180792  0.42358548 0.39720907 0.0785139  0.88023231 0.77696195
+  0.44283995 0.58653175 0.82766429 0.0250144 ]
+ [0.86367702 0.14206374 0.89853506 0.61313505 0.90074782 0.03714536
+  0.62199468 0.4952963  0.28793645 0.28703225]
+ [0.43242655 0.381343   0.42777552 0.58855508 0.10503516 0.38587487
+  0.41142489 0.77030114 0.51507537 0.37818545]
+ [0.57809694 0.36352141 0.06985994 0.58594931 0.52160353 0.01518308
+  0.09706739 0.95919913 0.79920915 0.00404742]
+ [0.2674444  0.6619427  0.29327101 0.89482419 0.27916842 0.78657427
+  0.50409291 0.24574509 0.93253014 0.75203724]
+ [0.59939234 0.54712909 0.54518203 0.22685557 0.81067807 0.68863448
+  0.18854688 0.05165266 0.43783861 0.00282521]
+ [0.71926452 0.91197064 0.57743717 0.17558465 0.93944574 0.15990777
+  0.24889058 0.18085972 0.84086353 0.03731001]
+ [0.47824519 0.03343097 0.71841819 0.77283868 0.50359648 0.59426952
+  0.49862225 0.48188168 0.11835917 0.73026295]
+ [0.59996811 0.77643261 0.62724147 0.8975522  0.00751988 0.33499948
+  0.74006011 0.84790236 0.09836363 0.26097876]
+ [0.30130036 0.86302523 0.60785022 0.74277823 0.50875089 0.26257828
+  0.59666121 0.69665447 0.95739967 0.06199814]
+ [0.65962853 0.93904543 0.96727614 0.06527325 0.72285601 0.71294289
+  0.3711645  0.16738365 0.87684149 0.35209521]
+ [0.69994283 0.71894018 0.5407838  0.6183768  0.48762743 0.22360659
+  0.69129054 0.15448732 0.82487313 0.09803218]
+ [0.89144408 0.22283324 0.04545075 0.62388198 0.78706388 0.40359344
+  0.50131585 0.66034629 0.38065142 0.53059811]
+ [0.11829669 0.30543468 0.68068319 0.7922244  0.81125062 0.370576
+  0.55464629 0.38074788 0.72788841 0.88519479]
+ [0.59174793 0.27186845 0.23177448 0.48855104 0.92589732 0.82002574
+  0.47970165 0.50785655 0.69328142 0.22421601]
+ [0.84213092 0.41490474 0.55105632 0.90419876 0.4734665  0.34605381
+  0.86819985 0.54475375 0.36837517 0.991379  ]
+ [0.16406653 0.01441457 0.80649134 0.52963264 0.53687485 0.46603348
+  0.21218352 0.79438685 0.92751633 0.323433  ]
+ [0.97872181 0.53545936 0.4388286  0.55011591 0.2853479  0.5216696
+  0.66293301 0.68801846 0.8963726  0.98313559]
+ [0.45039778 0.87470254 0.78821195 0.40924315 0.4704604  0.62960054
+  0.44229849 0.52840605 0.12109164 0.24936619]
+ [0.38657012 0.09076674 0.59020316 0.9635331  0.78260695 0.3674298
+  0.33547799 0.25776831 0.12135719 0.27735112]
+ [0.38810244 0.87129738 0.95678013 0.93838376 0.47366119 0.68674104
+  0.72071796 0.6513985  0.00841816 0.31458993]
+ [0.52729097 0.40851946 0.7757028  0.50719497 0.22251967 0.14148623
+  0.19646542 0.33073627 0.1362811  0.8139723 ]
+ [0.6723535  0.12750586 0.23473515 0.56391748 0.2356241  0.55990817
+  0.85365932 0.42805164 0.86848174 0.69806651]
+ [0.63737438 0.27556687 0.62877716 0.62004648 0.21620098 0.16043459
+  0.39529666 0.38413682 0.94518248 0.82596051]
+ [0.53297842 0.73936007 0.72530102 0.26912526 0.88043057 0.59841343
+  0.75732593 0.26522618 0.28279792 0.00398448]
+ [0.34463015 0.04533248 0.15515109 0.50474034 0.73484113 0.15610281
+  0.49182678 0.94466501 0.87961081 0.97498265]
+ [0.46060232 0.73139237 0.77109732 0.17490763 0.31625049 0.45930008
+  0.93502615 0.15403636 0.93784897 0.63046218]
+ [0.94969394 0.6469422  0.51124441 0.83386579 0.85733121 0.09774819
+  0.01315505 0.14633648 0.9946152  0.48598738]
+ [0.83879688 0.31460689 0.1056162  0.8632463  0.26515105 0.57941324
+  0.30397076 0.59053293 0.46054451 0.46531937]
+ [0.30210642 0.44225786 0.29186361 0.51974619 0.15397066 0.21051934
+  0.52885558 0.54443471 0.81254763 0.54536114]
+ [0.45655794 0.044576   0.17799553 0.2541221  0.96781832 0.89405817
+  0.97016192 0.09669451 0.45496225 0.98970227]
+ [0.17041915 0.77207149 0.24642845 0.64889572 0.25329592 0.95149851
+  0.82035845 0.61930651 0.06369619 0.26078056]
+ [0.39605217 0.12243874 0.73902057 0.88747498 0.70225878 0.84606677
+  0.89004725 0.74523097 0.41932041 0.72838613]
+ [0.20820906 0.36572701 0.11462889 0.50662364 0.08026981 0.38504507
+  0.2014801  0.72273283 0.97904647 0.03702713]
+ [0.6774467  0.93475945 0.75911477 0.47965349 0.53009436 0.13745247
+  0.38773792 0.06254182 0.13227311 0.68298575]
+ [0.76245465 0.95484743 0.7684427  0.13641888 0.70293019 0.97321256
+  0.88525309 0.58016603 0.09670707 0.62025819]
+ [0.33836909 0.23352735 0.54191408 0.00332874 0.72283833 0.03521547
+  0.11799156 0.10739608 0.53584626 0.23098818]
+ [0.7176235  0.20140973 0.39020927 0.56266888 0.7902708  0.9822771
+  0.13733629 0.9954744  0.66860687 0.58671926]
+ [0.09749135 0.34136763 0.17701602 0.64302684 0.24324202 0.40613446
+  0.97782847 0.0466933  0.34423225 0.49532996]
+ [0.38924239 0.18985519 0.21897368 0.07686062 0.9999355  0.32873972
+  0.00664554 0.35869048 0.94805805 0.79888499]
+ [0.27050116 0.50249742 0.87052257 0.55647684 0.01863864 0.61911736
+  0.0215093  0.6359549  0.27766968 0.22860543]
+ [0.13908219 0.4883609  0.269651   0.02601504 0.12951933 0.67268752
+  0.03174843 0.61570138 0.81647428 0.54344816]
+ [0.01779513 0.48478318 0.72444159 0.62333188 0.20159436 0.28089871
+  0.45307453 0.53649895 0.35490378 0.02350455]
+ [0.7412427  0.53039692 0.42262841 0.13114793 0.87995911 0.70050021
+  0.90950729 0.5249022  0.15155828 0.03428022]
+ [0.11295325 0.31424026 0.97253011 0.20924885 0.24370483 0.78197726
+  0.26524584 0.18216053 0.29964569 0.73454358]
+ [0.03121354 0.82985993 0.78110974 0.58285119 0.92193172 0.1795914
+  0.59443929 0.19977711 0.36786977 0.53507701]
+ [0.07378549 0.65281196 0.59964713 0.75818419 0.95257764 0.14719134
+  0.3557412  0.02391825 0.7301752  0.45453244]
+ [0.12986504 0.15161926 0.2010154  0.39869661 0.32413273 0.43340854
+  0.69303108 0.37333293 0.39350609 0.47331255]
+ [0.56147642 0.21870699 0.07480429 0.99443481 0.50363839 0.81118624
+  0.87647469 0.53040747 0.20032162 0.45932447]
+ [0.48697872 0.72624003 0.45947196 0.27564877 0.44950092 0.60137641
+  0.05628441 0.14643256 0.2552595  0.05154224]
+ [0.60932371 0.6331922  0.694698   0.58124819 0.44921405 0.21181608
+  0.21351439 0.8526765  0.38992217 0.20001317]
+ [0.26571621 0.15305046 0.56651619 0.02031385 0.44327248 0.97468198
+  0.48071714 0.93752572 0.27353316 0.89224905]
+ [0.62239311 0.10773374 0.08405201 0.36720535 0.07947624 0.03452457
+  0.71284817 0.02558002 0.64352373 0.53107336]
+ [0.73611503 0.07323812 0.12162276 0.02597909 0.97356232 0.1546691
+  0.55882033 0.69859251 0.22768825 0.6714776 ]
+ [0.04069994 0.20851829 0.32278828 0.50418291 0.13925864 0.56685589
+  0.02488814 0.55127178 0.44342477 0.9523311 ]
+ [0.55024354 0.90795625 0.30673674 0.57816154 0.51188885 0.81533173
+  0.86267411 0.15096184 0.75594933 0.91539986]
+ [0.93386046 0.02572616 0.84082561 0.49757845 0.17758068 0.4691101
+  0.68592087 0.92970773 0.40443324 0.47195003]
+ [0.91488644 0.90721162 0.30141222 0.48291922 0.68302912 0.48781849
+  0.26505621 0.30174263 0.37182294 0.89641855]
+ [0.04765091 0.39958571 0.02164095 0.31165589 0.92103141 0.67965679
+  0.05174617 0.14738355 0.26758686 0.25096562]
+ [0.72093662 0.72043833 0.82254942 0.92959353 0.50274849 0.28266382
+  0.98893461 0.34937385 0.28189706 0.58488294]]</pre></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776808590822-tbwn7nc">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Scratch cell</p>
+                  <p class="browser-notebook__cell-lead">Use this extra cell for your own experiments.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark ace_focus" style="font-size: 15px; height: 84px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(47px, 83px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 43px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 43px;"><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 42px;">3<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 63px;">4<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 43px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 752px; height: 126px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 63px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"><span class="ace_keyword">import</span> <span class="ace_identifier">micropip</span></div></div><div class="ace_line_group" style="height: 21px; top: 42px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">micropip</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">install</span><span class="ace_paren ace_lparen">(</span><span class="ace_string">"birt-gd"</span><span class="ace_paren ace_rparen">)</span></div></div><div class="ace_line_group" style="height: 21px; top: 63px;"><div class="ace_line" style="height: 21px;"></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_animate-blinking"><div class="ace_cursor" style="display: block; transform: translate(4px, 63px); width: 9px; height: 21px; animation-duration: 1000ms;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 84px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 84px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 43px; right: 0px; width: 752px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 752px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 8</div>
+              </div>
+              <div class="browser-notebook__output is-error"><pre>&lt;exec&gt;:3: RuntimeWarning: coroutine 'PackageManager.install' was never awaited
+RuntimeWarning: Enable tracemalloc to get the object allocation traceback
+Traceback (most recent call last):
+  File "&lt;exec&gt;", line 31, in run_notebook_cell
+  File "&lt;exec&gt;", line 5, in &lt;module&gt;
+ModuleNotFoundError: No module named 'birt'</pre></div>
+            </section><section class="browser-notebook__cell" data-cell-id="cell-1776807466630-ejivezk">
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">Task 8</p>
+                  <p class="browser-notebook__cell-lead">Inspect one representative item in more detail inside the feature space.</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor ace_editor ace_hidpi ace-github-dark ace_dark" style="font-size: 15px; height: 504px;"><textarea class="ace_text-input" wrap="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-haspopup="false" aria-autocomplete="both" role="textbox" style="opacity: 0; font-size: 1px; height: 1px; width: 1px; transform: translate(56px, 21px);"></textarea><div class="ace_gutter" aria-hidden="true" style="left: 0px; width: 52px;"><div class="ace_layer ace_gutter-layer ace_folding-enabled" style="height: 1e+06px; transform: translate(0px, 0px); width: 52px;"><div class="ace_gutter-cell ace_gutter-active-line " aria-hidden="true" style="height: 21px; top: 0px;">1<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 21px;">2<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 42px;">3<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 63px;">4<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 84px;">5<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 105px;">6<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 126px;">7<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 147px;">8<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 168px;">9<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="false" style="height: 21px; top: 189px;">10<span class="ace_fold-widget ace_start ace_open" role="button" tabindex="-1" aria-label="Toggle code folding, rows 10 through 11" aria-expanded="true" title="Fold code" style="height: 21px; display: inline-block;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 210px;">11<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 231px;">12<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 252px;">13<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 273px;">14<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 294px;">15<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 315px;">16<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 336px;">17<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 357px;">18<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 378px;">19<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 399px;">20<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 420px;">21<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 441px;">22<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 462px;">23<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div><div class="ace_gutter-cell " aria-hidden="true" style="height: 21px; top: 483px;">24<span tabindex="0" style="display: none;"></span><span tabindex="0" style="display: none;"><span></span></span></div></div></div><div class="ace_scroller " style="line-height: 21px; left: 52px; right: 0px; bottom: 0px;"><div class="ace_content" style="transform: translate(0px, 0px); width: 743px; height: 546px;"><div class="ace_layer ace_print-margin-layer"><div class="ace_print-margin" style="left: 724px; visibility: hidden;"></div></div><div class="ace_layer ace_marker-layer"><div class="ace_active-line" style="height: 21px; top: 0px; left: 0px; right: 0px;"></div></div><div class="ace_layer ace_text-layer" style="height: 1e+06px; margin: 0px 4px; transform: translate(0px, 0px);"><div class="ace_line_group" style="height: 21px; top: 0px;"><div class="ace_line" style="height: 21px;"><span class="ace_comment"># answer</span></div></div><div class="ace_line_group" style="height: 21px; top: 21px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 42px;"><div class="ace_line" style="height: 21px;"><span class="ace_keyword">from</span> <span class="ace_identifier">birt</span> <span class="ace_keyword">import</span> <span class="ace_identifier">Beta4</span></div></div><div class="ace_line_group" style="height: 21px; top: 63px;"><div class="ace_line" style="height: 21px;"><span class="ace_keyword">import</span> <span class="ace_identifier">numpy</span> <span class="ace_keyword">as</span> <span class="ace_identifier">np</span></div></div><div class="ace_line_group" style="height: 21px; top: 84px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 105px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">n</span><span class="ace_punctuation">,</span> <span class="ace_identifier">m</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_constant ace_numeric">100</span><span class="ace_punctuation">,</span> <span class="ace_constant ace_numeric">10</span></div></div><div class="ace_line_group" style="height: 21px; top: 126px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 147px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">pij</span> <span class="ace_keyword ace_operator">=</span><span class="ace_invisible ace_invisible_space ace_invalid">·</span> <span class="ace_identifier">np</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">zeros</span><span class="ace_paren ace_lparen">((</span><span class="ace_identifier">n</span><span class="ace_punctuation">,</span> <span class="ace_identifier">m</span><span class="ace_paren ace_rparen">))</span></div></div><div class="ace_line_group" style="height: 21px; top: 168px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 189px;"><div class="ace_line" style="height: 21px;"><span class="ace_keyword">for</span> <span class="ace_identifier">i</span> <span class="ace_keyword">in</span> <span class="ace_support ace_function">range</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">m</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation">:</span></div></div><div class="ace_line_group" style="height: 21px; top: 210px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">pij</span><span class="ace_paren ace_lparen">[</span><span class="ace_punctuation">:,</span> <span class="ace_identifier">i</span><span class="ace_paren ace_rparen">]</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">np</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">random</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">beta</span><span class="ace_paren ace_lparen">(</span><span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span> <span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span> <span class="ace_identifier">size</span><span class="ace_keyword ace_operator">=</span><span class="ace_identifier">n</span><span class="ace_paren ace_rparen">)</span></div></div><div class="ace_line_group" style="height: 21px; top: 231px;"><div class="ace_line" style="height: 21px;"></div></div><div class="ace_line_group" style="height: 21px; top: 252px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">birt</span> <span class="ace_keyword ace_operator">=</span> <span class="ace_identifier">Beta4</span><span class="ace_paren ace_lparen">(</span></div></div><div class="ace_line_group" style="height: 21px; top: 273px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">learning_rate</span><span class="ace_keyword ace_operator">=</span><span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 294px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">epochs</span><span class="ace_keyword ace_operator">=</span>10<span class="ace_identifier">_000</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 315px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">n_respondents</span><span class="ace_keyword ace_operator">=</span><span class="ace_identifier">pij</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">shape</span><span class="ace_paren ace_lparen">[</span><span class="ace_constant ace_numeric">1</span><span class="ace_paren ace_rparen">]</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 336px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">n_items</span><span class="ace_keyword ace_operator">=</span><span class="ace_identifier">pij</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">shape</span><span class="ace_paren ace_lparen">[</span><span class="ace_constant ace_numeric">0</span><span class="ace_paren ace_rparen">]</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 357px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">n_inits</span><span class="ace_keyword ace_operator">=</span><span class="ace_constant ace_numeric">1000</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 378px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">n_workers</span><span class="ace_keyword ace_operator">=</span><span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 399px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">random_seed</span><span class="ace_keyword ace_operator">=</span><span class="ace_constant ace_numeric">1</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 420px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">tol</span><span class="ace_keyword ace_operator">=</span><span class="ace_constant ace_numeric">10</span><span class="ace_keyword ace_operator">**</span><span class="ace_paren ace_lparen">(</span><span class="ace_keyword ace_operator">-</span><span class="ace_constant ace_numeric">8</span><span class="ace_paren ace_rparen">)</span><span class="ace_punctuation">,</span></div></div><div class="ace_line_group" style="height: 21px; top: 441px;"><div class="ace_line" style="height: 21px;">    <span class="ace_identifier">set_priors</span><span class="ace_keyword ace_operator">=</span><span class="ace_constant ace_language">True</span></div></div><div class="ace_line_group" style="height: 21px; top: 462px;"><div class="ace_line" style="height: 21px;"><span class="ace_paren ace_rparen">)</span></div></div><div class="ace_line_group" style="height: 21px; top: 483px;"><div class="ace_line" style="height: 21px;"><span class="ace_identifier">birt</span><span class="ace_punctuation">.</span><span class="ace_function ace_support">fit</span><span class="ace_paren ace_lparen">(</span><span class="ace_identifier">pij</span><span class="ace_paren ace_rparen">)</span></div></div></div><div class="ace_layer ace_marker-layer"></div><div class="ace_layer ace_cursor-layer ace_hidden-cursors"><div class="ace_cursor" style="display: block; transform: translate(4px, 0px); width: 9px; height: 21px;"></div></div></div></div><div class="ace_scrollbar ace_scrollbar-v" style="display: none; width: 28px; height: 504px; bottom: 0px;"><div class="ace_scrollbar-inner" style="width: 28px; height: 504px;">&nbsp;</div></div><div class="ace_scrollbar ace_scrollbar-h" style="display: none; height: 28px; left: 52px; right: 0px; width: 743px;"><div class="ace_scrollbar-inner" style="height: 28px; width: 743px;">&nbsp;</div></div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: hidden;"><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font: inherit; overflow: visible;">הההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</div><div style="height: auto; width: auto; top: 0px; left: 0px; visibility: hidden; position: absolute; white-space: pre; font-style: inherit; font-variant: inherit; font-stretch: inherit; font-size: inherit; line-height: inherit; font-family: inherit; font-optical-sizing: inherit; font-size-adjust: inherit; font-kerning: inherit; font-feature-settings: inherit; font-variation-settings: inherit; font-language-override: inherit; overflow: visible;">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</div></div></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false" style="display: none; height: 120px;"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell 9</div>
+              </div>
+              <div class="browser-notebook__output is-error"><pre>Traceback (most recent call last):
+  File "&lt;exec&gt;", line 23, in run_notebook_cell
+  File "/lib/python312.zip/ast.py", line 52, in parse
+    return compile(source, filename, mode, flags,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "&lt;unknown&gt;", line 8
+    pij =&nbsp; np.zeros((n, m))
+         ^
+SyntaxError: invalid non-printable character U+00A0</pre></div>
+            </section></div>
+        </div>
+
+      </main>
+
+      <div class="corner-logos" aria-label="Institutional logos">
+        <a href="https://portal.cin.ufpe.br/" target="_blank" rel="noreferrer">
+          <img src="./Activity _ Latent Ability_files/logo_ufpe.png" alt="UFPE" class="corner-logo corner-logo-ufpe">
+        </a>
+        <a href="https://www.kunuminst.org/en" target="_blank" rel="noreferrer">
+          <img src="./Activity _ Latent Ability_files/logo_kunumi.png" alt="Instituto Kunumi" class="corner-logo corner-logo-kunumi">
+        </a>
+      </div>
+
+      <div class="image-lightbox" id="image-lightbox" aria-hidden="true">
+        <div class="image-lightbox__frame">
+          <button class="image-lightbox__close" id="image-lightbox-close" type="button" aria-label="Close image preview">×</button>
+          <img class="image-lightbox__img" id="image-lightbox-img" alt="">
+          <div class="image-lightbox__card" id="image-lightbox-card"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (() => {
+        const siteShell = document.querySelector(".site-shell");
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebarStorageKey = "latent-ability-sidebar-collapsed";
+
+        if (siteShell && sidebarToggle && window.matchMedia("(min-width: 961px)").matches) {
+          const applySidebarState = (collapsed) => {
+            siteShell.classList.toggle("sidebar-collapsed", collapsed);
+            sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+            sidebarToggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+          };
+
+          applySidebarState(window.localStorage.getItem(sidebarStorageKey) === "true");
+
+          sidebarToggle.addEventListener("click", () => {
+            const collapsed = !siteShell.classList.contains("sidebar-collapsed");
+            applySidebarState(collapsed);
+            window.localStorage.setItem(sidebarStorageKey, String(collapsed));
+          });
+        }
+
+        const input = document.getElementById("page-search-input");
+        const button = document.getElementById("page-search-button");
+        const clearButton = document.getElementById("page-search-clear");
+        const suggestions = document.getElementById("page-search-suggestions");
+        const content = document.querySelector(".content");
+        if (!input || !button || !clearButton || !suggestions || !content) return;
+
+        let matches = [];
+        let activeIndex = -1;
+        let searchIndex = [];
+        const currentUrl = window.location.pathname.replace(/\/+$/, "") || "/";
+
+        const clearMarks = () => {
+          matches.forEach((mark) => {
+            const parent = mark.parentNode;
+            if (!parent) return;
+            parent.replaceChild(document.createTextNode(mark.textContent || ""), mark);
+            parent.normalize();
+          });
+          matches = [];
+          activeIndex = -1;
+        };
+
+        const clearSuggestions = () => {
+          suggestions.innerHTML = "";
+          suggestions.classList.remove("visible");
+        };
+
+        const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+        const shouldSkipNode = (node) => {
+          const parentElement = node.parentElement;
+          if (!parentElement) return true;
+          return Boolean(
+            parentElement.closest(".page-search") ||
+              parentElement.closest("script") ||
+              parentElement.closest("style") ||
+              parentElement.closest("mark")
+          );
+        };
+
+        const highlightQuery = (query) => {
+          clearMarks();
+          if (!query) return;
+
+          const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+              if (!node.nodeValue || !node.nodeValue.trim() || shouldSkipNode(node)) {
+                return NodeFilter.FILTER_REJECT;
+              }
+              return node.nodeValue.toLowerCase().includes(query.toLowerCase())
+                ? NodeFilter.FILTER_ACCEPT
+                : NodeFilter.FILTER_REJECT;
+            },
+          });
+
+          const textNodes = [];
+          while (walker.nextNode()) {
+            textNodes.push(walker.currentNode);
+          }
+
+          const regex = new RegExp(`(${escapeRegExp(query)})`, "gi");
+
+          textNodes.forEach((node) => {
+            const parent = node.parentNode;
+            if (!parent) return;
+
+            const fragment = document.createDocumentFragment();
+            const parts = node.nodeValue.split(regex);
+
+            if (parts.length === 1) return;
+
+            parts.forEach((part) => {
+              if (!part) return;
+              if (part.toLowerCase() === query.toLowerCase()) {
+                const mark = document.createElement("mark");
+                mark.className = "page-search-highlight";
+                mark.textContent = part;
+                fragment.appendChild(mark);
+                matches.push(mark);
+              } else {
+                fragment.appendChild(document.createTextNode(part));
+              }
+            });
+
+            parent.replaceChild(fragment, node);
+          });
+
+          if (matches.length) {
+            activeIndex = 0;
+            matches[0].classList.add("active");
+            matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        };
+
+        const truncateText = (text, query) => {
+          const normalized = text.replace(/\s+/g, " ").trim();
+          const lower = normalized.toLowerCase();
+          const idx = lower.indexOf(query.toLowerCase());
+          if (idx === -1) return normalized.slice(0, 120);
+          const start = Math.max(0, idx - 36);
+          const end = Math.min(normalized.length, idx + query.length + 64);
+          const snippet = normalized.slice(start, end).trim();
+          return `${start > 0 ? "..." : ""}${snippet}${end < normalized.length ? "..." : ""}`;
+        };
+
+        const renderSuggestions = (query) => {
+          clearSuggestions();
+          if (!query) return;
+
+          const normalizedQuery = query.toLowerCase();
+          const results = searchIndex
+            .filter((entry) => {
+              const haystack = `${entry.title} ${entry.eyebrow} ${entry.lead} ${entry.content}`.toLowerCase();
+              return haystack.includes(normalizedQuery);
+            })
+            .slice(0, 8);
+
+          if (!results.length) return;
+
+          const fragment = document.createDocumentFragment();
+          results.forEach((entry) => {
+            const item = document.createElement("button");
+            item.type = "button";
+            item.className = "page-search-suggestion";
+            item.setAttribute("role", "option");
+
+            const label = document.createElement("span");
+            label.className = "page-search-suggestion-label";
+            label.textContent = entry.eyebrow || entry.title;
+
+            const snippet = document.createElement("span");
+            snippet.className = "page-search-suggestion-snippet";
+            snippet.textContent = truncateText(entry.lead || entry.content || entry.title, query);
+
+            item.appendChild(label);
+            item.appendChild(snippet);
+            item.addEventListener("click", () => {
+              input.value = query;
+              clearSuggestions();
+              const targetUrl = entry.url.replace(/\/+$/, "") || "/";
+              if (targetUrl === currentUrl) {
+                highlightQuery(query);
+              } else {
+                window.location.href = `${entry.url}?q=${encodeURIComponent(query)}`;
+              }
+            });
+
+            fragment.appendChild(item);
+          });
+
+          suggestions.appendChild(fragment);
+          suggestions.classList.add("visible");
+        };
+
+        const activateMatch = (index) => {
+          if (!matches.length) return;
+          matches.forEach((mark) => mark.classList.remove("active"));
+          activeIndex = ((index % matches.length) + matches.length) % matches.length;
+          matches[activeIndex].classList.add("active");
+          matches[activeIndex].scrollIntoView({ behavior: "smooth", block: "center" });
+        };
+
+        button.addEventListener("click", () => {
+          input.focus();
+        });
+
+        clearButton.addEventListener("click", () => {
+          input.value = "";
+          clearMarks();
+          clearSuggestions();
+          input.focus();
+        });
+
+        input.addEventListener("input", () => {
+          const query = input.value.trim();
+          highlightQuery(query);
+          renderSuggestions(query);
+        });
+
+        input.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            activateMatch(activeIndex + 1);
+          }
+          if (event.key === "Escape") {
+            input.value = "";
+            clearMarks();
+            clearSuggestions();
+            input.blur();
+          }
+        });
+
+        document.addEventListener("click", (event) => {
+          if (!event.target.closest(".page-search")) {
+            clearSuggestions();
+          }
+        });
+
+        const initialQuery = new URLSearchParams(window.location.search).get("q");
+        if (initialQuery) {
+          input.value = initialQuery;
+          highlightQuery(initialQuery);
+        }
+
+        fetch("/latent-ability-ml/search.json")
+          .then((response) => response.json())
+          .then((data) => {
+            searchIndex = Array.isArray(data) ? data : [];
+            if (input.value.trim()) {
+              renderSuggestions(input.value.trim());
+            }
+          })
+          .catch(() => {
+            searchIndex = [];
+          });
+      })();
+
+      (() => {
+        const lightbox = document.getElementById("image-lightbox");
+        const lightboxImg = document.getElementById("image-lightbox-img");
+        const lightboxCard = document.getElementById("image-lightbox-card");
+        const closeButton = document.getElementById("image-lightbox-close");
+        const imageTargets = document.querySelectorAll("main.content figure img");
+        const authorCards = document.querySelectorAll("main.content .author-card");
+        if (!lightbox || !lightboxImg || !lightboxCard || !closeButton || (!imageTargets.length && !authorCards.length)) return;
+
+        const close = () => {
+          lightbox.classList.remove("is-open");
+          lightbox.setAttribute("aria-hidden", "true");
+          lightboxImg.removeAttribute("src");
+          lightboxImg.removeAttribute("alt");
+          lightboxImg.classList.remove("is-hidden");
+          lightboxCard.innerHTML = "";
+          lightboxCard.classList.remove("is-open");
+        };
+
+        imageTargets.forEach((img) => {
+          img.addEventListener("click", () => {
+            lightboxCard.innerHTML = "";
+            lightboxCard.classList.remove("is-open");
+            lightboxImg.classList.remove("is-hidden");
+            lightboxImg.src = img.currentSrc || img.src;
+            lightboxImg.alt = img.alt || "";
+            lightbox.classList.add("is-open");
+            lightbox.setAttribute("aria-hidden", "false");
+          });
+        });
+
+        authorCards.forEach((card) => {
+          const img = card.querySelector("img");
+          if (!img) return;
+          card.setAttribute("tabindex", "0");
+          card.setAttribute("role", "button");
+          card.setAttribute("aria-label", img.alt || "Open author photo");
+
+          const openCard = () => {
+            lightboxImg.classList.add("is-hidden");
+            lightboxImg.removeAttribute("src");
+            lightboxImg.removeAttribute("alt");
+            lightboxCard.innerHTML = card.outerHTML;
+            const clonedCard = lightboxCard.querySelector(".author-card");
+            if (clonedCard) {
+              clonedCard.removeAttribute("tabindex");
+              clonedCard.removeAttribute("role");
+              clonedCard.removeAttribute("aria-label");
+            }
+            lightboxCard.classList.add("is-open");
+            lightbox.classList.add("is-open");
+            lightbox.setAttribute("aria-hidden", "false");
+          };
+
+          card.addEventListener("click", openCard);
+          card.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              openCard();
+            }
+          });
+        });
+
+        closeButton.addEventListener("click", close);
+        lightbox.addEventListener("click", (event) => {
+          if (event.target === lightbox) close();
+        });
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") close();
+        });
+      })();
+    </script>
+
+  <!-- Browser notebook runtime -->
+  <script>
+    (() => {
+      const widgets = Array.from(document.querySelectorAll('.browser-notebook'));
+      if (!widgets.length) return;
+
+      const defaultRuntimeApiUrls = Array.isArray([])
+        ? []
+        : [];
+
+      const tabSessionStorageKey = 'browser-notebook:tab-session-id';
+      let tabSessionId = sessionStorage.getItem(tabSessionStorageKey);
+      if (!tabSessionId) {
+        tabSessionId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+        sessionStorage.setItem(tabSessionStorageKey, tabSessionId);
+      }
+
+      const runtimeState = {
+        pyodide: null,
+        promise: null,
+        editorPromise: null,
+        packages: new Set(),
+        files: new Set(),
+        micropipReady: false,
+      };
+
+      const backendHealth = new Map();
+
+      const loadExternalScript = (src) => new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[data-runtime-src="${src}"]`);
+        if (existing) {
+          existing.addEventListener('load', resolve, { once: true });
+          existing.addEventListener('error', reject, { once: true });
+          if (existing.dataset.loaded === 'true') resolve();
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.dataset.runtimeSrc = src;
+        script.addEventListener('load', () => {
+          script.dataset.loaded = 'true';
+          resolve();
+        }, { once: true });
+        script.addEventListener('error', reject, { once: true });
+        document.head.appendChild(script);
+      });
+
+      const describeError = (error) => {
+        if (!error) return 'Unknown error';
+        if (typeof error === 'string') return error;
+        if (error.message) return error.message;
+        if (typeof error.toString === 'function') {
+          const rendered = error.toString();
+          if (rendered && rendered !== '[object Object]') return rendered;
+        }
+        try {
+          return JSON.stringify(error, Object.getOwnPropertyNames(error));
+        } catch (_) {
+          return String(error);
+        }
+      };
+
+
+      const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/$/, '');
+
+      const fetchJson = async (url, options = {}) => {
+        const response = await fetch(url, {
+          headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+          ...options,
+        });
+        const body = await response.text();
+        let payload = {};
+        if (body) {
+          try {
+            payload = JSON.parse(body);
+          } catch (_) {
+            payload = { raw: body };
+          }
+        }
+        if (!response.ok) {
+          throw new Error(payload.error || payload.raw || `${response.status} ${response.statusText}`);
+        }
+        return payload;
+      };
+
+      const probeBackend = async (baseUrl) => {
+        const normalized = normalizeBaseUrl(baseUrl);
+        if (!normalized) throw new Error('Empty backend URL');
+        if (!backendHealth.has(normalized)) {
+          backendHealth.set(normalized, fetchJson(`${normalized}/health`, { method: 'GET' }));
+        }
+        return backendHealth.get(normalized);
+      };
+
+      const ensureEditor = async () => {
+        if (window.ace) return window.ace;
+        if (runtimeState.editorPromise) return runtimeState.editorPromise;
+        runtimeState.editorPromise = (async () => {
+          await loadExternalScript('https://cdn.jsdelivr.net/npm/ace-builds@1.36.2/src-min-noconflict/ace.js');
+          await loadExternalScript('https://cdn.jsdelivr.net/npm/ace-builds@1.36.2/src-min-noconflict/ext-language_tools.js');
+          return window.ace;
+        })().catch((error) => {
+          runtimeState.editorPromise = null;
+          throw error;
+        });
+        return runtimeState.editorPromise;
+      };
+
+      const ensureRuntimeBootstrap = async () => {
+        if (runtimeState.promise) return runtimeState.promise;
+        runtimeState.promise = (async () => {
+          await loadExternalScript('https://cdn.jsdelivr.net/pyodide/v0.27.5/full/pyodide.js');
+          const pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.27.5/full/' });
+          await pyodide.runPythonAsync(`
+import ast
+import base64
+import io
+import traceback
+from contextlib import redirect_stdout, redirect_stderr
+NOTEBOOK_CONTEXTS = {}
+
+def init_notebook_context(notebook_id, initial_code=''):
+    ctx = {'__builtins__': __builtins__}
+    NOTEBOOK_CONTEXTS[notebook_id] = ctx
+    if initial_code and initial_code.strip():
+        exec(initial_code, ctx, ctx)
+    return True
+
+def run_notebook_cell(notebook_id, user_code):
+    ctx = NOTEBOOK_CONTEXTS.setdefault(notebook_id, {'__builtins__': __builtins__})
+    stdout_buffer = io.StringIO()
+    stderr_buffer = io.StringIO()
+    figures = []
+    success = True
+    try:
+        tree = ast.parse(user_code, mode='exec')
+        body = list(tree.body)
+        trailing_expr = body[-1] if body and isinstance(body[-1], ast.Expr) else None
+        executable = ast.Module(body=body[:-1] if trailing_expr else body, type_ignores=[])
+        compiled_exec = compile(executable, '<exec>', 'exec')
+        compiled_expr = compile(ast.Expression(trailing_expr.value), '<exec>', 'eval') if trailing_expr else None
+
+        with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
+            exec(compiled_exec, ctx, ctx)
+            if compiled_expr is not None:
+                last_value = eval(compiled_expr, ctx, ctx)
+                if last_value is not None:
+                    print(last_value)
+    except Exception:
+        success = False
+        stderr_buffer.write(traceback.format_exc())
+
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+        for fig_number in plt.get_fignums():
+            figure = plt.figure(fig_number)
+            image_buffer = io.BytesIO()
+            figure.savefig(image_buffer, format='png', bbox_inches='tight', dpi=180)
+            figures.append(base64.b64encode(image_buffer.getvalue()).decode('ascii'))
+        plt.close('all')
+    except ModuleNotFoundError:
+        pass
+
+    return {
+        'success': success,
+        'stdout': stdout_buffer.getvalue(),
+        'stderr': stderr_buffer.getvalue(),
+        'figures': figures,
+    }
+          `);
+          runtimeState.pyodide = pyodide;
+          return pyodide;
+        })().catch((error) => {
+          runtimeState.promise = null;
+          throw error;
+        });
+        return runtimeState.promise;
+      };
+
+      const ensurePackages = async (pyodide, config) => {
+        const packages = Array.isArray(config.packages) ? config.packages : [];
+        for (const pkg of packages) {
+          if (runtimeState.packages.has(pkg)) continue;
+          try {
+            await pyodide.loadPackage(pkg);
+            if (pkg === 'matplotlib') {
+              await pyodide.runPythonAsync(`
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+              `);
+            }
+            runtimeState.packages.add(pkg);
+          } catch (error) {
+            throw new Error(`Could not load package ${pkg}: ${describeError(error)}`);
+          }
+        }
+
+        const micropipPackages = Array.isArray(config.micropipPackages) ? config.micropipPackages : [];
+        if (micropipPackages.length) {
+          if (!runtimeState.packages.has('micropip')) {
+            await pyodide.loadPackage('micropip');
+            runtimeState.packages.add('micropip');
+          }
+          if (!runtimeState.micropipReady) runtimeState.micropipReady = true;
+          const pyMicropip = pyodide.pyimport('micropip');
+          try {
+            for (const pkg of micropipPackages) {
+              if (runtimeState.packages.has(pkg)) continue;
+              try {
+                await pyMicropip.install(pkg);
+                runtimeState.packages.add(pkg);
+              } catch (error) {
+                console.warn(`Could not install ${pkg} in browser runtime.`, error);
+              }
+            }
+          } finally {
+            pyMicropip.destroy();
+          }
+        }
+      };
+
+      const ensurePythonFiles = async (pyodide, config) => {
+        const pythonFiles = Array.isArray(config.pythonFiles) ? config.pythonFiles : [];
+        if (!pythonFiles.length) return;
+        for (const file of pythonFiles) {
+          if (!file || !file.url || !file.path) continue;
+          if (runtimeState.files.has(file.path)) continue;
+          const response = await fetch(file.url);
+          if (!response.ok) {
+            throw new Error(`Could not load ${file.url}`);
+          }
+          const contents = await response.text();
+          const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
+          pyodide.globals.set('__module_name', moduleName);
+          pyodide.globals.set('__module_source', contents);
+          await pyodide.runPythonAsync(`
+import sys
+import types
+
+module_name = __module_name
+module_source = __module_source
+parts = module_name.split('.')
+
+for index in range(1, len(parts)):
+    package_name = '.'.join(parts[:index])
+    if package_name not in sys.modules:
+        package = types.ModuleType(package_name)
+        package.__path__ = []
+        sys.modules[package_name] = package
+    if index > 1:
+        parent_name = '.'.join(parts[: index - 1])
+        setattr(sys.modules[parent_name], parts[index - 1], sys.modules[package_name])
+
+module = types.ModuleType(module_name)
+module.__file__ = f'<{module_name}>'
+module.__package__ = module_name.rpartition('.')[0]
+sys.modules[module_name] = module
+if module.__package__:
+    parent = sys.modules[module.__package__]
+    setattr(parent, parts[-1], module)
+exec(module_source, module.__dict__)
+          `);
+          pyodide.globals.delete('__module_name');
+          pyodide.globals.delete('__module_source');
+          runtimeState.files.add(file.path);
+        }
+      };
+
+      const toPlainObject = (proxy) => {
+        const plain = proxy.toJs({ dict_converter: Object.fromEntries });
+        if (typeof proxy.destroy === 'function') proxy.destroy();
+        return plain;
+      };
+
+      const makeCell = (cell = {}, index = 0) => ({
+        id: cell.id || `cell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        label: cell.label || `Cell ${index + 1}`,
+        lead: cell.lead || 'Use this cell as scratch space during the activity.',
+        code: typeof cell.code === 'string' ? cell.code : '# answer\n',
+      });
+
+      const resizeEditor = (editor, host) => {
+        const lineHeight = editor.renderer.lineHeight || 19;
+        const lines = Math.max(4, editor.session.getScreenLength() + 1);
+        host.style.height = `${Math.max(120, lineHeight * lines + 18)}px`;
+        editor.resize();
+      };
+
+      const autoGrowFallback = (textarea) => {
+        textarea.style.height = 'auto';
+        textarea.style.height = `${Math.max(120, textarea.scrollHeight)}px`;
+      };
+
+      widgets.forEach((widget) => {
+        const seedEl = widget.querySelector('.browser-notebook__seed');
+        if (!seedEl) return;
+
+        let config = {};
+        try {
+          config = JSON.parse(seedEl.textContent);
+        } catch (_) {
+          widget.textContent = 'Notebook configuration could not be loaded.';
+          return;
+        }
+
+        const notebookId = widget.dataset.notebookId || `notebook-${Math.random().toString(36).slice(2)}`;
+        const backendSessionId = `${tabSessionId}:${notebookId}`;
+        const storageKey = `browser-notebook:${notebookId}`;
+        const runtimeApiUrls = (Array.isArray(config.runtimeApiUrls) && config.runtimeApiUrls.length
+          ? config.runtimeApiUrls
+          : defaultRuntimeApiUrls).map(normalizeBaseUrl).filter(Boolean);
+        const title = config.title || 'Browser notebook';
+        const lead = config.lead || 'Run Python cells directly in the page.';
+        const note = config.browserNote || '';
+        const seedCells = (config.cells || []).map((cell, index) => makeCell(cell, index));
+        let cells = seedCells.slice();
+        let storedState = null;
+        let currentRuntime = null;
+        let runtimeReady = false;
+
+        try {
+          storedState = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
+          if (storedState && Array.isArray(storedState.cells) && storedState.cells.length) {
+            cells = storedState.cells.map((cell, index) => makeCell(cell, index));
+          }
+        } catch (_) {
+          storedState = null;
+          cells = seedCells.slice();
+        }
+        const cellOutputs = new Map(Array.isArray(storedState?.outputs)
+          ? storedState.outputs.map((entry) => [entry.id, entry.result])
+          : []);
+
+        widget.innerHTML = `
+          <div class="browser-notebook__eyebrow">Notebook mode</div>
+          <div class="browser-notebook__title-row">
+            <div>
+              <h2>${title}</h2>
+              <p class="browser-notebook__lead">${lead}</p>
+            </div>
+          </div>
+          ${note ? `<div class="browser-notebook__note">${note}</div>` : ''}
+          <div class="browser-notebook__status" data-notebook-status>Preparing browser runtime…</div>
+          <div class="browser-notebook__toolbar">
+            <div class="browser-notebook__toolbar-actions">
+              <button class="button tiny" type="button" data-action="add-cell">Add cell</button>
+              <button class="button tiny secondary" type="button" data-action="run-all">Run all</button>
+              <button class="button tiny ghost" type="button" data-action="reset-notebook">Reset notebook</button>
+            </div>
+            <div class="browser-notebook__toolbar-meta">Use <code>Shift+Enter</code> to run the current cell.</div>
+          </div>
+          <div class="browser-notebook__cells" data-notebook-cells></div>
+        `;
+
+        const cellsHost = widget.querySelector('[data-notebook-cells]');
+        const status = widget.querySelector('[data-notebook-status]');
+
+        const setStatus = (message, type = '') => {
+          status.textContent = message;
+          status.classList.remove('is-ready', 'is-error');
+          if (type === 'ready') status.classList.add('is-ready');
+          if (type === 'error') status.classList.add('is-error');
+        };
+
+        const persist = () => {
+          sessionStorage.setItem(storageKey, JSON.stringify({
+            cells,
+            outputs: Array.from(cellOutputs, ([id, result]) => ({ id, result })),
+          }));
+        };
+
+        const initializeBackend = async (force = false) => {
+          let lastError = null;
+          for (const baseUrl of runtimeApiUrls) {
+            try {
+              await probeBackend(baseUrl);
+              const endpoint = force ? '/session/reset' : '/session/init';
+              await fetchJson(`${baseUrl}${endpoint}`, {
+                method: 'POST',
+                body: JSON.stringify({ session_id: backendSessionId, initial_code: config.initialCode || '' }),
+              });
+              return { kind: 'backend', baseUrl, sessionId: backendSessionId };
+            } catch (error) {
+              lastError = error;
+              console.warn(`Notebook backend unavailable at ${baseUrl}`, error);
+            }
+          }
+          throw lastError || new Error('No notebook backend could be reached.');
+        };
+
+        const initializeBrowser = async () => {
+          const pyodide = await ensureRuntimeBootstrap();
+          await ensurePackages(pyodide, config);
+          await ensurePythonFiles(pyodide, config);
+          pyodide.globals.get('init_notebook_context')(notebookId, config.initialCode || '');
+          return { kind: 'browser', pyodide };
+        };
+
+        const initializeNotebook = async (force = false) => {
+          if (runtimeReady && !force) return currentRuntime;
+          if (runtimeApiUrls.length) {
+            setStatus('Connecting to notebook backend…');
+            try {
+              currentRuntime = await initializeBackend(force);
+              runtimeReady = true;
+              setStatus(`Connected to notebook backend at ${currentRuntime.baseUrl}.`, 'ready');
+              return currentRuntime;
+            } catch (backendError) {
+              console.warn('Notebook backend unavailable; falling back to browser runtime.', backendError);
+            }
+          }
+          setStatus('Loading browser Python runtime…');
+          try {
+            currentRuntime = await initializeBrowser();
+            runtimeReady = true;
+            setStatus(runtimeApiUrls.length
+              ? 'Browser runtime ready. Backend was unavailable, so this notebook is using the in-page fallback.'
+              : 'Browser runtime ready. You can import common scientific Python libraries and the workshop helpers directly in the page.', 'ready');
+            return currentRuntime;
+          } catch (error) {
+            runtimeReady = false;
+            setStatus(`The notebook runtime could not be prepared: ${describeError(error)}`, 'error');
+            throw error;
+          }
+        };
+
+        const executeCell = async (runtime, code) => {
+          if (runtime.kind === 'backend') {
+            const payload = await fetchJson(`${runtime.baseUrl}/execute`, {
+              method: 'POST',
+              body: JSON.stringify({ session_id: runtime.sessionId, code }),
+            });
+            return payload;
+          }
+          const resultProxy = runtime.pyodide.globals.get('run_notebook_cell')(notebookId, code);
+          return toPlainObject(resultProxy);
+        };
+
+        const renderOutput = (cellEl, result) => {
+          const output = cellEl.querySelector('.browser-notebook__output');
+          const cellId = cellEl.dataset.cellId;
+          if (cellId) {
+            if (result && ((result.stdout || '').trim() || (result.stderr || '').trim() || (Array.isArray(result.figures) && result.figures.length))) {
+              cellOutputs.set(cellId, result);
+            } else {
+              cellOutputs.delete(cellId);
+            }
+            persist();
+          }
+          output.innerHTML = '';
+          output.classList.remove('is-empty', 'is-error');
+
+          const stdout = (result.stdout || '').trim();
+          const stderr = (result.stderr || '').trim();
+          const figures = Array.isArray(result.figures) ? result.figures : [];
+
+          if (!stdout && !stderr && !figures.length) {
+            output.classList.add('is-empty');
+            return;
+          }
+
+          if (stdout) {
+            const pre = document.createElement('pre');
+            pre.textContent = stdout;
+            output.appendChild(pre);
+          }
+
+          if (stderr) {
+            const pre = document.createElement('pre');
+            pre.textContent = stderr;
+            output.appendChild(pre);
+            output.classList.add('is-error');
+          }
+
+          if (figures.length) {
+            const figureWrap = document.createElement('div');
+            figureWrap.className = 'browser-notebook__figures';
+            figures.forEach((encoded) => {
+              const figure = document.createElement('figure');
+              figure.className = 'browser-notebook__figure';
+              const img = document.createElement('img');
+              img.src = `data:image/png;base64,${encoded}`;
+              img.alt = 'Notebook output figure';
+              figure.appendChild(img);
+              figureWrap.appendChild(figure);
+            });
+            output.appendChild(figureWrap);
+          }
+        };
+
+        const runCell = async (cellId) => {
+          const cell = cells.find((entry) => entry.id === cellId);
+          const cellEl = cellsHost.querySelector(`[data-cell-id="${cellId}"]`);
+          if (!cell || !cellEl) return;
+          const button = cellEl.querySelector('[data-action="run-cell"]');
+          const originalLabel = button.textContent;
+          button.disabled = true;
+          button.textContent = 'Running…';
+          setStatus('Running Python cell…');
+          try {
+            const runtime = await initializeNotebook();
+            const result = await executeCell(runtime, cell.code);
+            renderOutput(cellEl, result || {});
+            setStatus(result && result.success === false
+              ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
+              : runtime.kind === 'backend'
+                ? `Cell executed through backend ${runtime.baseUrl}.`
+                : 'Cell executed in the browser runtime.', result && result.success === false ? 'error' : 'ready');
+          } catch (error) {
+            const output = cellEl.querySelector('.browser-notebook__output');
+            output.classList.remove('is-empty');
+            output.classList.add('is-error');
+            output.innerHTML = `<pre>${describeError(error)}</pre>`;
+            setStatus(`The browser runtime raised an error: ${describeError(error)}`, 'error');
+          } finally {
+            button.disabled = false;
+            button.textContent = originalLabel;
+          }
+        };
+
+        const renderCells = () => {
+          cellsHost.innerHTML = '';
+          cells.forEach((cell, index) => {
+            const cellEl = document.createElement('section');
+            cellEl.className = 'browser-notebook__cell';
+            cellEl.dataset.cellId = cell.id;
+            cellEl.innerHTML = `
+              <div class="browser-notebook__cell-header">
+                <div>
+                  <p class="browser-notebook__cell-label">${cell.label}</p>
+                  <p class="browser-notebook__cell-lead">${cell.lead}</p>
+                </div>
+                <div class="browser-notebook__cell-actions">
+                  <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
+                  <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
+                  <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
+                </div>
+              </div>
+              <div class="browser-notebook__cell-editor">
+                <div class="browser-notebook__editor"></div>
+                <textarea class="browser-notebook__textarea browser-notebook__textarea--fallback" spellcheck="false"></textarea>
+              </div>
+              <div class="browser-notebook__cell-footer">
+                <div class="browser-notebook__cell-index">Cell ${index + 1}</div>
+              </div>
+              <div class="browser-notebook__output is-empty"></div>
+            `;
+            const editorHost = cellEl.querySelector('.browser-notebook__editor');
+            const fallbackTextarea = cellEl.querySelector('.browser-notebook__textarea--fallback');
+            fallbackTextarea.value = cell.code;
+            fallbackTextarea.style.display = 'block';
+            autoGrowFallback(fallbackTextarea);
+            fallbackTextarea.addEventListener('input', () => {
+              cell.code = fallbackTextarea.value;
+              autoGrowFallback(fallbackTextarea);
+              persist();
+            });
+            fallbackTextarea.addEventListener('keydown', (event) => {
+              if (event.key === 'Tab') {
+                event.preventDefault();
+                const start = fallbackTextarea.selectionStart;
+                const end = fallbackTextarea.selectionEnd;
+                const value = fallbackTextarea.value;
+                fallbackTextarea.value = `${value.slice(0, start)}    ${value.slice(end)}`;
+                fallbackTextarea.selectionStart = fallbackTextarea.selectionEnd = start + 4;
+                cell.code = fallbackTextarea.value;
+                autoGrowFallback(fallbackTextarea);
+                persist();
+              }
+              if (event.key === 'Enter' && event.shiftKey) {
+                event.preventDefault();
+                runCell(cell.id);
+              }
+            });
+
+            ensureEditor().then((aceLib) => {
+              if (!aceLib) return;
+              fallbackTextarea.style.display = 'none';
+              const editor = aceLib.edit(editorHost);
+              editor.session.setMode('ace/mode/python');
+              editor.setTheme('ace/theme/github_dark');
+              editor.setOptions({
+                fontSize: '15px',
+                showPrintMargin: false,
+                minLines: 4,
+                maxLines: Infinity,
+                useSoftTabs: true,
+                tabSize: 4,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: false,
+                highlightActiveLine: true,
+                showLineNumbers: true,
+                showGutter: true,
+                wrap: true,
+              });
+              editor.session.setUseWorker(false);
+              editor.setValue(cell.code, -1);
+              resizeEditor(editor, editorHost);
+              editor.session.on('change', () => {
+                cell.code = editor.getValue();
+                resizeEditor(editor, editorHost);
+                persist();
+              });
+              editor.commands.addCommand({
+                name: 'run-cell',
+                bindKey: { win: 'Shift-Enter', mac: 'Shift-Enter' },
+                exec: () => runCell(cell.id),
+              });
+            }).catch(() => {
+              fallbackTextarea.style.display = 'block';
+            });
+            cellEl.querySelector('[data-action="run-cell"]').addEventListener('click', () => runCell(cell.id));
+            cellEl.querySelector('[data-action="add-below"]').addEventListener('click', () => {
+              const insertion = makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n' }, cells.length);
+              cells.splice(index + 1, 0, insertion);
+              persist();
+              renderCells();
+            });
+            cellEl.querySelector('[data-action="delete-cell"]').addEventListener('click', () => {
+              cells = cells.filter((entry) => entry.id !== cell.id);
+              cellOutputs.delete(cell.id);
+              if (!cells.length) {
+                cells = [makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n' }, 0)];
+              }
+              persist();
+              renderCells();
+            });
+            const savedResult = cellOutputs.get(cell.id);
+            if (savedResult) {
+              renderOutput(cellEl, savedResult);
+            }
+            cellsHost.appendChild(cellEl);
+          });
+        };
+
+        widget.querySelector('[data-action="add-cell"]').addEventListener('click', () => {
+          cells.push(makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n' }, cells.length));
+          persist();
+          renderCells();
+        });
+
+        widget.querySelector('[data-action="run-all"]').addEventListener('click', async () => {
+          for (const cell of cells) {
+            await runCell(cell.id);
+          }
+        });
+
+        widget.querySelector('[data-action="reset-notebook"]').addEventListener('click', async () => {
+          cells = seedCells.map((cell, index) => makeCell(cell, index));
+          cellOutputs.clear();
+          sessionStorage.removeItem(storageKey);
+          renderCells();
+          try {
+            runtimeReady = false;
+            await initializeNotebook(true);
+          } catch (_) {
+            // status already updated in initializeNotebook
+          }
+        });
+
+        renderCells();
+        ensureEditor().then(() => renderCells()).catch(() => {});
+        initializeNotebook().catch(() => {});
+      });
+    })();
+  </script>
+
+  
+
+<svg id="MJX-SVG-global-cache" style="display: none;"><defs></defs></svg></body></html>
