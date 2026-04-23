@@ -1066,6 +1066,23 @@ exec(module_source, module.__dict__)
         "'": '&#39;',
       }[character]));
 
+      const renderHtmlWithScripts = (container, html) => {
+        container.innerHTML = '';
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        const fragment = template.content.cloneNode(true);
+        const scripts = Array.from(fragment.querySelectorAll('script'));
+        scripts.forEach((script) => {
+          const replacement = document.createElement('script');
+          Array.from(script.attributes).forEach((attribute) => {
+            replacement.setAttribute(attribute.name, attribute.value);
+          });
+          replacement.textContent = script.textContent;
+          script.replaceWith(replacement);
+        });
+        container.appendChild(fragment);
+      };
+
       widgets.forEach((widget) => {
         const seedEl = widget.querySelector('.browser-notebook__seed');
         if (!seedEl) return;
@@ -1523,7 +1540,7 @@ exec(module_source, module.__dict__)
             htmlBlocks.forEach((html) => {
               const block = document.createElement('div');
               block.className = 'browser-notebook__html-block';
-              block.innerHTML = html;
+              renderHtmlWithScripts(block, html);
               htmlWrap.appendChild(block);
             });
             output.appendChild(htmlWrap);
