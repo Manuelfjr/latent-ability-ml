@@ -9,4 +9,4 @@ theme: null
 permalink: pretty
 repo_url: https://github.com/manuelfjr/latent-ability-ml
 notebook_runtime_api_urls:
-  - "http://127.0.0.1:8765"
+  - "https://manuelfjr-latent-ability-backend.hf.space"

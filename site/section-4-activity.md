@@ -39,6 +39,33 @@ This page now includes executable Python cells directly in the site. Students ca
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
   "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, plotly, statsmodels, openpyxl, utils.handson, and utils.transform.",
+  "libraryCatalog": [
+    {"name": "numpy"},
+    {"name": "pandas"},
+    {"name": "matplotlib"},
+    {"name": "scipy"},
+    {"name": "scikit-learn"},
+    {"name": "plotly"},
+    {"name": "statsmodels"},
+    {"name": "openpyxl"}
+  ],
+  "quickInserts": [
+    {"id": "clustering-starter", "label": "Insert clustering starter", "description": "Quick clustering imports.", "code": "from utils.handson import make_toy_clustering_dataset, evaluate_clustering_models_on_dataset, summarize_clustering_instance_difficulty\nimport matplotlib.pyplot as plt\n"},
+    {"id": "plotly-clusters", "label": "Insert Plotly clusters", "description": "Interactive scatter example.", "code": "import plotly.express as px\nfig = px.scatter(x=[-1, 0, 1], y=[0.2, 0.5, 0.9], color=['a', 'b', 'a'])\nfig\n"}
+  ],
+  "sliderDemos": [
+    {
+      "id": "clustering-noise-lab",
+      "title": "Interactive clustering geometry lab",
+      "lead": "Increase the moon noise level and see how quickly the geometry becomes harder to separate.",
+      "buttonLabel": "Update dataset",
+      "template": "import matplotlib.pyplot as plt\nfrom sklearn.datasets import make_moons\nX, y = make_moons(n_samples={% raw %}{{samples}}{% endraw %}, noise={% raw %}{{noise}}{% endraw %}, random_state=7)\nfig, ax = plt.subplots(figsize=(7, 4))\nax.scatter(X[:,0], X[:,1], c=y, cmap='coolwarm', s=28, alpha=0.85)\nax.set_title('Interactive clustering geometry')\nax.set_xlabel('feature_1')\nax.set_ylabel('feature_2')\nax.grid(alpha=0.2)\nprint(f'samples={% raw %}{{samples}}{% endraw %}, noise={% raw %}{{noise}}{% endraw %}')\nplt.show()\n",
+      "controls": [
+        {"name": "samples", "label": "Samples", "min": 120, "max": 500, "step": 20, "value": 240},
+        {"name": "noise", "label": "Noise", "min": 0.02, "max": 0.35, "step": 0.01, "value": 0.12}
+      ]
+    }
+  ],
   "cells": [
     {
       "label": "Task 1",

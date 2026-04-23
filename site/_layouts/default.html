@@ -778,6 +778,7 @@ exec(module_source, module.__dict__)
           shownHints: Number.isFinite(cell.shownHints) ? Math.max(0, cell.shownHints) : 0,
           kind: cell.kind || 'task',
           done: Boolean(cell.done),
+          outputCollapsed: Boolean(cell.outputCollapsed),
         };
       };
 
@@ -798,6 +799,58 @@ exec(module_source, module.__dict__)
             value: Number.isFinite(control.value) ? control.value : 0,
           })),
         };
+      };
+
+      const makeQuickInsert = (snippet = {}, index = 0) => ({
+        id: snippet.id || `snippet-${index + 1}`,
+        label: snippet.label || `Quick insert ${index + 1}`,
+        code: typeof snippet.code === 'string' ? snippet.code : '',
+        description: snippet.description || '',
+      });
+
+      const libraryReferenceMap = {
+        numpy: { label: 'NumPy', url: 'https://numpy.org/doc/stable/', mode: 'browser + backend' },
+        pandas: { label: 'pandas', url: 'https://pandas.pydata.org/docs/', mode: 'browser + backend' },
+        matplotlib: { label: 'Matplotlib', url: 'https://matplotlib.org/stable/', mode: 'browser + backend' },
+        scipy: { label: 'SciPy', url: 'https://docs.scipy.org/doc/scipy/', mode: 'browser + backend' },
+        'scikit-learn': { label: 'scikit-learn', url: 'https://scikit-learn.org/stable/', mode: 'browser + backend' },
+        seaborn: { label: 'seaborn', url: 'https://seaborn.pydata.org/', mode: 'browser + backend' },
+        plotly: { label: 'Plotly', url: 'https://plotly.com/python/', mode: 'browser + backend' },
+        statsmodels: { label: 'statsmodels', url: 'https://www.statsmodels.org/stable/', mode: 'browser + backend' },
+        openpyxl: { label: 'openpyxl', url: 'https://openpyxl.readthedocs.io/en/stable/', mode: 'browser + backend' },
+        micropip: { label: 'micropip', url: 'https://micropip.pyodide.org/en/stable/', mode: 'browser' },
+        birt: { label: 'birt-gd / Beta4', url: 'https://pypi.org/project/birt-gd/', mode: 'backend' },
+        'birt-gd': { label: 'birt-gd / Beta4', url: 'https://pypi.org/project/birt-gd/', mode: 'backend' },
+      };
+
+      const deriveLibraryCatalog = (config = {}) => {
+        const ordered = [];
+        const seen = new Set();
+        [...(Array.isArray(config.packages) ? config.packages : []), ...(Array.isArray(config.micropipPackages) ? config.micropipPackages : [])].forEach((name) => {
+          if (!name || seen.has(name)) return;
+          seen.add(name);
+          const fallback = libraryReferenceMap[name] || { label: name, url: '', mode: 'browser + backend' };
+          ordered.push({ name, ...fallback });
+        });
+        (Array.isArray(config.libraryCatalog) ? config.libraryCatalog : []).forEach((item) => {
+          const key = item.name || item.label;
+          if (!key) return;
+          if (seen.has(key)) return;
+          seen.add(key);
+          const fallback = libraryReferenceMap[item.name] || {};
+          ordered.push({ ...fallback, ...item, label: item.label || fallback.label || key });
+        });
+        return ordered;
+      };
+
+      const formatSnapshotTime = (value) => {
+        try {
+          return new Intl.DateTimeFormat(undefined, {
+            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+          }).format(new Date(value));
+        } catch (_) {
+          return String(value || 'snapshot');
+        }
       };
 
       const resizeEditor = (editor, host) => {
@@ -852,6 +905,7 @@ exec(module_source, module.__dict__)
         const notebookId = widget.dataset.notebookId || `notebook-${Math.random().toString(36).slice(2)}`;
         const backendSessionId = `${tabSessionId}:${notebookId}`;
         const storageKey = `browser-notebook:${notebookId}`;
+        const snapshotStorageKey = `${storageKey}:snapshots`;
         const runtimeApiUrls = (Array.isArray(config.runtimeApiUrls) && config.runtimeApiUrls.length
           ? config.runtimeApiUrls
           : defaultRuntimeApiUrls).map(normalizeBaseUrl).filter(Boolean);
@@ -860,11 +914,16 @@ exec(module_source, module.__dict__)
         const note = config.browserNote || '';
         const seedCells = (config.cells || []).map((cell, index) => makeCell(cell, index));
         const sliderDemos = (config.sliderDemos || []).map((demo, index) => makeSliderDemo(demo, index));
+        const quickInserts = (config.quickInserts || []).map((snippet, index) => makeQuickInsert(snippet, index));
+        const libraryCatalog = deriveLibraryCatalog(config);
         let cells = seedCells.slice();
         let storedState = null;
         let currentRuntime = null;
         let runtimeReady = false;
         let shareConsent = false;
+        let activeCellId = seedCells[0]?.id || null;
+        let snapshots = [];
+        const cellEditors = new Map();
         let demoValues = Object.fromEntries(sliderDemos.map((demo) => [
           demo.id,
           Object.fromEntries(demo.controls.map((control) => [control.name, control.value])),
@@ -895,6 +954,54 @@ exec(module_source, module.__dict__)
           ? storedState.outputs.map((entry) => [entry.id, entry.result])
           : []);
 
+        try {
+          const parsedSnapshots = JSON.parse(sessionStorage.getItem(snapshotStorageKey) || '[]');
+          snapshots = Array.isArray(parsedSnapshots) ? parsedSnapshots : [];
+        } catch (_) {
+          snapshots = [];
+        }
+
+        const libraryMarkup = libraryCatalog.length
+          ? `
+          <section class="browser-notebook__resource-card">
+            <div class="browser-notebook__resource-header">
+              <div>
+                <p class="browser-notebook__cell-label">Environment</p>
+                <h3>Available libraries and docs</h3>
+                <p class="browser-notebook__cell-lead">Use these links to inspect documentation for the libraries already available in this notebook environment.</p>
+              </div>
+            </div>
+            <div class="browser-notebook__library-grid">
+              ${libraryCatalog.map((item) => `
+                <a class="browser-notebook__library-chip" href="${escapeHtml(item.url || '#')}" ${item.url ? 'target="_blank" rel="noreferrer"' : ''}>
+                  <strong>${escapeHtml(item.label || item.name || 'Library')}</strong>
+                  <span>${escapeHtml(item.mode || '')}</span>
+                </a>
+              `).join('')}
+            </div>
+          </section>
+          `
+          : '';
+
+        const quickInsertMarkup = quickInserts.length
+          ? `
+          <section class="browser-notebook__resource-card">
+            <div class="browser-notebook__resource-header">
+              <div>
+                <p class="browser-notebook__cell-label">Quick inserts</p>
+                <h3>Starter snippets</h3>
+                <p class="browser-notebook__cell-lead">Insert a starter block into the active cell or into a scratch cell for faster experimentation.</p>
+              </div>
+            </div>
+            <div class="browser-notebook__quick-inserts">
+              ${quickInserts.map((snippet) => `
+                <button class="button tiny secondary" type="button" data-action="insert-snippet" data-snippet-id="${escapeHtml(snippet.id)}">${escapeHtml(snippet.label)}</button>
+              `).join('')}
+            </div>
+          </section>
+          `
+          : '';
+
         const sliderMarkup = sliderDemos.length
           ? `
           <div class="browser-notebook__demos">
@@ -908,6 +1015,7 @@ exec(module_source, module.__dict__)
                   </div>
                   <div class="browser-notebook__demo-actions">
                     <button class="button tiny secondary" type="button" data-action="run-demo">${escapeHtml(demo.buttonLabel)}</button>
+                    <button class="button tiny ghost" type="button" data-action="clear-demo-output">Clear output</button>
                   </div>
                 </div>
                 <div class="browser-notebook__demo-controls">
@@ -924,10 +1032,8 @@ exec(module_source, module.__dict__)
                       />
                       <input
                         class="browser-notebook__control-number"
-                        type="number"
-                        min="${escapeHtml(control.min)}"
-                        max="${escapeHtml(control.max)}"
-                        step="${escapeHtml(control.step)}"
+                        type="text"
+                        inputmode="decimal"
                         value="${escapeHtml(control.value)}"
                         data-control-number="${escapeHtml(control.name)}"
                       />
@@ -950,6 +1056,7 @@ exec(module_source, module.__dict__)
             </div>
           </div>
           ${note ? `<div class="browser-notebook__note">${note}</div>` : ''}
+          ${libraryMarkup || quickInsertMarkup ? `<div class="browser-notebook__resources">${libraryMarkup}${quickInsertMarkup}</div>` : ''}
           <div class="browser-notebook__status" data-notebook-status>Preparing browser runtime…</div>
           <div class="browser-notebook__progress">
             <div class="browser-notebook__progress-header">
@@ -970,6 +1077,17 @@ exec(module_source, module.__dict__)
             <div class="browser-notebook__progress-track">
               <div class="browser-notebook__progress-bar" data-progress-bar></div>
             </div>
+            <div class="browser-notebook__snapshot-tools">
+              <div class="browser-notebook__snapshot-label">Snapshot history</div>
+              <div class="browser-notebook__snapshot-actions">
+                <select class="browser-notebook__snapshot-select" data-snapshot-select>
+                  <option value="">No snapshots yet</option>
+                </select>
+                <button class="button tiny secondary" type="button" data-action="save-snapshot">Save snapshot</button>
+                <button class="button tiny ghost" type="button" data-action="restore-snapshot">Restore</button>
+                <button class="button tiny ghost" type="button" data-action="delete-snapshot">Delete</button>
+              </div>
+            </div>
           </div>
           ${sliderMarkup}
           <div class="browser-notebook__toolbar">
@@ -989,6 +1107,7 @@ exec(module_source, module.__dict__)
         const progressBar = widget.querySelector('[data-progress-bar]');
         const shareConsentInput = widget.querySelector('[data-share-consent]');
         const shareNotebookButton = widget.querySelector('[data-action="share-notebook"]');
+        const snapshotSelect = widget.querySelector('[data-snapshot-select]');
 
         const setStatus = (message, type = '') => {
           status.textContent = message;
@@ -1009,6 +1128,64 @@ exec(module_source, module.__dict__)
         const syncShareState = () => {
           if (shareConsentInput) shareConsentInput.checked = shareConsent;
           if (shareNotebookButton) shareNotebookButton.disabled = !shareConsent;
+        };
+
+        const persistSnapshots = () => {
+          sessionStorage.setItem(snapshotStorageKey, JSON.stringify(snapshots));
+        };
+
+        const buildSnapshotState = () => ({
+          cells,
+          demoValues,
+          shareConsent,
+        });
+
+        const renderSnapshots = () => {
+          if (!snapshotSelect) return;
+          snapshotSelect.innerHTML = snapshots.length
+            ? snapshots.map((snapshot, index) => `<option value="${escapeHtml(snapshot.id)}">${escapeHtml(snapshot.label || `Snapshot ${index + 1}`)}</option>`).join('')
+            : '<option value="">No snapshots yet</option>';
+        };
+
+        const saveSnapshot = (label = '', { silent = false } = {}) => {
+          const stamp = new Date().toISOString();
+          snapshots.unshift({
+            id: `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+            label: label || `Snapshot · ${formatSnapshotTime(stamp)}`,
+            createdAt: stamp,
+            state: buildSnapshotState(),
+          });
+          snapshots = snapshots.slice(0, 6);
+          persistSnapshots();
+          renderSnapshots();
+          if (!silent) setStatus('Snapshot saved in this tab.', 'ready');
+        };
+
+        const restoreSnapshot = () => {
+          const snapshotId = snapshotSelect?.value;
+          const snapshot = snapshots.find((entry) => entry.id === snapshotId);
+          if (!snapshot) {
+            setStatus('Select a snapshot to restore.', 'error');
+            return;
+          }
+          cells = (snapshot.state?.cells || seedCells).map((cell, index) => makeCell(cell, index));
+          demoValues = snapshot.state?.demoValues || demoValues;
+          shareConsent = Boolean(snapshot.state?.shareConsent);
+          syncShareState();
+          persist();
+          renderCells();
+          renderSnapshots();
+          updateProgress();
+          setStatus(`Restored ${snapshot.label}.`, 'ready');
+        };
+
+        const deleteSnapshot = () => {
+          const snapshotId = snapshotSelect?.value;
+          if (!snapshotId) return;
+          snapshots = snapshots.filter((entry) => entry.id !== snapshotId);
+          persistSnapshots();
+          renderSnapshots();
+          setStatus('Snapshot removed.', 'ready');
         };
 
         const hasMeaningfulCode = (cell) => {
@@ -1209,6 +1386,72 @@ exec(module_source, module.__dict__)
           return Number.isFinite(value) ? String(value) : '0';
         });
 
+        const parseControlValue = (rawValue, control, { clamp = true } = {}) => {
+          const normalized = String(rawValue ?? '').trim().replace(',', '.');
+          const numeric = Number(normalized);
+          if (!Number.isFinite(numeric)) return null;
+          const clamped = clamp ? Math.min(control.max, Math.max(control.min, numeric)) : numeric;
+          const precision = String(control.step).includes('.')
+            ? String(control.step).split('.')[1].length
+            : 0;
+          return Number(clamped.toFixed(precision));
+        };
+
+        const insertSnippetIntoCell = (cellId, snippetCode) => {
+          const normalized = snippetCode.endsWith('\n') ? snippetCode : `${snippetCode}\n`;
+          const targetCell = cells.find((entry) => entry.id === cellId);
+          if (!targetCell) return;
+          const editor = cellEditors.get(cellId);
+          if (editor) {
+            const current = editor.getValue().trim() === '# answer' ? '' : editor.getValue();
+            if (!current.trim()) {
+              editor.setValue(normalized, -1);
+            } else {
+              editor.session.insert(editor.getCursorPosition(), normalized);
+            }
+            editor.focus();
+            return;
+          }
+          const cellEl = cellsHost.querySelector(`[data-cell-id="${cellId}"]`);
+          const textarea = cellEl?.querySelector('.browser-notebook__textarea--fallback');
+          if (!textarea) return;
+          const current = textarea.value.trim() === '# answer' ? '' : textarea.value;
+          if (!current.trim()) {
+            textarea.value = normalized;
+            textarea.selectionStart = textarea.selectionEnd = textarea.value.length;
+          } else {
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            textarea.value = `${textarea.value.slice(0, start)}${normalized}${textarea.value.slice(end)}`;
+            textarea.selectionStart = textarea.selectionEnd = start + normalized.length;
+          }
+          targetCell.code = textarea.value;
+          autoGrowFallback(textarea);
+          textarea.focus();
+          persist();
+        };
+
+        const insertSnippet = (snippetId) => {
+          const snippet = quickInserts.find((entry) => entry.id === snippetId);
+          if (!snippet) return;
+          const targetId = (activeCellId && cells.some((entry) => entry.id === activeCellId))
+            ? activeCellId
+            : (cells.find((entry) => entry.kind === 'scratch')?.id || cells[0]?.id);
+          if (!targetId) return;
+          insertSnippetIntoCell(targetId, snippet.code);
+          setStatus(`Inserted ${snippet.label} into the active cell.`, 'ready');
+        };
+
+        const updateCellOutputControls = (cellEl, cell, hasOutput) => {
+          const actions = cellEl.querySelector('[data-output-actions]');
+          const toggle = cellEl.querySelector('[data-action="toggle-output"]');
+          const output = cellEl.querySelector('.browser-notebook__output');
+          if (!actions || !toggle || !output) return;
+          actions.hidden = !hasOutput;
+          output.hidden = hasOutput ? Boolean(cell.outputCollapsed) : false;
+          toggle.textContent = cell.outputCollapsed ? 'Show output' : 'Hide output';
+        };
+
         const renderHintState = (cellEl, cell) => {
           const wrap = cellEl.querySelector('[data-cell-hints]');
           if (!wrap) return;
@@ -1301,7 +1544,9 @@ exec(module_source, module.__dict__)
         const renderOutput = (cellEl, result) => {
           const output = cellEl.querySelector('.browser-notebook__output');
           const cellId = cellEl.dataset.cellId;
+          let boundCell = null;
           if (cellId) {
+            boundCell = cells.find((entry) => entry.id === cellId) || null;
             if (result && (
               (result.stdout || '').trim()
               || (result.stderr || '').trim()
@@ -1325,6 +1570,7 @@ exec(module_source, module.__dict__)
 
           if (!stdout && !stderr && !figures.length && !htmlBlocks.length) {
             output.classList.add('is-empty');
+            if (boundCell) updateCellOutputControls(cellEl, boundCell, false);
             return;
           }
 
@@ -1367,6 +1613,7 @@ exec(module_source, module.__dict__)
             });
             output.appendChild(htmlWrap);
           }
+          if (boundCell) updateCellOutputControls(cellEl, boundCell, true);
         };
 
         const runCell = async (cellId) => {
@@ -1386,6 +1633,7 @@ exec(module_source, module.__dict__)
               persist();
             }
             renderOutput(cellEl, result || {});
+            saveSnapshot(`${cell.label} run`, { silent: true });
             setStatus(result && result.success === false
               ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
               : runtime.kind === 'backend'
@@ -1419,6 +1667,7 @@ exec(module_source, module.__dict__)
             const code = compileTemplate(demo.template, demoValues[demoId] || {});
             const result = await executeCell(runtime, code);
             renderOutput(demoEl, result || {});
+            saveSnapshot(`${demo.title} updated`, { silent: true });
             output.classList.remove('is-empty');
             setStatus(runtime.kind === 'backend'
               ? `Interactive demo executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
@@ -1434,8 +1683,23 @@ exec(module_source, module.__dict__)
           }
         };
 
+        const clearDemoOutput = (demoId) => {
+          const demoEl = widget.querySelector(`[data-demo-id="${demoId}"]`);
+          if (!demoEl) return;
+          const output = demoEl.querySelector('.browser-notebook__demo-output');
+          if (!output) return;
+          output.innerHTML = '';
+          output.classList.add('is-empty');
+          output.classList.remove('is-error');
+          setStatus('Interactive lab output cleared.', 'ready');
+        };
+
         const renderCells = () => {
           cellsHost.innerHTML = '';
+          cellEditors.clear();
+          if (!cells.some((entry) => entry.id === activeCellId)) {
+            activeCellId = cells[0]?.id || null;
+          }
           cells.forEach((cell, index) => {
             const isTask = cell.kind === 'task';
             const cellEl = document.createElement('section');
@@ -1470,15 +1734,27 @@ exec(module_source, module.__dict__)
                 <div class="browser-notebook__cell-index">Cell ${index + 1}</div>
                 ${isTask && cell.done ? '<div class="browser-notebook__cell-state">Completed</div>' : ''}
               </div>
-              <div class="browser-notebook__output is-empty"></div>
+               <div class="browser-notebook__output-actions" data-output-actions hidden>
+                 <button class="button tiny ghost" type="button" data-action="toggle-output">Hide output</button>
+                 <button class="button tiny ghost" type="button" data-action="clear-output">Clear output</button>
+               </div>
+               <div class="browser-notebook__output is-empty"></div>
             `;
             const editorHost = cellEl.querySelector('.browser-notebook__editor');
             const fallbackTextarea = cellEl.querySelector('.browser-notebook__textarea--fallback');
             renderHintState(cellEl, cell);
+            updateCellOutputControls(cellEl, cell, cellOutputs.has(cell.id));
+            cellEl.addEventListener('click', () => {
+              activeCellId = cell.id;
+            });
             fallbackTextarea.value = cell.code;
             fallbackTextarea.style.display = 'block';
             autoGrowFallback(fallbackTextarea);
+            fallbackTextarea.addEventListener('focus', () => {
+              activeCellId = cell.id;
+            });
             fallbackTextarea.addEventListener('input', () => {
+              activeCellId = cell.id;
               cell.code = fallbackTextarea.value;
               autoGrowFallback(fallbackTextarea);
               persist();
@@ -1505,6 +1781,7 @@ exec(module_source, module.__dict__)
               if (!aceLib) return;
               fallbackTextarea.style.display = 'none';
               const editor = aceLib.edit(editorHost);
+              cellEditors.set(cell.id, editor);
               editor.session.setMode('ace/mode/python');
               editor.setTheme('ace/theme/github_dark');
               editor.setOptions({
@@ -1523,8 +1800,12 @@ exec(module_source, module.__dict__)
               });
               editor.session.setUseWorker(false);
               editor.setValue(cell.code, -1);
+              editor.on('focus', () => {
+                activeCellId = cell.id;
+              });
               resizeEditor(editor, editorHost);
               editor.session.on('change', () => {
+                activeCellId = cell.id;
                 cell.code = editor.getValue();
                 resizeEditor(editor, editorHost);
                 persist();
@@ -1547,6 +1828,7 @@ exec(module_source, module.__dict__)
             cellEl.querySelector('[data-action="delete-cell"]').addEventListener('click', () => {
               cells = cells.filter((entry) => entry.id !== cell.id);
               cellOutputs.delete(cell.id);
+              cellEditors.delete(cell.id);
               if (!cells.length) {
                 cells = [makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n' }, 0)];
               }
@@ -1559,8 +1841,10 @@ exec(module_source, module.__dict__)
                 cell.code = cell.seedCode;
                 cell.done = false;
                 cell.shownHints = 0;
+                cell.outputCollapsed = false;
                 cellOutputs.delete(cell.id);
                 persist();
+                saveSnapshot(`${cell.label} reset`, { silent: true });
                 renderCells();
                 updateProgress();
               });
@@ -1590,6 +1874,23 @@ exec(module_source, module.__dict__)
                 updateProgress();
               });
             }
+            const toggleOutputButton = cellEl.querySelector('[data-action="toggle-output"]');
+            if (toggleOutputButton) {
+              toggleOutputButton.addEventListener('click', () => {
+                cell.outputCollapsed = !cell.outputCollapsed;
+                persist();
+                updateCellOutputControls(cellEl, cell, cellOutputs.has(cell.id));
+              });
+            }
+            const clearOutputButton = cellEl.querySelector('[data-action="clear-output"]');
+            if (clearOutputButton) {
+              clearOutputButton.addEventListener('click', () => {
+                cellOutputs.delete(cell.id);
+                cell.outputCollapsed = false;
+                persist();
+                renderOutput(cellEl, {});
+              });
+            }
             const savedResult = cellOutputs.get(cell.id);
             if (savedResult) {
               renderOutput(cellEl, savedResult);
@@ -1615,6 +1916,7 @@ exec(module_source, module.__dict__)
           cells = seedCells.map((cell, index) => makeCell(cell, index));
           cellOutputs.clear();
           sessionStorage.removeItem(storageKey);
+          saveSnapshot('Notebook reset', { silent: true });
           renderCells();
           try {
             runtimeReady = false;
@@ -1624,6 +1926,12 @@ exec(module_source, module.__dict__)
           }
         });
 
+        widget.querySelector('[data-action="save-snapshot"]').addEventListener('click', () => saveSnapshot());
+        widget.querySelector('[data-action="restore-snapshot"]').addEventListener('click', restoreSnapshot);
+        widget.querySelector('[data-action="delete-snapshot"]').addEventListener('click', deleteSnapshot);
+        widget.querySelectorAll('[data-action="insert-snippet"]').forEach((button) => {
+          button.addEventListener('click', () => insertSnippet(button.dataset.snippetId));
+        });
         widget.querySelector('[data-action="export-notebook"]').addEventListener('click', exportNotebook);
         widget.querySelector('[data-action="email-summary"]').addEventListener('click', emailSummary);
         if (shareNotebookButton) shareNotebookButton.addEventListener('click', shareNotebook);
@@ -1643,26 +1951,36 @@ exec(module_source, module.__dict__)
           demo.controls.forEach((control) => {
             const range = demoEl.querySelector(`[data-control-range="${control.name}"]`);
             const number = demoEl.querySelector(`[data-control-number="${control.name}"]`);
-            const syncValue = (rawValue) => {
-              const numeric = Number(rawValue);
-              const nextValue = Number.isFinite(numeric) ? numeric : control.value;
+            const syncValue = (rawValue, { keepRaw = false, clamp = true } = {}) => {
+              const nextValue = parseControlValue(rawValue, control, { clamp });
+              if (nextValue === null) {
+                if (keepRaw && number) number.value = String(rawValue ?? '');
+                return;
+              }
               currentValues[control.name] = nextValue;
               demoValues[demo.id] = currentValues;
-              if (range) range.value = String(nextValue);
+              if (range) {
+                const inRange = nextValue >= control.min && nextValue <= control.max;
+                range.value = String(inRange ? nextValue : Math.min(control.max, Math.max(control.min, nextValue)));
+              }
               if (number) number.value = String(nextValue);
               persist();
             };
             if (range) {
-              range.addEventListener('input', () => syncValue(range.value));
+              range.addEventListener('input', () => syncValue(range.value, { clamp: true }));
             }
             if (number) {
-              number.addEventListener('input', () => syncValue(number.value));
+              number.addEventListener('input', () => syncValue(number.value, { keepRaw: true, clamp: false }));
+              number.addEventListener('change', () => syncValue(number.value, { clamp: false }));
+              number.addEventListener('blur', () => syncValue(number.value, { clamp: false }));
             }
           });
           demoEl.querySelector('[data-action="run-demo"]').addEventListener('click', () => runDemo(demo.id));
+          demoEl.querySelector('[data-action="clear-demo-output"]').addEventListener('click', () => clearDemoOutput(demo.id));
         });
 
         renderCells();
+        renderSnapshots();
         ensureEditor().then(() => renderCells()).catch(() => {});
         updateProgress();
         initializeNotebook().catch(() => {});

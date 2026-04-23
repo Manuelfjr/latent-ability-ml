@@ -39,6 +39,36 @@ This page includes executable Python cells directly in the site. When a notebook
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
   "browserNote": "When a notebook backend is connected, imports such as `from birt import Beta4` are available. In both modes, students can also use numpy, pandas, matplotlib, seaborn, plotly, statsmodels, openpyxl, and the workshop helpers. Without it, keep the pure-Python helpers and use Colab for the full CLAIRE fitting pipeline.",
+  "libraryCatalog": [
+    {"name": "numpy"},
+    {"name": "pandas"},
+    {"name": "matplotlib"},
+    {"name": "scipy"},
+    {"name": "scikit-learn"},
+    {"name": "plotly"},
+    {"name": "statsmodels"},
+    {"name": "openpyxl"},
+    {"name": "birt", "label": "birt-gd / Beta4", "url": "https://pypi.org/project/birt-gd/", "mode": "backend"}
+  ],
+  "quickInserts": [
+    {"id": "claire-transform", "label": "Insert CLAIRE starter", "description": "Start from TransformPairwise.", "code": "from utils.transform import TransformPairwise\nfrom utils.handson import make_toy_clustering_partitions\n"},
+    {"id": "beta4-backend", "label": "Insert Beta4 starter", "description": "Use Beta4 when the backend is connected.", "code": "from birt import Beta4\n"},
+    {"id": "plotly-starter", "label": "Insert Plotly starter", "description": "Quick interactive chart.", "code": "import plotly.express as px\nfig = px.scatter(x=[1, 2, 3], y=[2, 1, 4])\nfig\n"}
+  ],
+  "sliderDemos": [
+    {
+      "id": "claire-icc-lab",
+      "title": "Interactive CLAIRE / Beta4 ICC lab",
+      "lead": "Move the latent quantities to see how a representative CLAIRE item would change its response curve.",
+      "buttonLabel": "Update CLAIRE curve",
+      "template": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom utils.handson import beta4_expected_response\ntheta = np.linspace(0.01, 0.99, 300)\nprob = beta4_expected_response(theta=theta, difficulty={% raw %}{{difficulty}}{% endraw %}, discrimination_sign={% raw %}{{discrimination_sign}}{% endraw %}, discrimination_magnitude={% raw %}{{discrimination_magnitude}}{% endraw %})\nfig, ax = plt.subplots(figsize=(7, 4))\nax.plot(theta, prob, linewidth=2.6, color='#35518e')\nax.set_title('Interactive CLAIRE / Beta4 ICC')\nax.set_xlabel('latent ability')\nax.set_ylabel('expected bounded response')\nax.set_ylim(0, 1.05)\nax.grid(alpha=0.25)\nprint(f'difficulty={% raw %}{{difficulty}}{% endraw %}, sign={% raw %}{{discrimination_sign}}{% endraw %}, magnitude={% raw %}{{discrimination_magnitude}}{% endraw %}')\nplt.show()\n",
+      "controls": [
+        {"name": "difficulty", "label": "Difficulty", "min": 0.05, "max": 0.95, "step": 0.05, "value": 0.45},
+        {"name": "discrimination_sign", "label": "Discrimination sign", "min": -1.0, "max": 1.0, "step": 0.1, "value": 0.8},
+        {"name": "discrimination_magnitude", "label": "Discrimination magnitude", "min": 0.2, "max": 2.0, "step": 0.1, "value": 1.1}
+      ]
+    }
+  ],
   "cells": [
     {
       "label": "Task 1",
