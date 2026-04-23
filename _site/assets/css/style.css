@@ -1213,6 +1213,21 @@ figcaption {
   margin-top: 16px;
 }
 
+.browser-notebook__html-output {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.browser-notebook__html-block {
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid #e9e1d5;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 34px rgba(27, 22, 14, 0.08);
+  padding: 12px;
+}
+
 .browser-notebook__figure {
   margin: 0;
 }

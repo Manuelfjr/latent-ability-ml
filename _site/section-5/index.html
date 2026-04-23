@@ -913,11 +913,28 @@ def init_notebook_context(notebook_id, initial_code=''):
         exec(initial_code, ctx, ctx)
     return True
 
+def _collect_html_outputs(value):
+    if value is None:
+        return []
+    try:
+        module_name = value.__class__.__module__
+    except Exception:
+        return []
+    if not module_name.startswith('plotly'):
+        return []
+    if not hasattr(value, 'to_html'):
+        return []
+    try:
+        return [value.to_html(include_plotlyjs='cdn', full_html=False)]
+    except Exception:
+        return []
+
 def run_notebook_cell(notebook_id, user_code):
     ctx = NOTEBOOK_CONTEXTS.setdefault(notebook_id, {'__builtins__': __builtins__})
     stdout_buffer = io.StringIO()
     stderr_buffer = io.StringIO()
     figures = []
+    html_outputs = []
     success = True
     try:
         tree = ast.parse(user_code, mode='exec')
@@ -932,7 +949,9 @@ def run_notebook_cell(notebook_id, user_code):
             if compiled_expr is not None:
                 last_value = eval(compiled_expr, ctx, ctx)
                 if last_value is not None:
-                    print(last_value)
+                    html_outputs = _collect_html_outputs(last_value)
+                    if not html_outputs:
+                        print(last_value)
     except Exception:
         success = False
         stderr_buffer.write(traceback.format_exc())
@@ -955,6 +974,7 @@ def run_notebook_cell(notebook_id, user_code):
         'stdout': stdout_buffer.getvalue(),
         'stderr': stderr_buffer.getvalue(),
         'figures': figures,
+        'html': html_outputs,
     }
           `);
           runtimeState.pyodide = pyodide;
@@ -1315,6 +1335,7 @@ exec(module_source, module.__dict__)
               const stdout = (result.stdout || '').trim();
               const stderr = (result.stderr || '').trim();
               const figures = Array.isArray(result.figures) ? result.figures : [];
+              const htmlBlocks = Array.isArray(result.html) ? result.html : [];
               if (stdout) {
                 outputs.push({
                   output_type: 'stream',
@@ -1333,6 +1354,13 @@ exec(module_source, module.__dict__)
                 outputs.push({
                   output_type: 'display_data',
                   data: { 'image/png': encoded },
+                  metadata: {},
+                });
+              });
+              htmlBlocks.forEach((html) => {
+                outputs.push({
+                  output_type: 'display_data',
+                  data: { 'text/html': html },
                   metadata: {},
                 });
               });
@@ -1507,7 +1535,12 @@ exec(module_source, module.__dict__)
           const output = cellEl.querySelector('.browser-notebook__output');
           const cellId = cellEl.dataset.cellId;
           if (cellId) {
-            if (result && ((result.stdout || '').trim() || (result.stderr || '').trim() || (Array.isArray(result.figures) && result.figures.length))) {
+            if (result && (
+              (result.stdout || '').trim()
+              || (result.stderr || '').trim()
+              || (Array.isArray(result.figures) && result.figures.length)
+              || (Array.isArray(result.html) && result.html.length)
+            )) {
               cellOutputs.set(cellId, result);
             } else {
               cellOutputs.delete(cellId);
@@ -1521,8 +1554,9 @@ exec(module_source, module.__dict__)
           const stdout = (result.stdout || '').trim();
           const stderr = (result.stderr || '').trim();
           const figures = Array.isArray(result.figures) ? result.figures : [];
+          const htmlBlocks = Array.isArray(result.html) ? result.html : [];
 
-          if (!stdout && !stderr && !figures.length) {
+          if (!stdout && !stderr && !figures.length && !htmlBlocks.length) {
             output.classList.add('is-empty');
             return;
           }
@@ -1553,6 +1587,18 @@ exec(module_source, module.__dict__)
               figureWrap.appendChild(figure);
             });
             output.appendChild(figureWrap);
+          }
+
+          if (htmlBlocks.length) {
+            const htmlWrap = document.createElement('div');
+            htmlWrap.className = 'browser-notebook__html-output';
+            htmlBlocks.forEach((html) => {
+              const block = document.createElement('div');
+              block.className = 'browser-notebook__html-block';
+              block.innerHTML = html;
+              htmlWrap.appendChild(block);
+            });
+            output.appendChild(htmlWrap);
           }
         };
 
