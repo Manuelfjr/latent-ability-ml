@@ -34,12 +34,12 @@ This page includes executable Python cells directly in the site. When a notebook
   "title": "Section 3 browser notebook",
   "lead": "Simulate bounded responses in the page, then inspect the Beta4 latent quantities.",
   "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
-  "micropipPackages": ["seaborn"],
+  "micropipPackages": ["seaborn", "plotly", "statsmodels", "openpyxl"],
   "pythonFiles": [
     {"url": "{{ '/assets/python/utils/transform.py' | relative_url }}", "path": "utils/transform.py"},
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
-  "browserNote": "When a notebook backend is connected, imports such as `from birt import Beta4` are available. Without it, keep the pure-Python helpers and use Colab for the full Beta4 fitting pipeline.",
+  "browserNote": "When a notebook backend is connected, imports such as `from birt import Beta4` are available. In both modes, students can also use numpy, pandas, matplotlib, seaborn, plotly, statsmodels, openpyxl, and the workshop helpers. Without the backend, keep the pure-Python helpers and use Colab for the full Beta4 fitting pipeline.",
   "sliderDemos": [
     {
       "id": "beta4-curve-lab",

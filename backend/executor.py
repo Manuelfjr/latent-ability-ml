@@ -74,11 +74,29 @@ def _collect_figures() -> list[str]:
     return encoded
 
 
+def _collect_html_outputs(value: Any) -> list[str]:
+    if value is None:
+        return []
+    try:
+        module_name = value.__class__.__module__
+    except Exception:
+        return []
+    if not module_name.startswith("plotly"):
+        return []
+    if not hasattr(value, "to_html"):
+        return []
+    try:
+        return [value.to_html(include_plotlyjs="cdn", full_html=False)]
+    except Exception:
+        return []
+
+
 def execute_code(session_id: str, code: str) -> dict[str, Any]:
     context = get_or_create_context(session_id)
     stdout_buffer = io.StringIO()
     stderr_buffer = io.StringIO()
     success = True
+    html_outputs: list[str] = []
 
     try:
         tree = ast.parse(code, mode="exec")
@@ -93,7 +111,9 @@ def execute_code(session_id: str, code: str) -> dict[str, Any]:
             if compiled_expr is not None:
                 value = eval(compiled_expr, context, context)
                 if value is not None:
-                    print(value)
+                    html_outputs = _collect_html_outputs(value)
+                    if not html_outputs:
+                        print(value)
     except Exception:
         success = False
         stderr_buffer.write(traceback.format_exc())
@@ -104,4 +124,5 @@ def execute_code(session_id: str, code: str) -> dict[str, Any]:
         "stdout": stdout_buffer.getvalue(),
         "stderr": stderr_buffer.getvalue(),
         "figures": figures,
+        "html": html_outputs,
     }

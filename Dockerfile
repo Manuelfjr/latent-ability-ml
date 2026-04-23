@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -10,7 +10,7 @@ WORKDIR /app
 
 COPY requirements.txt ./requirements.txt
 COPY pyproject.toml ./pyproject.toml
-RUN pip install --upgrade pip && pip install poetry && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi
+RUN pip install --upgrade pip && pip install poetry && poetry config virtualenvs.create false && poetry install --no-root --no-interaction --no-ansi
 
 COPY backend ./backend
 COPY utils ./utils

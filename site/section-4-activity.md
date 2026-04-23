@@ -33,12 +33,12 @@ This page now includes executable Python cells directly in the site. Students ca
   "title": "Section 4 browser notebook",
   "lead": "Run clustering experiments directly in the page, then compare model-level metrics with item-level difficulty.",
   "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
-  "micropipPackages": ["seaborn"],
+  "micropipPackages": ["seaborn", "plotly", "statsmodels", "openpyxl"],
   "pythonFiles": [
     {"url": "{{ '/assets/python/utils/transform.py' | relative_url }}", "path": "utils/transform.py"},
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
-  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, utils.handson, and utils.transform.",
+  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, plotly, statsmodels, openpyxl, utils.handson, and utils.transform.",
   "cells": [
     {
       "label": "Task 1",

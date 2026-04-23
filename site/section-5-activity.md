@@ -33,12 +33,12 @@ This page includes executable Python cells directly in the site. When a notebook
   "title": "Section 5 browser notebook",
   "lead": "Work through the full CLAIRE activity sequence in the page: synthetic data, model pool, response matrix, latent summaries, and item-level inspection.",
   "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
-  "micropipPackages": ["seaborn"],
+  "micropipPackages": ["seaborn", "plotly", "statsmodels", "openpyxl"],
   "pythonFiles": [
     {"url": "{{ '/assets/python/utils/transform.py' | relative_url }}", "path": "utils/transform.py"},
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
-  "browserNote": "When a notebook backend is connected, imports such as `from birt import Beta4` are available. Without it, keep the pure-Python helpers and use Colab for the full CLAIRE fitting pipeline.",
+  "browserNote": "When a notebook backend is connected, imports such as `from birt import Beta4` are available. In both modes, students can also use numpy, pandas, matplotlib, seaborn, plotly, statsmodels, openpyxl, and the workshop helpers. Without it, keep the pure-Python helpers and use Colab for the full CLAIRE fitting pipeline.",
   "cells": [
     {
       "label": "Task 1",

@@ -41,7 +41,10 @@ This page now includes executable Python cells directly in the site. Students ca
     "micropip"
   ],
   "micropipPackages": [
-    "seaborn"
+    "seaborn",
+    "plotly",
+    "statsmodels",
+    "openpyxl"
   ],
   "pythonFiles": [
     {
@@ -53,7 +56,7 @@ This page now includes executable Python cells directly in the site. Students ca
       "path": "utils/handson.py"
     }
   ],
-  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, utils.handson, and utils.transform.",
+  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, plotly, statsmodels, openpyxl, utils.handson, and utils.transform.",
   "sliderDemos": [
     {
       "id": "irt-curve-lab",

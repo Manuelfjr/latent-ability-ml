@@ -33,12 +33,12 @@ This page includes executable Python cells directly in the site. Students can ed
   "title": "Section 1 browser notebook",
   "lead": "Compare supervised models directly in the page, then inspect the examples that stay difficult.",
   "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
-  "micropipPackages": ["seaborn"],
+  "micropipPackages": ["seaborn", "plotly", "statsmodels", "openpyxl"],
   "pythonFiles": [
     {"url": "{{ '/assets/python/utils/transform.py' | relative_url }}", "path": "utils/transform.py"},
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
-  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, utils.handson, and utils.transform.",
+  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, plotly, statsmodels, openpyxl, utils.handson, and utils.transform.",
   "cells": [
     {
       "label": "Task 1",
