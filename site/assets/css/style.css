@@ -945,6 +945,24 @@ figcaption {
   gap: 10px;
 }
 
+.browser-notebook__share-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 0.96rem;
+}
+
+.browser-notebook__share-consent input {
+  margin-top: 0.2rem;
+}
+
+.browser-notebook__share-consent span {
+  display: block;
+  max-width: 70ch;
+}
+
 .browser-notebook__progress-track {
   margin-top: 14px;
   width: 100%;

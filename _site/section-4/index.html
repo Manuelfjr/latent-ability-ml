@@ -832,6 +832,7 @@
       const defaultRuntimeApiUrls = Array.isArray(["https://manuelfjr-latent-ability-backend.hf.space"])
         ? ["https://manuelfjr-latent-ability-backend.hf.space"]
         : [];
+      const notebookShareEmail = "ferreira.jr.ufpb@gmail.com";
 
       const tabSessionStorageKey = 'browser-notebook:tab-session-id';
       let tabSessionId = sessionStorage.getItem(tabSessionStorageKey);
@@ -1228,6 +1229,7 @@ exec(module_source, module.__dict__)
         let storedState = null;
         let currentRuntime = null;
         let runtimeReady = false;
+        let shareConsent = false;
         let demoValues = Object.fromEntries(sliderDemos.map((demo) => [
           demo.id,
           Object.fromEntries(demo.controls.map((control) => [control.name, control.value])),
@@ -1249,6 +1251,7 @@ exec(module_source, module.__dict__)
               ])),
             ]));
           }
+          shareConsent = Boolean(storedState?.shareConsent);
         } catch (_) {
           storedState = null;
           cells = seedCells.slice();
@@ -1322,8 +1325,13 @@ exec(module_source, module.__dict__)
               <div class="browser-notebook__progress-actions">
                 <button class="button tiny secondary" type="button" data-action="export-notebook">Export .ipynb</button>
                 <button class="button tiny ghost" type="button" data-action="email-summary">Email summary</button>
+                <button class="button tiny ghost" type="button" data-action="share-notebook" disabled>Share notebook</button>
               </div>
             </div>
+            <label class="browser-notebook__share-consent">
+              <input type="checkbox" data-share-consent ${shareConsent ? 'checked' : ''} />
+              <span>I agree to share my notebook work with the workshop instructor.</span>
+            </label>
             <div class="browser-notebook__progress-track">
               <div class="browser-notebook__progress-bar" data-progress-bar></div>
             </div>
@@ -1344,6 +1352,8 @@ exec(module_source, module.__dict__)
         const status = widget.querySelector('[data-notebook-status]');
         const progressLabel = widget.querySelector('[data-progress-label]');
         const progressBar = widget.querySelector('[data-progress-bar]');
+        const shareConsentInput = widget.querySelector('[data-share-consent]');
+        const shareNotebookButton = widget.querySelector('[data-action="share-notebook"]');
 
         const setStatus = (message, type = '') => {
           status.textContent = message;
@@ -1357,7 +1367,13 @@ exec(module_source, module.__dict__)
             cells,
             outputs: Array.from(cellOutputs, ([id, result]) => ({ id, result })),
             demoValues,
+            shareConsent,
           }));
+        };
+
+        const syncShareState = () => {
+          if (shareConsentInput) shareConsentInput.checked = shareConsent;
+          if (shareNotebookButton) shareNotebookButton.disabled = !shareConsent;
         };
 
         const hasMeaningfulCode = (cell) => {
@@ -1473,31 +1489,84 @@ exec(module_source, module.__dict__)
           URL.revokeObjectURL(url);
         };
 
-        const emailSummary = () => {
+        const buildNotebookFile = () => {
+          const notebook = buildNotebookExport();
+          const content = JSON.stringify(notebook, null, 2);
+          const blob = new Blob([content], { type: 'application/x-ipynb+json' });
+          return new File([blob], `${notebookId}.ipynb`, { type: 'application/x-ipynb+json' });
+        };
+
+        const downloadNotebookFile = () => {
+          const file = buildNotebookFile();
+          const url = URL.createObjectURL(file);
+          const anchor = document.createElement('a');
+          anchor.href = url;
+          anchor.download = file.name;
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          URL.revokeObjectURL(url);
+          return file;
+        };
+
+        const canShareFile = (file) => {
+          if (!navigator.share || !navigator.canShare) return false;
+          try {
+            return navigator.canShare({ files: [file] });
+          } catch (_) {
+            return false;
+          }
+        };
+
+        const buildEmailBody = ({ includeConsent = false } = {}) => {
           const taskCells = cells.filter((cell) => cell.kind === 'task');
+          const completed = taskCells.filter((cell) => cell.done).length;
           const lines = [
             `${title}`,
             '',
             `Page: ${window.location.href}`,
-            `Progress: ${taskCells.filter((cell) => cell.done).length}/${taskCells.length} tasks completed`,
+            `Progress: ${completed}/${taskCells.length} tasks completed`,
+            includeConsent ? 'The participant explicitly agreed to share this notebook work with the instructor.' : 'The notebook file was exported from the workshop site.',
             '',
-            'Notebook summary:',
-            '',
+            'The .ipynb file should be attached manually if it was not shared automatically by the browser.',
           ];
-          taskCells.forEach((cell) => {
-            lines.push(`${cell.label} - ${cell.done ? 'completed' : 'in progress'}`);
-            lines.push(cell.lead);
-            const snippet = String(cell.code || '').trim();
-            if (snippet) {
-              lines.push('Code:');
-              lines.push(snippet.slice(0, 1200));
-            }
-            lines.push('');
-          });
-          lines.push('If needed, attach the exported .ipynb file manually.');
-          const body = encodeURIComponent(lines.join('\n').slice(0, 7000));
-          const subject = encodeURIComponent(`${title} notebook summary`);
-          window.location.href = `mailto:?subject=${subject}&body=${body}`;
+          return lines.join('\n');
+        };
+
+        const openMailClient = (to, subjectText, bodyText) => {
+          const toPart = to ? `${encodeURIComponent(to)}` : '';
+          const query = `subject=${encodeURIComponent(subjectText)}&body=${encodeURIComponent(bodyText)}`;
+          window.location.href = `mailto:${toPart}?${query}`;
+        };
+
+        const emailSummary = () => {
+          downloadNotebookFile();
+          const body = buildEmailBody();
+          openMailClient('', `${title} notebook summary`, body);
+          setStatus('Your notebook file was downloaded. Please attach it manually in the email client.', 'ready');
+        };
+
+        const shareNotebook = () => {
+          if (!shareConsent) {
+            setStatus('Please confirm that you agree to share your notebook before sending it.', 'error');
+            return;
+          }
+          const file = buildNotebookFile();
+          if (canShareFile(file)) {
+            navigator.share({
+              title: `${title} notebook shared by participant`,
+              text: 'The participant explicitly agreed to share this notebook work with the instructor.',
+              files: [file],
+            }).catch(() => {
+              downloadNotebookFile();
+              openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+              setStatus('Native sharing was unavailable. Your notebook file was downloaded instead; please attach it manually.', 'ready');
+            });
+            return;
+          }
+          downloadNotebookFile();
+          openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+          setStatus('Your notebook file was downloaded. Please attach it manually before sending it to the instructor.', 'ready');
         };
 
         const compileTemplate = (template, values) => String(template || '').replace(/\{\{(\w+)\}\}/g, (_, key) => {
@@ -1922,6 +1991,15 @@ exec(module_source, module.__dict__)
 
         widget.querySelector('[data-action="export-notebook"]').addEventListener('click', exportNotebook);
         widget.querySelector('[data-action="email-summary"]').addEventListener('click', emailSummary);
+        if (shareNotebookButton) shareNotebookButton.addEventListener('click', shareNotebook);
+        if (shareConsentInput) {
+          shareConsentInput.addEventListener('change', (event) => {
+            shareConsent = Boolean(event.target.checked);
+            syncShareState();
+            persist();
+          });
+        }
+        syncShareState();
 
         sliderDemos.forEach((demo) => {
           const demoEl = widget.querySelector(`[data-demo-id="${demo.id}"]`);
