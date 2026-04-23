@@ -40,9 +40,33 @@ This page includes executable Python cells directly in the site. Students can ed
   ],
   "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, utils.handson, and utils.transform.",
   "cells": [
-    {"label": "Task 1", "lead": "Create or adapt a toy classification dataset.", "code": "# answer\n"},
-    {"label": "Task 2", "lead": "Evaluate a small pool of supervised models on your dataset.", "code": "# answer\n"},
-    {"label": "Task 3", "lead": "Inspect example-level difficulty or disagreement and discuss where the hard cases are.", "code": "# answer\n"}
+    {
+      "label": "Task 1",
+      "lead": "Create or adapt a toy classification dataset.",
+      "code": "# answer\n",
+      "hints": [
+        "You can start with `sklearn.datasets.make_classification` or adapt one of the toy helpers from `utils.handson`.",
+        "Keep the dataset small and two-dimensional if you want an easier visual inspection of hard examples."
+      ]
+    },
+    {
+      "label": "Task 2",
+      "lead": "Evaluate a small pool of supervised models on your dataset.",
+      "code": "# answer\n",
+      "hints": [
+        "A compact pool such as logistic regression, k-nearest neighbors, and a tree-based model is enough for comparison.",
+        "Store predictions per model so you can compare aggregate performance and local disagreement later."
+      ]
+    },
+    {
+      "label": "Task 3",
+      "lead": "Inspect example-level difficulty or disagreement and discuss where the hard cases are.",
+      "code": "# answer\n",
+      "hints": [
+        "Look for examples where several models disagree, not only where one model makes an error.",
+        "The most interesting cases are often the ones close to decision boundaries or class overlap."
+      ]
+    }
   ]
 }
   </script>

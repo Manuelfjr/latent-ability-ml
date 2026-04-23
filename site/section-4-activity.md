@@ -40,9 +40,33 @@ This page now includes executable Python cells directly in the site. Students ca
   ],
   "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, utils.handson, and utils.transform.",
   "cells": [
-    {"label": "Task 1", "lead": "Create or adapt a toy clustering dataset.", "code": "# answer\n"},
-    {"label": "Task 2", "lead": "Compare clustering models on the dataset.", "code": "# answer\n"},
-    {"label": "Task 3", "lead": "Inspect hard instances through agreement rather than only aggregate metrics.", "code": "# answer\n"}
+    {
+      "label": "Task 1",
+      "lead": "Create or adapt a toy clustering dataset.",
+      "code": "# answer\n",
+      "hints": [
+        "You can begin with a simple geometric setting and then make it harder through noise, overlap, or curved structure.",
+        "A two-dimensional dataset is usually enough for visual discussion."
+      ]
+    },
+    {
+      "label": "Task 2",
+      "lead": "Compare clustering models on the dataset.",
+      "code": "# answer\n",
+      "hints": [
+        "Pick models with different assumptions, such as centroid-based, connectivity-based, or spectral approaches.",
+        "Keep the model outputs so you can compare both summary metrics and pairwise agreement."
+      ]
+    },
+    {
+      "label": "Task 3",
+      "lead": "Inspect hard instances through agreement rather than only aggregate metrics.",
+      "code": "# answer\n",
+      "hints": [
+        "The most interesting instances are usually those around ambiguous boundaries or local geometric irregularities.",
+        "Try to identify points where model disagreement concentrates rather than being spread uniformly."
+      ]
+    }
   ]
 }
   </script>

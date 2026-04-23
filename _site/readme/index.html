@@ -1002,12 +1002,41 @@ exec(module_source, module.__dict__)
         return plain;
       };
 
-      const makeCell = (cell = {}, index = 0) => ({
-        id: cell.id || `cell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-        label: cell.label || `Cell ${index + 1}`,
-        lead: cell.lead || 'Use this cell as scratch space during the activity.',
-        code: typeof cell.code === 'string' ? cell.code : '# answer\n',
-      });
+      const makeCell = (cell = {}, index = 0) => {
+        const seedCode = typeof cell.seedCode === 'string'
+          ? cell.seedCode
+          : (typeof cell.code === 'string' ? cell.code : '# answer\n');
+        return {
+          id: cell.id || `cell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+          label: cell.label || `Cell ${index + 1}`,
+          lead: cell.lead || 'Use this cell as scratch space during the activity.',
+          code: typeof cell.code === 'string' ? cell.code : seedCode,
+          seedCode,
+          hints: Array.isArray(cell.hints) ? cell.hints.filter(Boolean) : [],
+          shownHints: Number.isFinite(cell.shownHints) ? Math.max(0, cell.shownHints) : 0,
+          kind: cell.kind || 'task',
+          done: Boolean(cell.done),
+        };
+      };
+
+      const makeSliderDemo = (demo = {}, index = 0) => {
+        const controls = Array.isArray(demo.controls) ? demo.controls : [];
+        return {
+          id: demo.id || `demo-${index + 1}`,
+          title: demo.title || `Interactive demo ${index + 1}`,
+          lead: demo.lead || 'Adjust the controls and rerun the demo.',
+          buttonLabel: demo.buttonLabel || 'Update figure',
+          template: typeof demo.template === 'string' ? demo.template : '',
+          controls: controls.map((control, controlIndex) => ({
+            name: control.name || `param_${controlIndex + 1}`,
+            label: control.label || `Parameter ${controlIndex + 1}`,
+            min: Number.isFinite(control.min) ? control.min : 0,
+            max: Number.isFinite(control.max) ? control.max : 1,
+            step: Number.isFinite(control.step) ? control.step : 0.1,
+            value: Number.isFinite(control.value) ? control.value : 0,
+          })),
+        };
+      };
 
       const resizeEditor = (editor, host) => {
         const lineHeight = editor.renderer.lineHeight || 19;
@@ -1020,6 +1049,14 @@ exec(module_source, module.__dict__)
         textarea.style.height = 'auto';
         textarea.style.height = `${Math.max(120, textarea.scrollHeight)}px`;
       };
+
+      const escapeHtml = (value) => String(value || '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      }[character]));
 
       widgets.forEach((widget) => {
         const seedEl = widget.querySelector('.browser-notebook__seed');
@@ -1043,15 +1080,31 @@ exec(module_source, module.__dict__)
         const lead = config.lead || 'Run Python cells directly in the page.';
         const note = config.browserNote || '';
         const seedCells = (config.cells || []).map((cell, index) => makeCell(cell, index));
+        const sliderDemos = (config.sliderDemos || []).map((demo, index) => makeSliderDemo(demo, index));
         let cells = seedCells.slice();
         let storedState = null;
         let currentRuntime = null;
         let runtimeReady = false;
+        let demoValues = Object.fromEntries(sliderDemos.map((demo) => [
+          demo.id,
+          Object.fromEntries(demo.controls.map((control) => [control.name, control.value])),
+        ]));
 
         try {
           storedState = JSON.parse(sessionStorage.getItem(storageKey) || 'null');
           if (storedState && Array.isArray(storedState.cells) && storedState.cells.length) {
             cells = storedState.cells.map((cell, index) => makeCell(cell, index));
+          }
+          if (storedState && storedState.demoValues && typeof storedState.demoValues === 'object') {
+            demoValues = Object.fromEntries(sliderDemos.map((demo) => [
+              demo.id,
+              Object.fromEntries(demo.controls.map((control) => [
+                control.name,
+                Number.isFinite(storedState.demoValues?.[demo.id]?.[control.name])
+                  ? storedState.demoValues[demo.id][control.name]
+                  : control.value,
+              ])),
+            ]));
           }
         } catch (_) {
           storedState = null;
@@ -1060,6 +1113,52 @@ exec(module_source, module.__dict__)
         const cellOutputs = new Map(Array.isArray(storedState?.outputs)
           ? storedState.outputs.map((entry) => [entry.id, entry.result])
           : []);
+
+        const sliderMarkup = sliderDemos.length
+          ? `
+          <div class="browser-notebook__demos">
+            ${sliderDemos.map((demo) => `
+              <section class="browser-notebook__demo" data-demo-id="${escapeHtml(demo.id)}">
+                <div class="browser-notebook__demo-header">
+                  <div>
+                    <p class="browser-notebook__cell-label">Interactive lab</p>
+                    <h3>${escapeHtml(demo.title)}</h3>
+                    <p class="browser-notebook__cell-lead">${escapeHtml(demo.lead)}</p>
+                  </div>
+                  <div class="browser-notebook__demo-actions">
+                    <button class="button tiny secondary" type="button" data-action="run-demo">${escapeHtml(demo.buttonLabel)}</button>
+                  </div>
+                </div>
+                <div class="browser-notebook__demo-controls">
+                  ${demo.controls.map((control) => `
+                    <label class="browser-notebook__control">
+                      <span class="browser-notebook__control-label">${escapeHtml(control.label)}</span>
+                      <input
+                        type="range"
+                        min="${escapeHtml(control.min)}"
+                        max="${escapeHtml(control.max)}"
+                        step="${escapeHtml(control.step)}"
+                        value="${escapeHtml(control.value)}"
+                        data-control-range="${escapeHtml(control.name)}"
+                      />
+                      <input
+                        class="browser-notebook__control-number"
+                        type="number"
+                        min="${escapeHtml(control.min)}"
+                        max="${escapeHtml(control.max)}"
+                        step="${escapeHtml(control.step)}"
+                        value="${escapeHtml(control.value)}"
+                        data-control-number="${escapeHtml(control.name)}"
+                      />
+                    </label>
+                  `).join('')}
+                </div>
+                <div class="browser-notebook__output browser-notebook__demo-output is-empty"></div>
+              </section>
+            `).join('')}
+          </div>
+          `
+          : '';
 
         widget.innerHTML = `
           <div class="browser-notebook__eyebrow">Notebook mode</div>
@@ -1071,6 +1170,22 @@ exec(module_source, module.__dict__)
           </div>
           ${note ? `<div class="browser-notebook__note">${note}</div>` : ''}
           <div class="browser-notebook__status" data-notebook-status>Preparing browser runtime…</div>
+          <div class="browser-notebook__progress">
+            <div class="browser-notebook__progress-header">
+              <div>
+                <strong class="browser-notebook__progress-label" data-progress-label>0 of 0 tasks completed</strong>
+                <p class="browser-notebook__progress-note">Your work stays saved in this tab until you close it.</p>
+              </div>
+              <div class="browser-notebook__progress-actions">
+                <button class="button tiny secondary" type="button" data-action="export-notebook">Export .ipynb</button>
+                <button class="button tiny ghost" type="button" data-action="email-summary">Email summary</button>
+              </div>
+            </div>
+            <div class="browser-notebook__progress-track">
+              <div class="browser-notebook__progress-bar" data-progress-bar></div>
+            </div>
+          </div>
+          ${sliderMarkup}
           <div class="browser-notebook__toolbar">
             <div class="browser-notebook__toolbar-actions">
               <button class="button tiny" type="button" data-action="add-cell">Add cell</button>
@@ -1084,6 +1199,8 @@ exec(module_source, module.__dict__)
 
         const cellsHost = widget.querySelector('[data-notebook-cells]');
         const status = widget.querySelector('[data-notebook-status]');
+        const progressLabel = widget.querySelector('[data-progress-label]');
+        const progressBar = widget.querySelector('[data-progress-bar]');
 
         const setStatus = (message, type = '') => {
           status.textContent = message;
@@ -1096,7 +1213,167 @@ exec(module_source, module.__dict__)
           sessionStorage.setItem(storageKey, JSON.stringify({
             cells,
             outputs: Array.from(cellOutputs, ([id, result]) => ({ id, result })),
+            demoValues,
           }));
+        };
+
+        const hasMeaningfulCode = (cell) => {
+          const stripped = String(cell.code || '')
+            .replace(/#\s*answer/g, '')
+            .replace(/\s+/g, '');
+          return stripped.length > 0;
+        };
+
+        const updateProgress = () => {
+          const taskCells = cells.filter((cell) => cell.kind === 'task');
+          const completed = taskCells.filter((cell) => cell.done).length;
+          const started = taskCells.filter((cell) => cell.done || hasMeaningfulCode(cell) || cellOutputs.has(cell.id)).length;
+          const total = taskCells.length;
+          if (progressLabel) {
+            progressLabel.textContent = `${completed} of ${total} tasks completed`;
+            progressLabel.dataset.secondary = `${started} started`;
+          }
+          if (progressBar) {
+            progressBar.style.width = `${total ? (completed / total) * 100 : 0}%`;
+          }
+        };
+
+        const buildNotebookExport = () => {
+          const notebookCells = [
+            {
+              cell_type: 'markdown',
+              metadata: {},
+              source: [
+                `# ${title}\n`,
+                '\n',
+                `${lead}\n`,
+              ],
+            },
+            ...cells.map((cell) => {
+              const result = cellOutputs.get(cell.id) || {};
+              const outputs = [];
+              const stdout = (result.stdout || '').trim();
+              const stderr = (result.stderr || '').trim();
+              const figures = Array.isArray(result.figures) ? result.figures : [];
+              if (stdout) {
+                outputs.push({
+                  output_type: 'stream',
+                  name: 'stdout',
+                  text: [`${stdout}\n`],
+                });
+              }
+              if (stderr) {
+                outputs.push({
+                  output_type: 'stream',
+                  name: 'stderr',
+                  text: [`${stderr}\n`],
+                });
+              }
+              figures.forEach((encoded) => {
+                outputs.push({
+                  output_type: 'display_data',
+                  data: { 'image/png': encoded },
+                  metadata: {},
+                });
+              });
+              return {
+                cell_type: 'code',
+                metadata: {
+                  label: cell.label,
+                  lead: cell.lead,
+                  done: cell.done,
+                },
+                execution_count: null,
+                outputs,
+                source: cell.code.split('\n').map((line, idx, arr) => idx < arr.length - 1 ? `${line}\n` : line),
+              };
+            }),
+          ];
+          return {
+            cells: notebookCells,
+            metadata: {
+              kernelspec: {
+                display_name: 'Python 3',
+                language: 'python',
+                name: 'python3',
+              },
+              language_info: {
+                name: 'python',
+                version: '3',
+              },
+              workshop_notebook_id: notebookId,
+              title,
+            },
+            nbformat: 4,
+            nbformat_minor: 5,
+          };
+        };
+
+        const exportNotebook = () => {
+          const notebook = buildNotebookExport();
+          const blob = new Blob([JSON.stringify(notebook, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement('a');
+          anchor.href = url;
+          anchor.download = `${notebookId}.ipynb`;
+          document.body.appendChild(anchor);
+          anchor.click();
+          anchor.remove();
+          URL.revokeObjectURL(url);
+        };
+
+        const emailSummary = () => {
+          const taskCells = cells.filter((cell) => cell.kind === 'task');
+          const lines = [
+            `${title}`,
+            '',
+            `Page: ${window.location.href}`,
+            `Progress: ${taskCells.filter((cell) => cell.done).length}/${taskCells.length} tasks completed`,
+            '',
+            'Notebook summary:',
+            '',
+          ];
+          taskCells.forEach((cell) => {
+            lines.push(`${cell.label} - ${cell.done ? 'completed' : 'in progress'}`);
+            lines.push(cell.lead);
+            const snippet = String(cell.code || '').trim();
+            if (snippet) {
+              lines.push('Code:');
+              lines.push(snippet.slice(0, 1200));
+            }
+            lines.push('');
+          });
+          lines.push('If needed, attach the exported .ipynb file manually.');
+          const body = encodeURIComponent(lines.join('\n').slice(0, 7000));
+          const subject = encodeURIComponent(`${title} notebook summary`);
+          window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        };
+
+        const compileTemplate = (template, values) => String(template || '').replace(/\{\{(\w+)\}\}/g, (_, key) => {
+          const value = values[key];
+          return Number.isFinite(value) ? String(value) : '0';
+        });
+
+        const renderHintState = (cellEl, cell) => {
+          const wrap = cellEl.querySelector('[data-cell-hints]');
+          if (!wrap) return;
+          const list = wrap.querySelector('[data-hint-list]');
+          const reveal = wrap.querySelector('[data-action="show-hint"]');
+          const hide = wrap.querySelector('[data-action="hide-hints"]');
+          if (!Array.isArray(cell.hints) || !cell.hints.length) {
+            wrap.hidden = true;
+            return;
+          }
+          wrap.hidden = false;
+          list.innerHTML = cell.hints.slice(0, cell.shownHints).map((hint, index) => `
+            <div class="browser-notebook__hint-item">
+              <strong>Hint ${index + 1}</strong>
+              <p>${escapeHtml(hint)}</p>
+            </div>
+          `).join('');
+          reveal.textContent = cell.shownHints >= cell.hints.length ? 'All hints shown' : `Show hint ${cell.shownHints + 1}`;
+          reveal.disabled = cell.shownHints >= cell.hints.length;
+          hide.hidden = cell.shownHints === 0;
         };
 
         const initializeBackend = async (force = false) => {
@@ -1176,6 +1453,7 @@ exec(module_source, module.__dict__)
               cellOutputs.delete(cellId);
             }
             persist();
+            updateProgress();
           }
           output.innerHTML = '';
           output.classList.remove('is-empty', 'is-error');
@@ -1230,12 +1508,17 @@ exec(module_source, module.__dict__)
           try {
             const runtime = await initializeNotebook();
             const result = await executeCell(runtime, cell.code);
+            if (!((result.stderr || '').trim())) {
+              cell.done = true;
+              persist();
+            }
             renderOutput(cellEl, result || {});
             setStatus(result && result.success === false
               ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
               : runtime.kind === 'backend'
                 ? `Cell executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
                 : 'Cell executed in the browser runtime.', result && result.success === false ? 'error' : 'ready');
+            updateProgress();
           } catch (error) {
             const output = cellEl.querySelector('.browser-notebook__output');
             output.classList.remove('is-empty');
@@ -1248,23 +1531,63 @@ exec(module_source, module.__dict__)
           }
         };
 
+        const runDemo = async (demoId) => {
+          const demo = sliderDemos.find((entry) => entry.id === demoId);
+          const demoEl = widget.querySelector(`[data-demo-id="${demoId}"]`);
+          if (!demo || !demoEl) return;
+          const output = demoEl.querySelector('.browser-notebook__demo-output');
+          const button = demoEl.querySelector('[data-action="run-demo"]');
+          const originalLabel = button.textContent;
+          button.disabled = true;
+          button.textContent = 'Running…';
+          setStatus('Running interactive demo…');
+          try {
+            const runtime = await initializeNotebook();
+            const code = compileTemplate(demo.template, demoValues[demoId] || {});
+            const result = await executeCell(runtime, code);
+            renderOutput(demoEl, result || {});
+            output.classList.remove('is-empty');
+            setStatus(runtime.kind === 'backend'
+              ? `Interactive demo executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
+              : 'Interactive demo executed in the browser runtime.', 'ready');
+          } catch (error) {
+            output.classList.remove('is-empty');
+            output.classList.add('is-error');
+            output.innerHTML = `<pre>${describeError(error)}</pre>`;
+            setStatus(`The interactive demo raised an error: ${describeError(error)}`, 'error');
+          } finally {
+            button.disabled = false;
+            button.textContent = originalLabel;
+          }
+        };
+
         const renderCells = () => {
           cellsHost.innerHTML = '';
           cells.forEach((cell, index) => {
+            const isTask = cell.kind === 'task';
             const cellEl = document.createElement('section');
-            cellEl.className = 'browser-notebook__cell';
+            cellEl.className = `browser-notebook__cell${cell.done ? ' is-complete' : ''}`;
             cellEl.dataset.cellId = cell.id;
             cellEl.innerHTML = `
               <div class="browser-notebook__cell-header">
                 <div>
-                  <p class="browser-notebook__cell-label">${cell.label}</p>
-                  <p class="browser-notebook__cell-lead">${cell.lead}</p>
+                  <p class="browser-notebook__cell-label">${escapeHtml(cell.label)}</p>
+                  <p class="browser-notebook__cell-lead">${escapeHtml(cell.lead)}</p>
                 </div>
                 <div class="browser-notebook__cell-actions">
+                  ${isTask ? `<button class="button tiny secondary" type="button" data-action="reset-task">Reset task</button>` : ''}
                   <button class="button tiny secondary" type="button" data-action="add-below">Add below</button>
                   <button class="button tiny ghost" type="button" data-action="delete-cell">Delete</button>
                   <button class="button tiny" type="button" data-action="run-cell">Run cell</button>
                 </div>
+              </div>
+              <div class="browser-notebook__cell-hints" data-cell-hints hidden>
+                <div class="browser-notebook__cell-hint-actions">
+                  <button class="button tiny secondary" type="button" data-action="show-hint">Show hint 1</button>
+                  <button class="button tiny ghost" type="button" data-action="hide-hints" hidden>Hide hints</button>
+                  ${isTask ? `<button class="button tiny ghost" type="button" data-action="toggle-done">${cell.done ? 'Mark incomplete' : 'Mark complete'}</button>` : ''}
+                </div>
+                <div class="browser-notebook__hint-list" data-hint-list></div>
               </div>
               <div class="browser-notebook__cell-editor">
                 <div class="browser-notebook__editor"></div>
@@ -1272,11 +1595,13 @@ exec(module_source, module.__dict__)
               </div>
               <div class="browser-notebook__cell-footer">
                 <div class="browser-notebook__cell-index">Cell ${index + 1}</div>
+                ${isTask && cell.done ? '<div class="browser-notebook__cell-state">Completed</div>' : ''}
               </div>
               <div class="browser-notebook__output is-empty"></div>
             `;
             const editorHost = cellEl.querySelector('.browser-notebook__editor');
             const fallbackTextarea = cellEl.querySelector('.browser-notebook__textarea--fallback');
+            renderHintState(cellEl, cell);
             fallbackTextarea.value = cell.code;
             fallbackTextarea.style.display = 'block';
             autoGrowFallback(fallbackTextarea);
@@ -1341,7 +1666,7 @@ exec(module_source, module.__dict__)
             });
             cellEl.querySelector('[data-action="run-cell"]').addEventListener('click', () => runCell(cell.id));
             cellEl.querySelector('[data-action="add-below"]').addEventListener('click', () => {
-              const insertion = makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n' }, cells.length);
+              const insertion = makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n', kind: 'scratch' }, cells.length);
               cells.splice(index + 1, 0, insertion);
               persist();
               renderCells();
@@ -1355,16 +1680,54 @@ exec(module_source, module.__dict__)
               persist();
               renderCells();
             });
+            const resetTaskButton = cellEl.querySelector('[data-action="reset-task"]');
+            if (resetTaskButton) {
+              resetTaskButton.addEventListener('click', () => {
+                cell.code = cell.seedCode;
+                cell.done = false;
+                cell.shownHints = 0;
+                cellOutputs.delete(cell.id);
+                persist();
+                renderCells();
+                updateProgress();
+              });
+            }
+            const showHintButton = cellEl.querySelector('[data-action="show-hint"]');
+            if (showHintButton) {
+              showHintButton.addEventListener('click', () => {
+                cell.shownHints = Math.min(cell.hints.length, cell.shownHints + 1);
+                persist();
+                renderHintState(cellEl, cell);
+              });
+            }
+            const hideHintButton = cellEl.querySelector('[data-action="hide-hints"]');
+            if (hideHintButton) {
+              hideHintButton.addEventListener('click', () => {
+                cell.shownHints = 0;
+                persist();
+                renderHintState(cellEl, cell);
+              });
+            }
+            const toggleDoneButton = cellEl.querySelector('[data-action="toggle-done"]');
+            if (toggleDoneButton) {
+              toggleDoneButton.addEventListener('click', () => {
+                cell.done = !cell.done;
+                persist();
+                renderCells();
+                updateProgress();
+              });
+            }
             const savedResult = cellOutputs.get(cell.id);
             if (savedResult) {
               renderOutput(cellEl, savedResult);
             }
             cellsHost.appendChild(cellEl);
           });
+          updateProgress();
         };
 
         widget.querySelector('[data-action="add-cell"]').addEventListener('click', () => {
-          cells.push(makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n' }, cells.length));
+          cells.push(makeCell({ label: 'Scratch cell', lead: 'Use this extra cell for your own experiments.', code: '# answer\n', kind: 'scratch' }, cells.length));
           persist();
           renderCells();
         });
@@ -1388,8 +1751,38 @@ exec(module_source, module.__dict__)
           }
         });
 
+        widget.querySelector('[data-action="export-notebook"]').addEventListener('click', exportNotebook);
+        widget.querySelector('[data-action="email-summary"]').addEventListener('click', emailSummary);
+
+        sliderDemos.forEach((demo) => {
+          const demoEl = widget.querySelector(`[data-demo-id="${demo.id}"]`);
+          if (!demoEl) return;
+          const currentValues = demoValues[demo.id] || {};
+          demo.controls.forEach((control) => {
+            const range = demoEl.querySelector(`[data-control-range="${control.name}"]`);
+            const number = demoEl.querySelector(`[data-control-number="${control.name}"]`);
+            const syncValue = (rawValue) => {
+              const numeric = Number(rawValue);
+              const nextValue = Number.isFinite(numeric) ? numeric : control.value;
+              currentValues[control.name] = nextValue;
+              demoValues[demo.id] = currentValues;
+              if (range) range.value = String(nextValue);
+              if (number) number.value = String(nextValue);
+              persist();
+            };
+            if (range) {
+              range.addEventListener('input', () => syncValue(range.value));
+            }
+            if (number) {
+              number.addEventListener('input', () => syncValue(number.value));
+            }
+          });
+          demoEl.querySelector('[data-action="run-demo"]').addEventListener('click', () => runDemo(demo.id));
+        });
+
         renderCells();
         ensureEditor().then(() => renderCells()).catch(() => {});
+        updateProgress();
         initializeNotebook().catch(() => {});
       });
     })();
