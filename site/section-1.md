@@ -81,7 +81,7 @@ First, evaluation should not stop at a single aggregate number. Second, local di
 
 That is exactly the bridge into IRT. Once those claims feel natural in a supervised setting, the transition to latent ability, item difficulty, and item discrimination becomes much smoother. The next section simply turns these qualitative observations into a probabilistic language.
 
-## Questions That Organize the Section
+## Questions for Discussion
 
 - Why is it still useful to inspect example-level difficulty even when labels are available?
 - What do average metrics hide about the geometry of the problem?

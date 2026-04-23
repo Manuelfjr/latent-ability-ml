@@ -97,7 +97,7 @@ That prepares the transition to the next section. Logistic ICCs are excellent fo
 
 In that sense, Section 2 is the conceptual spine of the workshop. It gives the language that later sections will extend, generalize, and repurpose in settings that are more realistic than simple right-or-wrong responses.
 
-## Questions That Organize the Section
+## Questions for Discussion
 
 - What changes visually when only difficulty moves, and what stays fixed?
 - Why does stronger discrimination make an item more informative near its transition region?

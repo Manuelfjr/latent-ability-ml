@@ -91,7 +91,7 @@ This final comparison is important because it returns the audience to a familiar
 
 The workshop ends here because CLAIRE depends on everything that came before. The supervised section taught the room to care about local difficulty. Binary IRT taught the language of ability, difficulty, and discrimination. Beta4 showed that bounded responses can still support that language. Unsupervised evaluation made agreement visible as a meaningful signal. CLAIRE is where those pieces finally become one workflow.
 
-## Questions That Organize the Section
+## Questions for Discussion
 
 - Why is agreement a more interesting signal than correctness in this setting?
 - What does the response matrix keep from the clustering geometry and what does it discard?

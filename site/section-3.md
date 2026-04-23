@@ -79,7 +79,7 @@ Beta4-IRT should be understood before the workshop turns to agreement-based eval
 
 This is the strategic role of the section. Beta4 is the bridge between classical IRT and the more unusual response construction that CLAIRE will later introduce. Without this section, CLAIRE could look like two difficult ideas at once: a new response matrix and a new latent model. With this section in place, only the response matrix is new; the latent model has already been read and trusted.
 
-## Questions That Organize the Section
+## Questions for Discussion
 
 - What does Beta4 preserve from binary IRT and what does it generalize?
 - Why is it important to inspect generating and fitted parameters side by side?
