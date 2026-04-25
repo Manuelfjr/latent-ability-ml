@@ -16,7 +16,6 @@ The workshop now progresses through five connected stages: supervised evaluation
     <p>Supervised evaluation, compact metric tables, and example-level difficulty.</p>
     <div class="button-row">
       <a class="button" href="{{ '/section-1/' | relative_url }}">Open section</a>
-      <a class="button secondary" href="{{ '/section-1-activity/' | relative_url }}">Open activity</a>
     </div>
   </div>
   <div class="card">

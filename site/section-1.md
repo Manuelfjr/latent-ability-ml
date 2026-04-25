@@ -8,7 +8,6 @@ permalink: /section-1/
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb">Open guided notebook</a>
-  <a class="button secondary" href="{{ '/section-1-activity/' | relative_url }}">Go to activity</a>
 </div>
 
 ## Supervised evaluation and example difficulty

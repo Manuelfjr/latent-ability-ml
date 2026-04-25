@@ -8,10 +8,6 @@
   children:
     - title: Overview
       url: /section-1/
-    - title: Activity
-      url: /section-1-activity/
-    - title: Answer
-      url: /section-1-answer/
 - title: Binary IRT and 2PL
   children:
     - title: Overview

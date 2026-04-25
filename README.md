@@ -65,10 +65,8 @@ Total estimated duration: `3 hours`.
 
 - `notebooks/01_00_supervised_evaluation_toy_problems.ipynb`
   Guided exposition notebook.
-- `notebooks/01_01_activities.ipynb`
-  Participant activity notebook.
-- `notebooks/01_02_answer.ipynb`
-  Instructor answer notebook.
+  
+This opening section is now treated as a guided conceptual block. It introduces the problem of example-level difficulty in a familiar supervised setting, but it no longer has a separate public activity or answer page in the site flow.
 
 ### 2. Binary IRT and 2PL
 
@@ -103,10 +101,10 @@ The simplest reading path is:
 
 1. open the roadmap notebook;
 2. follow the overview page or main notebook of the current section;
-3. move to the corresponding activity notebook;
+3. from Section 2 onward, move to the corresponding activity notebook;
 4. compare your work with the answer notebook only after discussion or consolidation.
 
-The activity notebooks are designed as working spaces. They are intentionally lighter on exposition so that the conceptual narrative stays in the overview material and the guided section notebooks.
+The activity notebooks are designed as working spaces from Section 2 onward. They are intentionally lighter on exposition so that the conceptual narrative stays in the overview material and the guided section notebooks.
 
 ### If you are delivering the workshop
 
@@ -126,8 +124,6 @@ These files are not part of the public site flow. They are instructor-oriented n
 ├── notebooks/
 │   ├── 00_workshop_roadmap.ipynb
 │   ├── 01_00_supervised_evaluation_toy_problems.ipynb
-│   ├── 01_01_activities.ipynb
-│   ├── 01_02_answer.ipynb
 │   ├── 02_00_binary_irt_and_2pl.ipynb
 │   ├── 02_01_activities.ipynb
 │   ├── 02_02_answer.ipynb
