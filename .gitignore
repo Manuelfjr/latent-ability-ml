@@ -4,6 +4,13 @@
 __pycache__/
 .pytest_cache/
 .venv/
+.env
+.env.*
+backend/.env
+backend/.env.*
+site/.env
+site/.env.*
+!/backend/.env.example
 
 *[0-9][0-9]_99_*.ipynb
 *99*.ipynb

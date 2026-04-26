@@ -30,6 +30,22 @@ By default the backend listens on `0.0.0.0:8765`.
 - `WORKSHOP_BACKEND_HOST`
 - `WORKSHOP_BACKEND_PORT`
 - `WORKSHOP_BACKEND_ALLOW_ORIGIN`
+- `WORKSHOP_ENABLE_ADMIN_ANALYTICS`
+- `WORKSHOP_ADMIN_USERNAME`
+- `WORKSHOP_ADMIN_PASSWORD`
+- `WORKSHOP_ANALYTICS_FILE`
+
+## Local `.env`
+
+For local development, the backend scripts automatically load `backend/.env` if it exists.
+
+Start from the example:
+
+```bash
+cp backend/.env.example backend/.env
+```
+
+Then edit the credentials and flags there. The `.env` file is ignored by Git.
 
 Example:
 
@@ -38,6 +54,20 @@ WORKSHOP_BACKEND_HOST=0.0.0.0 \
 WORKSHOP_BACKEND_PORT=8765 \
 WORKSHOP_BACKEND_ALLOW_ORIGIN="https://manuelfjr.github.io" \
 poetry run python -m backend.app
+```
+
+To enable the private admin route locally:
+
+```bash
+WORKSHOP_ENABLE_ADMIN_ANALYTICS=true
+WORKSHOP_ADMIN_USERNAME=admin
+WORKSHOP_ADMIN_PASSWORD=change-me
+```
+
+The route will then be available at:
+
+```text
+http://127.0.0.1:8765/admin
 ```
 
 ## Cluster-oriented deployment idea
@@ -83,3 +113,14 @@ RBENV_VERSION=3.2.2 /Users/manuelfjr/.rbenv/versions/3.2.2/bin/jekyll serve --so
 2. Expose it over HTTPS.
 3. Copy `site/_config.cluster.example.yml` to a real config file and set the cluster URL.
 4. Build or serve Jekyll with that extra config layered on top of `site/_config.yml`.
+
+### Hugging Face / production
+
+For Hugging Face or any production deployment, do not rely on a checked-in `.env`.
+Set the credentials and flags through the platform secrets / environment configuration instead:
+
+- `WORKSHOP_ENABLE_ADMIN_ANALYTICS=true`
+- `WORKSHOP_ADMIN_USERNAME=...`
+- `WORKSHOP_ADMIN_PASSWORD=...`
+
+This keeps the admin route protected without exposing credentials in the repository.

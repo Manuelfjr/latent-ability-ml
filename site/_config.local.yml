@@ -2,3 +2,4 @@ baseurl: ""
 url: "http://127.0.0.1:4000"
 notebook_runtime_api_urls:
   - "http://127.0.0.1:8765"
+admin_analytics_enabled: true

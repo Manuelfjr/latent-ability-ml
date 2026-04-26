@@ -708,6 +708,57 @@
       })();
     </script>
 
+  <script>
+    (() => {
+      const analyticsEnabled = Boolean(true);
+      const defaultAnalyticsApiUrls = Array.isArray(["https://manuelfjr-latent-ability-backend.hf.space"])
+        ? ["https://manuelfjr-latent-ability-backend.hf.space"]
+        : [];
+
+      const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/$/, '');
+      const analyticsApiUrls = defaultAnalyticsApiUrls.map(normalizeBaseUrl).filter(Boolean);
+
+      const track = async (eventType, payload = {}) => {
+        if (!analyticsEnabled || !analyticsApiUrls.length) return;
+        const body = JSON.stringify({
+          event_type: eventType,
+          page: window.location.pathname,
+          title: document.title,
+          language: navigator.language || '',
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+          platform: navigator.userAgentData?.platform || navigator.platform || '',
+          viewport_width: window.innerWidth,
+          viewport_height: window.innerHeight,
+          screen_width: window.screen?.width || '',
+          screen_height: window.screen?.height || '',
+          ...payload,
+        });
+
+        for (const baseUrl of analyticsApiUrls) {
+          try {
+            fetch(`${baseUrl}/analytics/event`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body,
+              keepalive: true,
+            }).catch(() => {});
+          } catch (_) {
+            // Analytics must never interfere with the workshop UI.
+          }
+        }
+      };
+
+      window.__workshopAnalytics = {
+        enabled: analyticsEnabled,
+        track,
+      };
+
+      if (analyticsEnabled) {
+        track('page_view');
+      }
+    })();
+  </script>
+
   <!-- Browser notebook runtime -->
   <script>
     (() => {
@@ -718,6 +769,7 @@
         ? ["https://manuelfjr-latent-ability-backend.hf.space"]
         : [];
       const notebookShareEmail = "ferreira.jr.ufpb@gmail.com";
+      const analytics = window.__workshopAnalytics || { enabled: false, track: async () => {} };
 
       const tabSessionStorageKey = 'browser-notebook:tab-session-id';
       let tabSessionId = sessionStorage.getItem(tabSessionStorageKey);
@@ -1549,6 +1601,10 @@ exec(module_source, module.__dict__)
           anchor.click();
           anchor.remove();
           URL.revokeObjectURL(url);
+          analytics.track('export_ipynb', {
+            notebook_id: notebookId,
+            section: window.location.pathname,
+          });
         };
 
         const buildNotebookFile = () => {
@@ -1605,6 +1661,11 @@ exec(module_source, module.__dict__)
           downloadNotebookFile();
           const body = buildEmailBody();
           openMailClient('', `${title} notebook summary`, body);
+          analytics.track('email_summary', {
+            notebook_id: notebookId,
+            section: window.location.pathname,
+            shared: false,
+          });
           setStatus('Your notebook file was downloaded. Please attach it manually in the email client.', 'ready');
         };
 
@@ -1624,10 +1685,20 @@ exec(module_source, module.__dict__)
               openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
               setStatus('Native sharing was unavailable. Your notebook file was downloaded instead; please attach it manually.', 'ready');
             });
+            analytics.track('share_notebook', {
+              notebook_id: notebookId,
+              section: window.location.pathname,
+              shared: true,
+            });
             return;
           }
           downloadNotebookFile();
           openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+          analytics.track('share_notebook', {
+            notebook_id: notebookId,
+            section: window.location.pathname,
+            shared: true,
+          });
           setStatus('Your notebook file was downloaded. Please attach it manually before sending it to the instructor.', 'ready');
         };
 
@@ -1882,6 +1953,14 @@ exec(module_source, module.__dict__)
               cell.done = true;
               persist();
             }
+            analytics.track('run_cell', {
+              notebook_id: notebookId,
+              session_id: backendSessionId,
+              runtime_mode: runtime.kind === 'backend' ? describeBackendTarget(runtime.baseUrl).toLowerCase() : 'browser',
+              cell_label: cell.label,
+              cell_id: cell.id,
+              shared: shareConsent,
+            });
             renderOutput(cellEl, result || {});
             saveSnapshot(`${cell.label} run`, { silent: true });
             setStatus(result && result.success === false
@@ -1916,6 +1995,13 @@ exec(module_source, module.__dict__)
             const runtime = await initializeNotebook();
             const code = compileTemplate(demo.template, demoValues[demoId] || {});
             const result = await executeCell(runtime, code);
+            analytics.track('run_demo', {
+              notebook_id: notebookId,
+              session_id: backendSessionId,
+              runtime_mode: runtime.kind === 'backend' ? describeBackendTarget(runtime.baseUrl).toLowerCase() : 'browser',
+              demo_id: demo.id,
+              shared: shareConsent,
+            });
             renderOutput(demoEl, result || {});
             saveSnapshot(`${demo.title} updated`, { silent: true });
             output.classList.remove('is-empty');
