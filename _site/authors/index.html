@@ -2312,6 +2312,44 @@ exec(module_source, module.__dict__)
       });
     })();
   </script>
+  <script>
+  (function () {
+    const BACKEND_URL = "https://manuelfjr-latent-ability-backend.hf.space";
 
+    const session_id =
+      localStorage.getItem("sid") || crypto.randomUUID();
+
+    localStorage.setItem("sid", session_id);
+
+    function track(event_type) {
+      fetch(`${BACKEND_URL}/analytics/event`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          event_type: event_type,
+          page: window.location.pathname,
+          title: document.title,
+          session_id: session_id,
+          platform: navigator.platform,
+          language: navigator.language,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          viewport_width: window.innerWidth,
+          viewport_height: window.innerHeight,
+          screen_width: screen.width,
+          screen_height: screen.height
+        })
+      }).catch(() => {});
+    }
+
+    // evita múltiplos eventos por página
+    if (!sessionStorage.getItem("tracked")) {
+      sessionStorage.setItem("tracked", "1");
+      track("page_view");
+    }
+
+  })();
+  </script>
   </body>
 </html>
