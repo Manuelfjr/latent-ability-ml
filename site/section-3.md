@@ -17,13 +17,54 @@ The previous section introduced latent ability, item difficulty, and item discri
 
 This matters because many evaluation signals are not naturally binary. Agreement proportions, bounded scores, and normalized response intensities all call for a model that can live on `(0, 1)` without abandoning the interpretability of latent ability and item parameters. In other words, the question is no longer just whether a respondent succeeded. The question becomes how strongly a bounded response reflects latent ability and item structure.
 
+## Beta4 as an adaptation of Beta3
+
+The missing formal bridge is important here: Beta4-IRT is introduced as an adaptation of Beta3-IRT. Before the expected response, Beta3 defines the bounded response and its latent parameters as:
+
+$$
+p_{ij} \sim \mathcal{B}(\alpha_{ij}, \beta_{ij}),
+$$
+
+$$
+\alpha_{ij} = \left(\frac{\theta_i}{\delta_j}\right)^{a_j},
+\qquad
+\beta_{ij} = \left(\frac{1-\theta_i}{1-\delta_j}\right)^{a_j},
+$$
+
+$$
+\theta_i \sim \mathcal{B}(1,1),
+\qquad
+\delta_j \sim \mathcal{B}(1,1),
+\qquad
+a_j \sim \mathcal{N}(1,\sigma_0^2).
+$$
+
+With those definitions in place, the equation bellow writes the expected bounded response with a single discrimination parameter $a_j$:
+
+$$
+E[p_{ij} \mid \theta_i, \delta_j, a_j]
+= \frac{\alpha_{ij}}{\alpha_{ij} + \beta_{ij}}
+= \frac{1}{1 + \left(\frac{\delta_j}{1-\delta_j}\right)^{a_j}
+\left(\frac{\theta_i}{1-\theta_i}\right)^{-a_j}}.
+$$
+
+Beta4 keeps the same bounded-response logic, but rewrites discrimination as two separate terms so that sign and magnitude can be modeled explicitly. In Equation bellow, using $\tau_j$ for the sign component and $\omega_j$ for the magnitude component, the expected response becomes:
+
+$$
+E[p_{ij} \mid \theta_i, \delta_j, \omega_j, \tau_j]
+= \frac{1}{1 + \left(\frac{\delta_j}{1-\delta_j}\right)^{\tau_j \cdot \omega_j}
+\left(\frac{\theta_i}{1-\theta_i}\right)^{-\tau_j \cdot \omega_j}}.
+$$
+
+So the conceptual move from Beta3 to Beta4 is compact but meaningful: instead of using one single $a_j$, Beta4 decomposes the effective discrimination into sign and magnitude. That is what lets the model represent richer item behavior while preserving the same latent reading of ability and difficulty.
+
 <div class="notice">
   The pedagogical goal of this section is to understand Beta4 first on its own terms: what the parameters mean, what curve shapes become possible, and whether the model can recover latent quantities in a controlled synthetic experiment.
 </div>
 
 ## Beta4 curves can express richer behavior
 
-The notebook begins with a compact item bank where difficulty is still bounded in `(0,1)`, but discrimination is decomposed into sign and magnitude before being interpreted as an effective $a_j$.
+The notebook begins with a compact item bank where difficulty is still bounded in `(0,1)`, but discrimination is decomposed into sign and magnitude before being interpreted through the product $\tau_j \omega_j$.
 
 <figure>
   <img src="{{ '/assets/section-3-beta4-signs.svg' | relative_url }}" alt="Beta4 item characteristic curves under different signs and magnitudes of discrimination." />
