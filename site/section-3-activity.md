@@ -10,6 +10,28 @@ permalink: /section-3-activity/
 
 This page includes executable Python cells directly in the site. When a notebook backend is available, `birt` can be imported here; otherwise the page falls back to the pure-Python workshop helpers and the Colab notebook remains the companion environment.
 
+## Shared Helpers You Can Use
+
+The activity notebook, Colab, and the in-page runtime can all use the same shared helpers. This section is designed so that you can mix the latent-response helpers with the partition-to-response-matrix utilities.
+
+```python
+from utils.handson import (
+    evaluate_clustering_models_on_dataset,
+    get_default_clustering_models,
+    make_beta4_item_bank,
+    make_toy_clustering_dataset,
+    plot_beta4_iccs,
+)
+from utils.transform import TransformPairwise
+```
+
+- `make_toy_clustering_dataset` creates a small clustering problem that you can adapt before building bounded responses.
+- `get_default_clustering_models` and `evaluate_clustering_models_on_dataset` help you generate a compact pool of partitions for the activity.
+- `make_beta4_item_bank` and `plot_beta4_iccs` let you inspect Beta4 item behavior without rebuilding the plotting code from scratch.
+- `TransformPairwise` converts model partitions into the `pij` matrix that you can pass to the rest of the Beta4 workflow.
+
+Inside the browser notebook editor, hovering one of these helper names now shows its docstring.
+
 ## Notebook
 
 - Activity notebook: `03_01_activities.ipynb`

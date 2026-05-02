@@ -94,29 +94,7 @@
             
             <details class="nav-disclosure">
               <summary class="nav-link nav-summary">
-                Supervised Evaluation
-              </summary>
-              <div class="nav-children">
-                
-                <a
-                  href="/section-1/"
-                  class="nav-sublink"
-                >
-                  Overview
-                </a>
-                
-              </div>
-            </details>
-            
-          </div>
-          
-          
-          
-          <div class="nav-group">
-            
-            <details class="nav-disclosure">
-              <summary class="nav-link nav-summary">
-                Binary IRT and 2PL
+                Supervised Evaluation + IRT
               </summary>
               <div class="nav-children">
                 
@@ -768,6 +746,11 @@
         packages: new Set(),
         files: new Set(),
         micropipReady: false,
+        pythonSources: new Map(),
+        helperDocs: new Map(),
+        docPromises: new Map(),
+        docTooltip: null,
+        hoveredDocKey: '',
       };
 
       const backendHealth = new Map();
@@ -1002,11 +985,7 @@ import matplotlib.pyplot as plt
         for (const file of pythonFiles) {
           if (!file || !file.url || !file.path) continue;
           if (runtimeState.files.has(file.path)) continue;
-          const response = await fetch(file.url);
-          if (!response.ok) {
-            throw new Error(`Could not load ${file.url}`);
-          }
-          const contents = await response.text();
+          const contents = await fetchPythonSource(file);
           const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
           pyodide.globals.set('__module_name', moduleName);
           pyodide.globals.set('__module_source', contents);
@@ -1128,16 +1107,6 @@ exec(module_source, module.__dict__)
         return ordered;
       };
 
-      const formatSnapshotTime = (value) => {
-        try {
-          return new Intl.DateTimeFormat(undefined, {
-            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-          }).format(new Date(value));
-        } catch (_) {
-          return String(value || 'snapshot');
-        }
-      };
-
       const resizeEditor = (editor, host) => {
         const lineHeight = editor.renderer.lineHeight || 19;
         const lines = Math.max(4, editor.session.getScreenLength() + 1);
@@ -1157,6 +1126,202 @@ exec(module_source, module.__dict__)
         '"': '&quot;',
         "'": '&#39;',
       }[character]));
+
+      const fetchPythonSource = async (file) => {
+        if (!file || !file.url || !file.path) return '';
+        if (runtimeState.pythonSources.has(file.path)) {
+          return runtimeState.pythonSources.get(file.path);
+        }
+        const response = await fetch(file.url);
+        if (!response.ok) {
+          throw new Error(`Could not load ${file.url}`);
+        }
+        const contents = await response.text();
+        runtimeState.pythonSources.set(file.path, contents);
+        return contents;
+      };
+
+      const normalizePythonDoc = (value) => String(value || '')
+        .replace(/\r\n/g, '\n')
+        .split('\n')
+        .map((line) => line.replace(/\s+$/g, ''))
+        .join('\n')
+        .replace(/^\n+|\n+$/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      const extractPythonDocstrings = (source, moduleName = '') => {
+        const docs = [];
+        const lines = String(source || '').replace(/\r\n/g, '\n').split('\n');
+        const getIndent = (line) => (line.match(/^\s*/) || [''])[0].length;
+
+        for (let index = 0; index < lines.length; index += 1) {
+          const match = lines[index].match(/^(\s*)(def|class)\s+([A-Za-z_][A-Za-z0-9_]*)\b/);
+          if (!match) continue;
+
+          const baseIndent = match[1].length;
+          const kind = match[2];
+          const name = match[3];
+          let headerCursor = index;
+
+          while (headerCursor < lines.length && !lines[headerCursor].trim().endsWith(':')) {
+            headerCursor += 1;
+          }
+
+          let cursor = headerCursor + 1;
+
+          while (cursor < lines.length && !lines[cursor].trim()) cursor += 1;
+          if (cursor >= lines.length || getIndent(lines[cursor]) <= baseIndent) continue;
+
+          const trimmed = lines[cursor].trimStart();
+          const quote = trimmed.startsWith('"""') ? '"""' : trimmed.startsWith("'''") ? "'''" : '';
+          if (!quote) continue;
+
+          let doc = trimmed.slice(quote.length);
+          if (doc.includes(quote)) {
+            doc = doc.slice(0, doc.indexOf(quote));
+          } else {
+            const collected = [doc];
+            cursor += 1;
+            while (cursor < lines.length) {
+              const currentLine = lines[cursor];
+              const closingIndex = currentLine.indexOf(quote);
+              if (closingIndex !== -1) {
+                collected.push(currentLine.slice(0, closingIndex));
+                break;
+              }
+              collected.push(currentLine);
+              cursor += 1;
+            }
+            doc = collected.join('\n');
+          }
+
+          const normalizedDoc = normalizePythonDoc(doc);
+          if (!normalizedDoc) continue;
+          docs.push({ name, kind, module: moduleName, doc: normalizedDoc });
+        }
+
+        return docs;
+      };
+
+      const ensureHelperDocs = async (config = {}) => {
+        const pythonFiles = Array.isArray(config.pythonFiles) ? config.pythonFiles : [];
+        const tasks = [];
+
+        for (const file of pythonFiles) {
+          if (!file || !file.url || !file.path) continue;
+          if (runtimeState.docPromises.has(file.path)) {
+            tasks.push(runtimeState.docPromises.get(file.path));
+            continue;
+          }
+
+          const task = (async () => {
+            const contents = await fetchPythonSource(file);
+            const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
+            extractPythonDocstrings(contents, moduleName).forEach((entry) => {
+              runtimeState.helperDocs.set(entry.name, entry);
+            });
+          })().catch((error) => {
+            runtimeState.docPromises.delete(file.path);
+            console.warn(`Could not load helper docs from ${file.path}.`, error);
+          });
+
+          runtimeState.docPromises.set(file.path, task);
+          tasks.push(task);
+        }
+
+        await Promise.all(tasks);
+        return runtimeState.helperDocs;
+      };
+
+      const ensureDocTooltip = () => {
+        if (runtimeState.docTooltip) return runtimeState.docTooltip;
+        const tooltip = document.createElement('div');
+        tooltip.className = 'browser-notebook__doc-tooltip';
+        tooltip.hidden = true;
+        document.body.appendChild(tooltip);
+        runtimeState.docTooltip = tooltip;
+        return tooltip;
+      };
+
+      const hideDocTooltip = () => {
+        if (!runtimeState.docTooltip) return;
+        runtimeState.docTooltip.hidden = true;
+        runtimeState.hoveredDocKey = '';
+      };
+
+      const showDocTooltip = (entry, event) => {
+        if (!entry || !entry.name || !entry.doc) {
+          hideDocTooltip();
+          return;
+        }
+
+        const tooltip = ensureDocTooltip();
+        const kindLabel = entry.kind === 'class' ? 'Class' : 'Function';
+        tooltip.innerHTML = `
+          <div class="browser-notebook__doc-tooltip-head">
+            <code>${escapeHtml(entry.name)}</code>
+            <span>${escapeHtml(kindLabel)}${entry.module ? ` · ${escapeHtml(entry.module)}` : ''}</span>
+          </div>
+          <div class="browser-notebook__doc-tooltip-body">${escapeHtml(entry.doc)}</div>
+        `;
+        tooltip.hidden = false;
+
+        const margin = 16;
+        const offset = 18;
+        let left = event.clientX + offset;
+        let top = event.clientY + offset;
+        const rect = tooltip.getBoundingClientRect();
+
+        if (left + rect.width > window.innerWidth - margin) {
+          left = Math.max(margin, window.innerWidth - rect.width - margin);
+        }
+        if (top + rect.height > window.innerHeight - margin) {
+          top = Math.max(margin, event.clientY - rect.height - offset);
+        }
+
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+        runtimeState.hoveredDocKey = entry.name;
+      };
+
+      const findHelperDocAtEvent = (editor, event) => {
+        if (!editor || !event) return null;
+        try {
+          const position = editor.renderer.screenToTextCoordinates(event.clientX, event.clientY);
+          if (!position || position.row == null || position.column == null) return null;
+          const token = editor.session.getTokenAt(position.row, position.column);
+          const tokenValue = token && typeof token.value === 'string' ? token.value : '';
+          if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(tokenValue)) return null;
+          return runtimeState.helperDocs.get(tokenValue) || null;
+        } catch (_) {
+          return null;
+        }
+      };
+
+      const attachEditorDocHover = (editor) => {
+        if (!editor || editor.__docHoverAttached) return;
+        editor.__docHoverAttached = true;
+
+        const handleMove = (event) => {
+          const entry = findHelperDocAtEvent(editor, event);
+          if (!entry) {
+            hideDocTooltip();
+            return;
+          }
+          showDocTooltip(entry, event);
+        };
+
+        const handleLeave = () => {
+          hideDocTooltip();
+        };
+
+        editor.container.addEventListener('mousemove', handleMove);
+        editor.container.addEventListener('mouseleave', handleLeave);
+        editor.container.addEventListener('mousedown', handleLeave);
+        editor.session.on('changeScrollTop', handleLeave);
+        editor.session.on('changeScrollLeft', handleLeave);
+      };
 
       const renderHtmlWithScripts = (container, html) => {
         container.innerHTML = '';
@@ -1187,10 +1352,11 @@ exec(module_source, module.__dict__)
           return;
         }
 
+        ensureHelperDocs(config).catch(() => {});
+
         const notebookId = widget.dataset.notebookId || `notebook-${Math.random().toString(36).slice(2)}`;
         const backendSessionId = `${tabSessionId}:${notebookId}`;
         const storageKey = `browser-notebook:${notebookId}`;
-        const snapshotStorageKey = `${storageKey}:snapshots`;
         const runtimeApiUrls = (Array.isArray(config.runtimeApiUrls) && config.runtimeApiUrls.length
           ? config.runtimeApiUrls
           : defaultRuntimeApiUrls).map(normalizeBaseUrl).filter(Boolean);
@@ -1205,9 +1371,7 @@ exec(module_source, module.__dict__)
         let storedState = null;
         let currentRuntime = null;
         let runtimeReady = false;
-        let shareConsent = false;
         let activeCellId = seedCells[0]?.id || null;
-        let snapshots = [];
         const cellEditors = new Map();
         let demoValues = Object.fromEntries(sliderDemos.map((demo) => [
           demo.id,
@@ -1230,7 +1394,6 @@ exec(module_source, module.__dict__)
               ])),
             ]));
           }
-          shareConsent = Boolean(storedState?.shareConsent);
         } catch (_) {
           storedState = null;
           cells = seedCells.slice();
@@ -1238,13 +1401,6 @@ exec(module_source, module.__dict__)
         const cellOutputs = new Map(Array.isArray(storedState?.outputs)
           ? storedState.outputs.map((entry) => [entry.id, entry.result])
           : []);
-
-        try {
-          const parsedSnapshots = JSON.parse(sessionStorage.getItem(snapshotStorageKey) || '[]');
-          snapshots = Array.isArray(parsedSnapshots) ? parsedSnapshots : [];
-        } catch (_) {
-          snapshots = [];
-        }
 
         const libraryMarkup = libraryCatalog.length
           ? `
@@ -1352,26 +1508,11 @@ exec(module_source, module.__dict__)
               <div class="browser-notebook__progress-actions">
                 <button class="button tiny secondary" type="button" data-action="export-notebook">Export .ipynb</button>
                 <button class="button tiny ghost" type="button" data-action="email-summary">Email summary</button>
-                <button class="button tiny ghost" type="button" data-action="share-notebook" disabled>Share notebook</button>
+                <button class="button tiny ghost" type="button" data-action="share-notebook">Share notebook</button>
               </div>
             </div>
-            <label class="browser-notebook__share-consent">
-              <input type="checkbox" data-share-consent ${shareConsent ? 'checked' : ''} />
-              <span>I agree to share my notebook work with the workshop instructor.</span>
-            </label>
             <div class="browser-notebook__progress-track">
               <div class="browser-notebook__progress-bar" data-progress-bar></div>
-            </div>
-            <div class="browser-notebook__snapshot-tools">
-              <div class="browser-notebook__snapshot-label">Snapshot history</div>
-              <div class="browser-notebook__snapshot-actions">
-                <select class="browser-notebook__snapshot-select" data-snapshot-select>
-                  <option value="">No snapshots yet</option>
-                </select>
-                <button class="button tiny secondary" type="button" data-action="save-snapshot">Save snapshot</button>
-                <button class="button tiny ghost" type="button" data-action="restore-snapshot">Restore</button>
-                <button class="button tiny ghost" type="button" data-action="delete-snapshot">Delete</button>
-              </div>
             </div>
           </div>
           ${sliderMarkup}
@@ -1390,9 +1531,7 @@ exec(module_source, module.__dict__)
         const status = widget.querySelector('[data-notebook-status]');
         const progressLabel = widget.querySelector('[data-progress-label]');
         const progressBar = widget.querySelector('[data-progress-bar]');
-        const shareConsentInput = widget.querySelector('[data-share-consent]');
         const shareNotebookButton = widget.querySelector('[data-action="share-notebook"]');
-        const snapshotSelect = widget.querySelector('[data-snapshot-select]');
 
         const setStatus = (message, type = '') => {
           status.textContent = message;
@@ -1406,71 +1545,7 @@ exec(module_source, module.__dict__)
             cells,
             outputs: Array.from(cellOutputs, ([id, result]) => ({ id, result })),
             demoValues,
-            shareConsent,
           }));
-        };
-
-        const syncShareState = () => {
-          if (shareConsentInput) shareConsentInput.checked = shareConsent;
-          if (shareNotebookButton) shareNotebookButton.disabled = !shareConsent;
-        };
-
-        const persistSnapshots = () => {
-          sessionStorage.setItem(snapshotStorageKey, JSON.stringify(snapshots));
-        };
-
-        const buildSnapshotState = () => ({
-          cells,
-          demoValues,
-          shareConsent,
-        });
-
-        const renderSnapshots = () => {
-          if (!snapshotSelect) return;
-          snapshotSelect.innerHTML = snapshots.length
-            ? snapshots.map((snapshot, index) => `<option value="${escapeHtml(snapshot.id)}">${escapeHtml(snapshot.label || `Snapshot ${index + 1}`)}</option>`).join('')
-            : '<option value="">No snapshots yet</option>';
-        };
-
-        const saveSnapshot = (label = '', { silent = false } = {}) => {
-          const stamp = new Date().toISOString();
-          snapshots.unshift({
-            id: `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            label: label || `Snapshot · ${formatSnapshotTime(stamp)}`,
-            createdAt: stamp,
-            state: buildSnapshotState(),
-          });
-          snapshots = snapshots.slice(0, 6);
-          persistSnapshots();
-          renderSnapshots();
-          if (!silent) setStatus('Snapshot saved in this tab.', 'ready');
-        };
-
-        const restoreSnapshot = () => {
-          const snapshotId = snapshotSelect?.value;
-          const snapshot = snapshots.find((entry) => entry.id === snapshotId);
-          if (!snapshot) {
-            setStatus('Select a snapshot to restore.', 'error');
-            return;
-          }
-          cells = (snapshot.state?.cells || seedCells).map((cell, index) => makeCell(cell, index));
-          demoValues = snapshot.state?.demoValues || demoValues;
-          shareConsent = Boolean(snapshot.state?.shareConsent);
-          syncShareState();
-          persist();
-          renderCells();
-          renderSnapshots();
-          updateProgress();
-          setStatus(`Restored ${snapshot.label}.`, 'ready');
-        };
-
-        const deleteSnapshot = () => {
-          const snapshotId = snapshotSelect?.value;
-          if (!snapshotId) return;
-          snapshots = snapshots.filter((entry) => entry.id !== snapshotId);
-          persistSnapshots();
-          renderSnapshots();
-          setStatus('Snapshot removed.', 'ready');
         };
 
         const hasMeaningfulCode = (cell) => {
@@ -1619,7 +1694,7 @@ exec(module_source, module.__dict__)
           }
         };
 
-        const buildEmailBody = ({ includeConsent = false } = {}) => {
+        const buildEmailBody = () => {
           const taskCells = cells.filter((cell) => cell.kind === 'task');
           const completed = taskCells.filter((cell) => cell.done).length;
           const lines = [
@@ -1627,7 +1702,7 @@ exec(module_source, module.__dict__)
             '',
             `Page: ${window.location.href}`,
             `Progress: ${completed}/${taskCells.length} tasks completed`,
-            includeConsent ? 'The participant explicitly agreed to share this notebook work with the instructor.' : 'The notebook file was exported from the workshop site.',
+            'The notebook file was exported from the workshop site.',
             '',
             'The .ipynb file should be attached manually if it was not shared automatically by the browser.',
           ];
@@ -1653,19 +1728,15 @@ exec(module_source, module.__dict__)
         };
 
         const shareNotebook = () => {
-          if (!shareConsent) {
-            setStatus('Please confirm that you agree to share your notebook before sending it.', 'error');
-            return;
-          }
           const file = buildNotebookFile();
           if (canShareFile(file)) {
             navigator.share({
               title: `${title} notebook shared by participant`,
-              text: 'The participant explicitly agreed to share this notebook work with the instructor.',
+              text: 'The notebook file was exported from the workshop site.',
               files: [file],
             }).catch(() => {
               downloadNotebookFile();
-              openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+              openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody());
               setStatus('Native sharing was unavailable. Your notebook file was downloaded instead; please attach it manually.', 'ready');
             });
             analytics.track('share_notebook', {
@@ -1676,7 +1747,7 @@ exec(module_source, module.__dict__)
             return;
           }
           downloadNotebookFile();
-          openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+          openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody());
           analytics.track('share_notebook', {
             notebook_id: notebookId,
             section: window.location.pathname,
@@ -1685,10 +1756,15 @@ exec(module_source, module.__dict__)
           setStatus('Your notebook file was downloaded. Please attach it manually before sending it to the instructor.', 'ready');
         };
 
-        const compileTemplate = (template, values) => String(template || '').replace(/\{\{(\w+)\}\}/g, (_, key) => {
-          const value = values[key];
-          return Number.isFinite(value) ? String(value) : '0';
-        });
+        const compileTemplate = (template, values) => String(template || '')
+          .replace(/\[\[(\w+)\]\]/g, (_, key) => {
+            const value = values[key];
+            return Number.isFinite(value) ? String(value) : '0';
+          })
+          .replace(/\{\{(\w+)\}\}/g, (_, key) => {
+            const value = values[key];
+            return Number.isFinite(value) ? String(value) : '0';
+          });
 
         const parseControlValue = (rawValue, control, { clamp = true } = {}) => {
           const normalized = String(rawValue ?? '').trim().replace(',', '.');
@@ -1942,10 +2018,8 @@ exec(module_source, module.__dict__)
               runtime_mode: runtime.kind === 'backend' ? describeBackendTarget(runtime.baseUrl).toLowerCase() : 'browser',
               cell_label: cell.label,
               cell_id: cell.id,
-              shared: shareConsent,
             });
             renderOutput(cellEl, result || {});
-            saveSnapshot(`${cell.label} run`, { silent: true });
             setStatus(result && result.success === false
               ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
               : runtime.kind === 'backend'
@@ -1983,10 +2057,8 @@ exec(module_source, module.__dict__)
               session_id: backendSessionId,
               runtime_mode: runtime.kind === 'backend' ? describeBackendTarget(runtime.baseUrl).toLowerCase() : 'browser',
               demo_id: demo.id,
-              shared: shareConsent,
             });
             renderOutput(demoEl, result || {});
-            saveSnapshot(`${demo.title} updated`, { silent: true });
             output.classList.remove('is-empty');
             setStatus(runtime.kind === 'backend'
               ? `Interactive demo executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
@@ -2134,6 +2206,7 @@ exec(module_source, module.__dict__)
                 bindKey: { win: 'Shift-Enter', mac: 'Shift-Enter' },
                 exec: () => runCell(cell.id),
               });
+              attachEditorDocHover(editor);
             }).catch(() => {
               fallbackTextarea.style.display = 'block';
             });
@@ -2163,7 +2236,6 @@ exec(module_source, module.__dict__)
                 cell.outputCollapsed = false;
                 cellOutputs.delete(cell.id);
                 persist();
-                saveSnapshot(`${cell.label} reset`, { silent: true });
                 renderCells();
                 updateProgress();
               });
@@ -2235,7 +2307,6 @@ exec(module_source, module.__dict__)
           cells = seedCells.map((cell, index) => makeCell(cell, index));
           cellOutputs.clear();
           sessionStorage.removeItem(storageKey);
-          saveSnapshot('Notebook reset', { silent: true });
           renderCells();
           try {
             runtimeReady = false;
@@ -2245,23 +2316,12 @@ exec(module_source, module.__dict__)
           }
         });
 
-        widget.querySelector('[data-action="save-snapshot"]').addEventListener('click', () => saveSnapshot());
-        widget.querySelector('[data-action="restore-snapshot"]').addEventListener('click', restoreSnapshot);
-        widget.querySelector('[data-action="delete-snapshot"]').addEventListener('click', deleteSnapshot);
         widget.querySelectorAll('[data-action="insert-snippet"]').forEach((button) => {
           button.addEventListener('click', () => insertSnippet(button.dataset.snippetId));
         });
         widget.querySelector('[data-action="export-notebook"]').addEventListener('click', exportNotebook);
         widget.querySelector('[data-action="email-summary"]').addEventListener('click', emailSummary);
         if (shareNotebookButton) shareNotebookButton.addEventListener('click', shareNotebook);
-        if (shareConsentInput) {
-          shareConsentInput.addEventListener('change', (event) => {
-            shareConsent = Boolean(event.target.checked);
-            syncShareState();
-            persist();
-          });
-        }
-        syncShareState();
 
         sliderDemos.forEach((demo) => {
           const demoEl = widget.querySelector(`[data-demo-id="${demo.id}"]`);
@@ -2299,7 +2359,6 @@ exec(module_source, module.__dict__)
         });
 
         renderCells();
-        renderSnapshots();
         ensureEditor().then(() => renderCells()).catch(() => {});
         updateProgress();
         initializeNotebook().catch(() => {});

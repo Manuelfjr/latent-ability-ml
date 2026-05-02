@@ -8,8 +8,17 @@ permalink: /section-3/
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/03_00_beta4_irt.ipynb">Open guided notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/03_00_beta4_irt.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
   <a class="button secondary" href="{{ '/section-3-activity/' | relative_url }}">Go to activity</a>
 </div>
+
+## Associated Notebook
+
+If you want to run this overview locally or in Colab, the associated guided notebook is:
+
+- `03_00_beta4_irt.ipynb`, which introduces the Beta4 parameterization, curve family, and recovery logic used in this section.
+
+The local notebook environment can also import the shared helpers from `utils/handson.py` and `utils/transform.py`.
 
 ## From binary IRT to bounded responses
 

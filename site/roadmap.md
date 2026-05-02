@@ -9,7 +9,7 @@ permalink: /roadmap/
 ## Recommended Order
 
 1. `00_workshop_roadmap.ipynb`
-2. `01_00_supervised_evaluation_toy_problems.ipynb`
+2. `01_00_supervised_evaluation_toy_problems.ipynb` as the guided motivation inside the IRT block
 3. `02_00_binary_irt_and_2pl.ipynb`
 4. `02_01_activities.ipynb`
 5. `02_02_answer.ipynb`
@@ -27,8 +27,8 @@ permalink: /roadmap/
 ## Notes
 
 - Use the roadmap notebook to frame the workshop before the first section.
-- Treat Section 1 as a guided opening section rather than a participant activity block.
-- Move directly from each guided notebook into the corresponding activity notebook from Section 2 onward.
+- Treat the supervised notebook as the opening motivation inside the Binary IRT and 2PL block.
+- Move from the supervised motivation into the IRT notebook, then into the opening activity at `02_01_activities.ipynb`.
 - Keep `05_01_extra_negative_disc.ipynb` as an extra analytical notebook rather than the main participant task.
 
 ## Notebook Links

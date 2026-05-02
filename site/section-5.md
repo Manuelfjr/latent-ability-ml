@@ -8,9 +8,19 @@ permalink: /section-5/
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/05_00_claire.ipynb">Open guided notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/05_00_claire.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
   <a class="button secondary" href="{{ '/section-5-activity/' | relative_url }}">Go to activity</a>
   <a class="button secondary" href="{{ '/section-5-extra/' | relative_url }}">Open extra analysis</a>
 </div>
+
+## Associated Notebooks
+
+If you want to run this overview locally or in Colab, the CLAIRE section is anchored by:
+
+- `05_00_claire.ipynb`, which contains the main guided walkthrough for the response-matrix and latent-analysis pipeline.
+- `05_01_extra_negative_disc.ipynb`, which serves as the optional companion notebook for the extra analysis linked from this section.
+
+Both notebooks can use the shared helpers from `utils/handson.py` and `utils/transform.py`.
 
 ## From unsupervised disagreement to a response matrix
 

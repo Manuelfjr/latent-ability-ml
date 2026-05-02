@@ -8,8 +8,17 @@ permalink: /section-4/
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/04_00_unsupervised_evaluation_toy_problems.ipynb">Open guided notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/04_00_unsupervised_evaluation_toy_problems.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
   <a class="button secondary" href="{{ '/section-4-activity/' | relative_url }}">Go to activity</a>
 </div>
+
+## Associated Notebook
+
+If you want to run this overview locally or in Colab, the associated guided notebook is:
+
+- `04_00_unsupervised_evaluation_toy_problems.ipynb`, which walks through the clustering scenarios and the move from aggregate metrics to instance-level difficulty.
+
+The same local setup can import the workshop helpers from `utils/handson.py` and `utils/transform.py`.
 
 ## Unsupervised evaluation and instance difficulty
 

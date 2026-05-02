@@ -2,7 +2,7 @@
 layout: default
 title: Activity
 eyebrow: Activity Notebook
-lead: Participants manipulate difficulty and discrimination values and then interpret the resulting 2PL ICCs.
+lead: Participants move from the supervised-evaluation motivation into hands-on 2PL ICCs, manipulating difficulty and discrimination values directly.
 permalink: /section-2-activity/
 ---
 
@@ -10,7 +10,25 @@ permalink: /section-2-activity/
 
 This page now includes executable Python cells directly in the site. Students can adjust 2PL item parameters, rerun cells, add scratch cells, and compare curves without leaving the workshop page.
 
-In this section, we treat difficulty as a bounded location parameter on the latent ability axis, so the activity uses values in the interval `[0, 1]`. Discrimination is treated as a positive slope parameter in the 2PL model, so the interactive lab emphasizes values greater than `0`, while still allowing students to type custom numeric values for exploration.
+In this section, the 2PL ability parameter `theta` is real-valued. The interactive lab plots the ICC over `theta` in `[-3, 3]`, which is a common practical window for visualizing the central part of a latent ability scale. Item difficulty is also real-valued and acts as the location of the curve on that axis. Discrimination is a slope parameter; the standard case is positive discrimination, although the input fields allow custom numeric values for exploration.
+
+## Shared Helpers You Can Use
+
+The browser notebook, the local notebook, and Colab can all import the same workshop helpers directly. You do not need to rewrite these utilities during the activity.
+
+```python
+from utils.handson import (
+    binary_irt_probability,
+    make_binary_item_bank,
+    plot_binary_iccs,
+)
+```
+
+- `binary_irt_probability` computes the 2PL probability curve for chosen ability, difficulty, and discrimination values.
+- `make_binary_item_bank` creates a small starter item bank that is ready to plot and edit.
+- `plot_binary_iccs` plots several ICCs at once so you can compare items quickly in the activity notebook or locally.
+
+Inside the browser notebook editor, hovering one of these helper names now shows its docstring.
 
 ## Notebook
 
@@ -33,7 +51,7 @@ In this section, we treat difficulty as a bounded location parameter on the late
   <script type="application/json" class="browser-notebook__seed">
 {
   "title": "Section 2 browser notebook",
-  "lead": "Manipulate 2PL item parameters directly in the page and inspect how the ICC geometry changes.",
+  "lead": "Use the supervised-evaluation motivation as context, then manipulate 2PL item parameters directly in the page and inspect how the ICC geometry changes.",
   "packages": [
     "numpy",
     "pandas",
@@ -79,9 +97,9 @@ In this section, we treat difficulty as a bounded location parameter on the late
       "title": "Interactive 2PL curve lab",
       "lead": "Move difficulty and discrimination to see how the 2PL ICC changes before writing your own code.",
       "buttonLabel": "Update curve",
-      "template": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom utils.handson import binary_irt_probability\n\ntheta = np.linspace(0.01, 0.99, 300)\nprob = binary_irt_probability(theta, difficulty={% raw %}{{difficulty}}{% endraw %}, discrimination={% raw %}{{discrimination}}{% endraw %})\nfig, ax = plt.subplots(figsize=(7, 4))\nax.plot(theta, prob, linewidth=2.6, color='#ab2330')\nax.set_title('Interactive 2PL ICC')\nax.set_xlabel('latent ability')\nax.set_ylabel('probability of a correct response')\nax.set_ylim(0, 1.05)\nax.grid(alpha=0.25)\nprint(f'difficulty={% raw %}{{difficulty}}{% endraw %}, discrimination={% raw %}{{discrimination}}{% endraw %}')\nplt.show()\n",
+      "template": "import numpy as np\nimport matplotlib.pyplot as plt\nfrom utils.handson import binary_irt_probability\n\ntheta = np.linspace(-3.0, 3.0, 300)\nprob = binary_irt_probability(theta, difficulty=[[difficulty]], discrimination=[[discrimination]])\nfig, ax = plt.subplots(figsize=(7, 4))\nax.plot(theta, prob, linewidth=2.6, color='#ab2330')\nax.set_title('Interactive 2PL ICC')\nax.set_xlabel('latent ability')\nax.set_ylabel('probability of a correct response')\nax.set_ylim(0, 1.05)\nax.grid(alpha=0.25)\nprint(f'difficulty=[[difficulty]], discrimination=[[discrimination]]')\nplt.show()\n",
       "controls": [
-        {"name": "difficulty", "label": "Difficulty", "min": 0.05, "max": 0.95, "step": 0.05, "value": 0.5},
+        {"name": "difficulty", "label": "Difficulty", "min": -2.0, "max": 2.0, "step": 0.1, "value": 0.0},
         {"name": "discrimination", "label": "Discrimination", "min": 0.2, "max": 3.0, "step": 0.1, "value": 1.2}
       ]
     }

@@ -10,6 +10,29 @@ permalink: /section-4-activity/
 
 This page now includes executable Python cells directly in the site. Students can edit code, add new cells, delete cells, import the workshop helpers, and work through the activity without leaving the page.
 
+## Shared Helpers You Can Use
+
+This activity already has the shared workshop helpers available in the browser runtime, and the same imports work in the local notebook and in Colab.
+
+```python
+from utils.handson import (
+    evaluate_clustering_models_on_dataset,
+    get_default_clustering_models,
+    make_toy_clustering_dataset,
+    plot_clustering_dataset,
+    plot_clustering_instance_difficulty,
+    summarize_clustering_instance_difficulty,
+    summarize_clustering_results,
+)
+```
+
+- `make_toy_clustering_dataset` gives you ready-made geometric scenarios that you can keep or adapt.
+- `get_default_clustering_models` and `evaluate_clustering_models_on_dataset` provide a fast way to compare a small heterogeneous model pool.
+- `summarize_clustering_results` builds the aggregate metrics table for the same assignments.
+- `summarize_clustering_instance_difficulty` and `plot_clustering_instance_difficulty` make the agreement-based hard-instance analysis explicit.
+
+Inside the browser notebook editor, hovering one of these helper names now shows its docstring.
+
 ## Notebook
 
 - Activity notebook: `04_01_activities.ipynb`

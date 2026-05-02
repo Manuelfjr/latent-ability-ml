@@ -1,14 +1,71 @@
-from typing import Dict, List
+"""Helpers for turning clustering partitions into CLAIRE-style response matrices."""
+
+from typing import Any, Callable, Dict, List
 
 import numpy as np
 import pandas as pd
 
 
 class TransformPairwise:
+    """Build a CLAIRE-style pairwise-agreement matrix from model partitions.
+
+    Parameters
+    ----------
+    works : int, default=-1
+        Worker setting kept for API compatibility with the local version.
+
+    Examples
+    --------
+    >>> from utils.handson import make_toy_clustering_partitions
+    >>> tp = TransformPairwise(works=1)
+    >>> matrix = tp.generate_pij_matrix(make_toy_clustering_partitions().T)
+    >>> matrix.shape
+    (4, 6)
+    """
+
     def __init__(self, works: int = -1):
+        """Store the worker configuration kept for API compatibility.
+
+        Parameters
+        ----------
+        works : int, default=-1
+            Worker setting stored on the instance.
+
+        Returns
+        -------
+        None
+            This initializer only stores configuration data.
+
+        Examples
+        --------
+        >>> tp = TransformPairwise(works=1)
+        >>> tp.works
+        1
+        """
         self.works = works
 
     def calculate_pij_value(self, i: int) -> List[float]:
+        """Compute one row of CLAIRE-style agreement scores.
+
+        Parameters
+        ----------
+        i : int
+            Row index of the focal model inside ``self.data``.
+
+        Returns
+        -------
+        list[float]
+            Agreement scores for every instance with respect to the focal
+            model ``i``.
+
+        Examples
+        --------
+        >>> from utils.handson import make_toy_clustering_partitions
+        >>> tp = TransformPairwise(works=1)
+        >>> tp.data = make_toy_clustering_partitions().T.to_numpy()
+        >>> len(tp.calculate_pij_value(0))
+        6
+        """
         item_i = self.data[i]
         tmp = np.delete(self.data, i, axis=0)
         data_boolean = np.array([[k == j for k, j in zip(item_i, model_j)] for model_j in tmp])
@@ -20,7 +77,29 @@ class TransformPairwise:
             pij_values_row.append(pij_value)
         return pij_values_row
 
-    def generate_pij_matrix(self, data: pd.DataFrame = None) -> pd.DataFrame:
+    def generate_pij_matrix(self, data: pd.DataFrame | np.ndarray | None = None) -> pd.DataFrame:
+        """Generate the full ``pij`` agreement matrix.
+
+        Parameters
+        ----------
+        data : pandas.DataFrame or numpy.ndarray or None, default=None
+            Model-by-instance partition table. Rows must correspond to models
+            and columns to instances.
+
+        Returns
+        -------
+        pandas.DataFrame
+            CLAIRE-style agreement matrix with the same shape as the input
+            partition table.
+
+        Examples
+        --------
+        >>> from utils.handson import make_toy_clustering_partitions
+        >>> tp = TransformPairwise(works=1)
+        >>> matrix = tp.generate_pij_matrix(make_toy_clustering_partitions().T)
+        >>> matrix.shape
+        (4, 6)
+        """
         if data is None:
             raise ValueError("`data` must be provided as a pandas DataFrame or numpy ndarray.")
 
@@ -38,7 +117,35 @@ class TransformPairwise:
         self.transformed_matrix = np.array(pij_values)
         return pd.DataFrame(self.transformed_matrix, columns=self.columns)
 
-    def combination_models(self, models: Dict[str, callable], params: Dict[str, List[Dict[str, any]]]) -> Dict:
+    def combination_models(
+        self,
+        models: Dict[str, Callable[..., Any]],
+        params: Dict[str, List[Dict[str, Any]]],
+    ) -> Dict[str, List[Any]]:
+        """Instantiate a grid of models from parameter dictionaries.
+
+        Parameters
+        ----------
+        models : dict[str, collections.abc.Callable[..., Any]]
+            Mapping from model family names to constructors or callables.
+        params : dict[str, list[dict[str, Any]]]
+            Parameter grid keyed by the same family names used in ``models``.
+
+        Returns
+        -------
+        dict[str, list[Any]]
+            Instantiated model objects grouped by model family.
+
+        Examples
+        --------
+        >>> tp = TransformPairwise()
+        >>> built = tp.combination_models(
+        ...     models={'dummy': lambda value=0: {'value': value}},
+        ...     params={'dummy': [{'value': 1}, {'value': 2}]},
+        ... )
+        >>> len(built['dummy'])
+        2
+        """
         results = {}
         for params_model in params.keys():
             results[params_model] = []

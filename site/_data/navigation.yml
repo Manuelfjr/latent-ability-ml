@@ -4,11 +4,7 @@
   url: /readme/
 - title: Roadmap
   url: /roadmap/
-- title: Supervised Evaluation
-  children:
-    - title: Overview
-      url: /section-1/
-- title: Binary IRT and 2PL
+- title: Supervised Evaluation + IRT
   children:
     - title: Overview
       url: /section-2/

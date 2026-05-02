@@ -10,6 +10,28 @@ permalink: /section-5-activity/
 
 This page includes executable Python cells directly in the site. When a notebook backend is connected, `birt` is available and the full CLAIRE workflow can run here; otherwise the page falls back to the pure-Python workshop helpers.
 
+## Shared Helpers You Can Use
+
+The CLAIRE activity can use the same helpers in the browser notebook, in the local notebook, and in Colab. The point is to let you focus on the latent analysis rather than rewriting support code.
+
+```python
+from utils.handson import (
+    beta4_expected_response,
+    build_claire_response_matrix,
+    compute_claire_like_scores,
+    estimate_case_statistics,
+    make_toy_clustering_partitions,
+)
+from utils.transform import TransformPairwise
+```
+
+- `make_toy_clustering_partitions` gives you a compact starter set of partitions for a CLAIRE-style demo.
+- `build_claire_response_matrix` and `TransformPairwise` both make the agreement-to-response-matrix step explicit.
+- `estimate_case_statistics` and `compute_claire_like_scores` provide simple summaries that help inspect the response matrix before or after fitting.
+- `beta4_expected_response` is available when you want to interpret representative items back through a bounded-response curve.
+
+Inside the browser notebook editor, hovering one of these helper names now shows its docstring.
+
 ## Notebook
 
 - Activity notebook: `05_02_activities.ipynb`

@@ -1,19 +1,33 @@
 ---
 layout: default
-title: Section 2
-eyebrow: Binary IRT and 2PL
-lead: Item Response Theory gives us a language for talking about who is strong, which items are hard, and which items truly separate respondents.
+title: Section 1
+eyebrow: Supervised Evaluation + Binary IRT and 2PL
+lead: We start from familiar supervised evaluation, use it to expose example-level difficulty, and then introduce IRT as a language for ability, difficulty, discrimination, and ICCs.
 permalink: /section-2/
 ---
 
 <div class="button-row">
-  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/02_00_binary_irt_and_2pl.ipynb">Open guided notebook</a>
+  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/02_00_binary_irt_and_2pl.ipynb">Open IRT notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/02_00_binary_irt_and_2pl.ipynb" target="_blank" rel="noreferrer">Open IRT in Colab</a>
+  <a class="button secondary" href="{{ site.repo_url }}/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb">Open supervised motivation</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb" target="_blank" rel="noreferrer">Open motivation in Colab</a>
   <a class="button secondary" href="{{ '/section-2-activity/' | relative_url }}">Go to activity</a>
 </div>
 
+## Associated Notebooks
+
+If you want to follow this overview locally or in Colab, this combined section is organized around two guided notebooks:
+
+- `01_00_supervised_evaluation_toy_problems.ipynb`, which introduces example-level difficulty through the supervised motivation.
+- `02_00_binary_irt_and_2pl.ipynb`, which develops the Binary IRT and 2PL overview itself.
+
+Both notebooks can import the shared workshop helpers from `utils/handson.py` and `utils/transform.py`.
+
 ## Binary IRT as a language for evaluation
 
-The first section already showed that average model scores can hide which examples are genuinely informative. Section 2 gives that intuition a formal language. Instead of speaking only about a model score, we begin to speak about latent ability on one side and item properties on the other.
+In a labeled setting, it is tempting to rank models by accuracy, F1, or another aggregate score and then stop. But the supervised examples already show the limitation of that habit: two models can have similar average performance while hesitating on different examples, and the difficult cases are usually not spread uniformly across the data. They concentrate around ambiguous regions.
+
+That is why supervised evaluation belongs here as the entry point to IRT. It gives the first concrete version of the workshop's central question: are all instances equally difficult when we evaluate a model? Once the answer is clearly no, the need for a latent language becomes much easier to motivate. IRT gives that intuition a formal structure. Instead of speaking only about a model score, we begin to speak about latent ability on one side and item properties on the other.
 
 In the binary IRT setting, each response is treated as success or failure. That could be a correct answer, a solved item, or any binary outcome that distinguishes stronger and weaker respondents. The central question becomes probabilistic: given a respondent with latent ability <span class="math-inline">&theta;<sub>i</sub></span> and an item with latent parameters, what is the probability of success?
 
@@ -22,6 +36,42 @@ This is a conceptual shift away from flat evaluation tables. We are no longer pr
 <div class="notice">
   The central achievement of this section is not just learning a formula. It is learning how to read evaluation relationally: a response depends at once on who is answering and on what kind of item is being faced.
 </div>
+
+## Supervised evaluation gives the first intuition
+
+In the supervised toy problem, labels are available and the evaluation looks familiar. The dataset is intentionally small enough to visualize, so the geometry can be read before any model is fitted. Some points are far from the decision boundary and are naturally easy. Others sit close to the boundary, where different classifiers can make different commitments.
+
+<figure>
+  <img src="{{ '/assets/section-1-supervised.svg' | relative_url }}" alt="Toy supervised classification problem with two classes." />
+  <figcaption>The opening supervised example is intentionally visual: the audience can see clean regions and ambiguous regions before looking at any metric.</figcaption>
+</figure>
+
+That visual fact changes how the metrics table should be read. A high average score is still useful, but it does not tell us where the model struggled. It does not distinguish errors spread randomly over the space from errors concentrated in one structurally ambiguous region. It also does not tell us which examples are especially informative for separating stronger and weaker models.
+
+| Model | Accuracy | Balanced Accuracy | F1 | Mean Difficulty Proxy |
+| --- | ---: | ---: | ---: | ---: |
+| KNN | 0.990 | 0.988 | 0.988 | 0.037 |
+| Logistic Regression | 0.990 | 0.988 | 0.988 | 0.093 |
+| Decision Tree | 0.979 | 0.977 | 0.976 | 0.011 |
+
+The table is deliberately compact, because compactness is both its strength and its weakness. It tells us that all three classifiers perform well. It also hides the local structure of the mistakes. Logistic regression and KNN can look almost tied in aggregate while still expressing different uncertainty around the boundary.
+
+<figure>
+  <img src="{{ '/assets/section-1-supervised-difficulty.svg' | relative_url }}" alt="Example difficulty proxy and model disagreement in the toy supervised dataset." />
+  <figcaption>When model behavior is aggregated per example, difficulty becomes local: ambiguous cases concentrate near the boundary instead of spreading uniformly.</figcaption>
+</figure>
+
+This is the bridge to IRT. In a supervised setting, a model can be read like a respondent and an example can be read like an item. Correctness becomes the binary response. The examples that many models solve easily behave like easy items. The examples that repeatedly induce mistakes, low confidence, or disagreement behave like hard items. Some examples may also be more discriminative: they reveal more about the difference between models because stronger models handle them reliably while weaker models do not.
+
+| Model | Example 27 | Example 79 | Example 119 | Example 224 | Example 287 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Decision Tree | 1 | 0 | 1 | 0 | 1 |
+| KNN | 1 | 1 | 1 | 0 | 1 |
+| Logistic Regression | 1 | 1 | 1 | 0 | 1 |
+
+This tiny table is already an IRT-shaped object. The rows are models, the columns are examples, and the entries are binary responses: `1` means the model got the example right, `0` means it did not. Once the data are written this way, the language of IRT becomes natural. A model with more reliable correct responses can be described as having higher latent ability; an example that few models solve can be described as harder; and an example that separates one model from the others carries discriminative information.
+
+The point is not to replace standard supervised metrics. The point is to stop treating them as the end of the evaluation. IRT gives us a way to keep the model-level summary while also asking which examples produced the evidence behind that summary.
 
 ## A small item bank makes the ideas visible
 
@@ -50,7 +100,7 @@ $$
 
 and then specializes to the 1PL intuition by fixing <span class="math-inline">a<sub>j</sub> = 1</span>. Once that happens, the curves differ only through <span class="math-inline">&delta;<sub>j</sub></span>, the item difficulty.
 
-That simplification is powerful because it forces the audience to see what difficulty actually does. It is not a vague statement about an item being “challenging.” It is a location parameter. It tells us where the transition from low to high success probability occurs.
+That simplification is powerful because it forces the audience to see what difficulty actually does. It is not a vague statement about an item being “challenging.” In the classical 2PL scale used here, ability <span class="math-inline">&theta;<sub>i</sub></span> and difficulty <span class="math-inline">&delta;<sub>j</sub></span> live on the real line. Difficulty is a location parameter: it tells us where, on the latent ability axis, the transition from low to high success probability occurs.
 
 ## The 2PL model adds discrimination
 
@@ -95,7 +145,7 @@ Once we move beyond a single dataset-level score, evaluation becomes a relations
 
 That prepares the transition to the next section. Logistic ICCs are excellent for binary intuition, but many AI evaluation settings are not naturally binary. Agreement values, proportions, and bounded continuous responses require a richer model family. That is where Beta4-IRT enters the story.
 
-In that sense, Section 2 is the conceptual spine of the workshop. It gives the language that later sections will extend, generalize, and repurpose in settings that are more realistic than simple right-or-wrong responses.
+In that sense, the opening section is the conceptual spine of the workshop. It begins with supervised evaluation because that is the most familiar place to see example-level difficulty, and then uses Binary IRT and 2PL to give that intuition a formal language that later sections will extend, generalize, and repurpose in settings that are more realistic than simple right-or-wrong responses.
 
 ## Questions for Discussion
 

@@ -20,11 +20,10 @@ This project contains the full material for a hands-on workshop on latent-abilit
 
 ## Main Sections
 
-1. Supervised evaluation and example-level difficulty.
-2. Binary IRT, with emphasis on 1PL intuition, 2PL-IRT, and ICC interpretation.
-3. Beta4-IRT for bounded responses and synthetic recovery checks.
-4. Unsupervised evaluation and the limitation of weighting clustering instances equally.
-5. CLAIRE as an agreement-based latent-evaluation framework.
+1. Supervised evaluation as motivation, followed by Binary IRT, 1PL intuition, 2PL-IRT, and ICC interpretation.
+2. Beta4-IRT for bounded responses and synthetic recovery checks.
+3. Unsupervised evaluation and the limitation of weighting clustering instances equally.
+4. CLAIRE as an agreement-based latent-evaluation framework.
 
 ## Full Guide
 

@@ -2,12 +2,12 @@
 layout: default
 title: Answer
 eyebrow: Answer Notebook
-lead: This page is reserved for the worked answer of Section 2 and can be released after the participant activity window.
+lead: This page is reserved for the worked answer of the opening Supervised Evaluation + Binary IRT and 2PL section and can be released after the participant activity window.
 permalink: /section-2-answer/
 ---
 
 <div class="notice">
-  This page links to the worked answer notebook for Section 2.
+  This page links to the worked answer notebook for the opening Supervised Evaluation + Binary IRT and 2PL section.
 </div>
 
 ## Planned Notebook

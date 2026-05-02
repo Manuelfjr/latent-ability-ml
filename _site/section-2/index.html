@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Section 2 | Latent Ability</title>
+    <title>Section 1 | Latent Ability</title>
     <meta name="description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
     <link rel="icon" type="image/png" href="/assets/icon_bristol.png" />
     <link rel="apple-touch-icon" href="/assets/icon_bristol.png" />
-    <meta property="og:title" content="Section 2 | Latent Ability" />
+    <meta property="og:title" content="Section 1 | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
     <meta property="og:image" content="http://localhost:4000/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
@@ -92,31 +92,9 @@
           
           <div class="nav-group">
             
-            <details class="nav-disclosure">
-              <summary class="nav-link nav-summary">
-                Supervised Evaluation
-              </summary>
-              <div class="nav-children">
-                
-                <a
-                  href="/section-1/"
-                  class="nav-sublink"
-                >
-                  Overview
-                </a>
-                
-              </div>
-            </details>
-            
-          </div>
-          
-          
-          
-          <div class="nav-group">
-            
             <details class="nav-disclosure" open>
               <summary class="nav-link nav-summary active">
-                Binary IRT and 2PL
+                Supervised Evaluation + IRT
               </summary>
               <div class="nav-children">
                 
@@ -335,20 +313,36 @@
           <div class="page-search-suggestions" id="page-search-suggestions" role="listbox" aria-label="Search suggestions"></div>
         </div>
         
-        <div class="eyebrow">Binary IRT and 2PL</div>
+        <div class="eyebrow">Supervised Evaluation + Binary IRT and 2PL</div>
         
-        <h1>Section 2</h1>
+        <h1>Section 1</h1>
         
-        <p class="lead">Item Response Theory gives us a language for talking about who is strong, which items are hard, and which items truly separate respondents.</p>
+        <p class="lead">We start from familiar supervised evaluation, use it to expose example-level difficulty, and then introduce IRT as a language for ability, difficulty, discrimination, and ICCs.</p>
         
         <div class="button-row">
-  <a class="button" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/02_00_binary_irt_and_2pl.ipynb">Open guided notebook</a>
+  <a class="button" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/02_00_binary_irt_and_2pl.ipynb">Open IRT notebook</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/02_00_binary_irt_and_2pl.ipynb" target="_blank" rel="noreferrer">Open IRT in Colab</a>
+  <a class="button secondary" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb">Open supervised motivation</a>
+  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb" target="_blank" rel="noreferrer">Open motivation in Colab</a>
   <a class="button secondary" href="/section-2-activity/">Go to activity</a>
 </div>
 
+<h2 id="associated-notebooks">Associated Notebooks</h2>
+
+<p>If you want to follow this overview locally or in Colab, this combined section is organized around two guided notebooks:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">01_00_supervised_evaluation_toy_problems.ipynb</code>, which introduces example-level difficulty through the supervised motivation.</li>
+  <li><code class="language-plaintext highlighter-rouge">02_00_binary_irt_and_2pl.ipynb</code>, which develops the Binary IRT and 2PL overview itself.</li>
+</ul>
+
+<p>Both notebooks can import the shared workshop helpers from <code class="language-plaintext highlighter-rouge">utils/handson.py</code> and <code class="language-plaintext highlighter-rouge">utils/transform.py</code>.</p>
+
 <h2 id="binary-irt-as-a-language-for-evaluation">Binary IRT as a language for evaluation</h2>
 
-<p>The first section already showed that average model scores can hide which examples are genuinely informative. Section 2 gives that intuition a formal language. Instead of speaking only about a model score, we begin to speak about latent ability on one side and item properties on the other.</p>
+<p>In a labeled setting, it is tempting to rank models by accuracy, F1, or another aggregate score and then stop. But the supervised examples already show the limitation of that habit: two models can have similar average performance while hesitating on different examples, and the difficult cases are usually not spread uniformly across the data. They concentrate around ambiguous regions.</p>
+
+<p>That is why supervised evaluation belongs here as the entry point to IRT. It gives the first concrete version of the workshop’s central question: are all instances equally difficult when we evaluate a model? Once the answer is clearly no, the need for a latent language becomes much easier to motivate. IRT gives that intuition a formal structure. Instead of speaking only about a model score, we begin to speak about latent ability on one side and item properties on the other.</p>
 
 <p>In the binary IRT setting, each response is treated as success or failure. That could be a correct answer, a solved item, or any binary outcome that distinguishes stronger and weaker respondents. The central question becomes probabilistic: given a respondent with latent ability <span class="math-inline">θ<sub>i</sub></span> and an item with latent parameters, what is the probability of success?</p>
 
@@ -357,6 +351,104 @@
 <div class="notice">
   The central achievement of this section is not just learning a formula. It is learning how to read evaluation relationally: a response depends at once on who is answering and on what kind of item is being faced.
 </div>
+
+<h2 id="supervised-evaluation-gives-the-first-intuition">Supervised evaluation gives the first intuition</h2>
+
+<p>In the supervised toy problem, labels are available and the evaluation looks familiar. The dataset is intentionally small enough to visualize, so the geometry can be read before any model is fitted. Some points are far from the decision boundary and are naturally easy. Others sit close to the boundary, where different classifiers can make different commitments.</p>
+
+<figure>
+  <img src="/assets/section-1-supervised.svg" alt="Toy supervised classification problem with two classes." />
+  <figcaption>The opening supervised example is intentionally visual: the audience can see clean regions and ambiguous regions before looking at any metric.</figcaption>
+</figure>
+
+<p>That visual fact changes how the metrics table should be read. A high average score is still useful, but it does not tell us where the model struggled. It does not distinguish errors spread randomly over the space from errors concentrated in one structurally ambiguous region. It also does not tell us which examples are especially informative for separating stronger and weaker models.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th style="text-align: right">Accuracy</th>
+      <th style="text-align: right">Balanced Accuracy</th>
+      <th style="text-align: right">F1</th>
+      <th style="text-align: right">Mean Difficulty Proxy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>KNN</td>
+      <td style="text-align: right">0.990</td>
+      <td style="text-align: right">0.988</td>
+      <td style="text-align: right">0.988</td>
+      <td style="text-align: right">0.037</td>
+    </tr>
+    <tr>
+      <td>Logistic Regression</td>
+      <td style="text-align: right">0.990</td>
+      <td style="text-align: right">0.988</td>
+      <td style="text-align: right">0.988</td>
+      <td style="text-align: right">0.093</td>
+    </tr>
+    <tr>
+      <td>Decision Tree</td>
+      <td style="text-align: right">0.979</td>
+      <td style="text-align: right">0.977</td>
+      <td style="text-align: right">0.976</td>
+      <td style="text-align: right">0.011</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The table is deliberately compact, because compactness is both its strength and its weakness. It tells us that all three classifiers perform well. It also hides the local structure of the mistakes. Logistic regression and KNN can look almost tied in aggregate while still expressing different uncertainty around the boundary.</p>
+
+<figure>
+  <img src="/assets/section-1-supervised-difficulty.svg" alt="Example difficulty proxy and model disagreement in the toy supervised dataset." />
+  <figcaption>When model behavior is aggregated per example, difficulty becomes local: ambiguous cases concentrate near the boundary instead of spreading uniformly.</figcaption>
+</figure>
+
+<p>This is the bridge to IRT. In a supervised setting, a model can be read like a respondent and an example can be read like an item. Correctness becomes the binary response. The examples that many models solve easily behave like easy items. The examples that repeatedly induce mistakes, low confidence, or disagreement behave like hard items. Some examples may also be more discriminative: they reveal more about the difference between models because stronger models handle them reliably while weaker models do not.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th style="text-align: right">Example 27</th>
+      <th style="text-align: right">Example 79</th>
+      <th style="text-align: right">Example 119</th>
+      <th style="text-align: right">Example 224</th>
+      <th style="text-align: right">Example 287</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Decision Tree</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">1</td>
+    </tr>
+    <tr>
+      <td>KNN</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">1</td>
+    </tr>
+    <tr>
+      <td>Logistic Regression</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">1</td>
+      <td style="text-align: right">0</td>
+      <td style="text-align: right">1</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This tiny table is already an IRT-shaped object. The rows are models, the columns are examples, and the entries are binary responses: <code class="language-plaintext highlighter-rouge">1</code> means the model got the example right, <code class="language-plaintext highlighter-rouge">0</code> means it did not. Once the data are written this way, the language of IRT becomes natural. A model with more reliable correct responses can be described as having higher latent ability; an example that few models solve can be described as harder; and an example that separates one model from the others carries discriminative information.</p>
+
+<p>The point is not to replace standard supervised metrics. The point is to stop treating them as the end of the evaluation. IRT gives us a way to keep the model-level summary while also asking which examples produced the evidence behind that summary.</p>
 
 <h2 id="a-small-item-bank-makes-the-ideas-visible">A small item bank makes the ideas visible</h2>
 
@@ -383,7 +475,7 @@
 
 <p>and then specializes to the 1PL intuition by fixing <span class="math-inline">a<sub>j</sub> = 1</span>. Once that happens, the curves differ only through <span class="math-inline">δ<sub>j</sub></span>, the item difficulty.</p>
 
-<p>That simplification is powerful because it forces the audience to see what difficulty actually does. It is not a vague statement about an item being “challenging.” It is a location parameter. It tells us where the transition from low to high success probability occurs.</p>
+<p>That simplification is powerful because it forces the audience to see what difficulty actually does. It is not a vague statement about an item being “challenging.” In the classical 2PL scale used here, ability <span class="math-inline">θ<sub>i</sub></span> and difficulty <span class="math-inline">δ<sub>j</sub></span> live on the real line. Difficulty is a location parameter: it tells us where, on the latent ability axis, the transition from low to high success probability occurs.</p>
 
 <h2 id="the-2pl-model-adds-discrimination">The 2PL model adds discrimination</h2>
 
@@ -428,7 +520,7 @@
 
 <p>That prepares the transition to the next section. Logistic ICCs are excellent for binary intuition, but many AI evaluation settings are not naturally binary. Agreement values, proportions, and bounded continuous responses require a richer model family. That is where Beta4-IRT enters the story.</p>
 
-<p>In that sense, Section 2 is the conceptual spine of the workshop. It gives the language that later sections will extend, generalize, and repurpose in settings that are more realistic than simple right-or-wrong responses.</p>
+<p>In that sense, the opening section is the conceptual spine of the workshop. It begins with supervised evaluation because that is the most familiar place to see example-level difficulty, and then uses Binary IRT and 2PL to give that intuition a formal language that later sections will extend, generalize, and repurpose in settings that are more realistic than simple right-or-wrong responses.</p>
 
 <h2 id="questions-for-discussion">Questions for Discussion</h2>
 
@@ -848,6 +940,11 @@
         packages: new Set(),
         files: new Set(),
         micropipReady: false,
+        pythonSources: new Map(),
+        helperDocs: new Map(),
+        docPromises: new Map(),
+        docTooltip: null,
+        hoveredDocKey: '',
       };
 
       const backendHealth = new Map();
@@ -1082,11 +1179,7 @@ import matplotlib.pyplot as plt
         for (const file of pythonFiles) {
           if (!file || !file.url || !file.path) continue;
           if (runtimeState.files.has(file.path)) continue;
-          const response = await fetch(file.url);
-          if (!response.ok) {
-            throw new Error(`Could not load ${file.url}`);
-          }
-          const contents = await response.text();
+          const contents = await fetchPythonSource(file);
           const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
           pyodide.globals.set('__module_name', moduleName);
           pyodide.globals.set('__module_source', contents);
@@ -1208,16 +1301,6 @@ exec(module_source, module.__dict__)
         return ordered;
       };
 
-      const formatSnapshotTime = (value) => {
-        try {
-          return new Intl.DateTimeFormat(undefined, {
-            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-          }).format(new Date(value));
-        } catch (_) {
-          return String(value || 'snapshot');
-        }
-      };
-
       const resizeEditor = (editor, host) => {
         const lineHeight = editor.renderer.lineHeight || 19;
         const lines = Math.max(4, editor.session.getScreenLength() + 1);
@@ -1237,6 +1320,202 @@ exec(module_source, module.__dict__)
         '"': '&quot;',
         "'": '&#39;',
       }[character]));
+
+      const fetchPythonSource = async (file) => {
+        if (!file || !file.url || !file.path) return '';
+        if (runtimeState.pythonSources.has(file.path)) {
+          return runtimeState.pythonSources.get(file.path);
+        }
+        const response = await fetch(file.url);
+        if (!response.ok) {
+          throw new Error(`Could not load ${file.url}`);
+        }
+        const contents = await response.text();
+        runtimeState.pythonSources.set(file.path, contents);
+        return contents;
+      };
+
+      const normalizePythonDoc = (value) => String(value || '')
+        .replace(/\r\n/g, '\n')
+        .split('\n')
+        .map((line) => line.replace(/\s+$/g, ''))
+        .join('\n')
+        .replace(/^\n+|\n+$/g, '')
+        .replace(/\n{3,}/g, '\n\n')
+        .trim();
+
+      const extractPythonDocstrings = (source, moduleName = '') => {
+        const docs = [];
+        const lines = String(source || '').replace(/\r\n/g, '\n').split('\n');
+        const getIndent = (line) => (line.match(/^\s*/) || [''])[0].length;
+
+        for (let index = 0; index < lines.length; index += 1) {
+          const match = lines[index].match(/^(\s*)(def|class)\s+([A-Za-z_][A-Za-z0-9_]*)\b/);
+          if (!match) continue;
+
+          const baseIndent = match[1].length;
+          const kind = match[2];
+          const name = match[3];
+          let headerCursor = index;
+
+          while (headerCursor < lines.length && !lines[headerCursor].trim().endsWith(':')) {
+            headerCursor += 1;
+          }
+
+          let cursor = headerCursor + 1;
+
+          while (cursor < lines.length && !lines[cursor].trim()) cursor += 1;
+          if (cursor >= lines.length || getIndent(lines[cursor]) <= baseIndent) continue;
+
+          const trimmed = lines[cursor].trimStart();
+          const quote = trimmed.startsWith('"""') ? '"""' : trimmed.startsWith("'''") ? "'''" : '';
+          if (!quote) continue;
+
+          let doc = trimmed.slice(quote.length);
+          if (doc.includes(quote)) {
+            doc = doc.slice(0, doc.indexOf(quote));
+          } else {
+            const collected = [doc];
+            cursor += 1;
+            while (cursor < lines.length) {
+              const currentLine = lines[cursor];
+              const closingIndex = currentLine.indexOf(quote);
+              if (closingIndex !== -1) {
+                collected.push(currentLine.slice(0, closingIndex));
+                break;
+              }
+              collected.push(currentLine);
+              cursor += 1;
+            }
+            doc = collected.join('\n');
+          }
+
+          const normalizedDoc = normalizePythonDoc(doc);
+          if (!normalizedDoc) continue;
+          docs.push({ name, kind, module: moduleName, doc: normalizedDoc });
+        }
+
+        return docs;
+      };
+
+      const ensureHelperDocs = async (config = {}) => {
+        const pythonFiles = Array.isArray(config.pythonFiles) ? config.pythonFiles : [];
+        const tasks = [];
+
+        for (const file of pythonFiles) {
+          if (!file || !file.url || !file.path) continue;
+          if (runtimeState.docPromises.has(file.path)) {
+            tasks.push(runtimeState.docPromises.get(file.path));
+            continue;
+          }
+
+          const task = (async () => {
+            const contents = await fetchPythonSource(file);
+            const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
+            extractPythonDocstrings(contents, moduleName).forEach((entry) => {
+              runtimeState.helperDocs.set(entry.name, entry);
+            });
+          })().catch((error) => {
+            runtimeState.docPromises.delete(file.path);
+            console.warn(`Could not load helper docs from ${file.path}.`, error);
+          });
+
+          runtimeState.docPromises.set(file.path, task);
+          tasks.push(task);
+        }
+
+        await Promise.all(tasks);
+        return runtimeState.helperDocs;
+      };
+
+      const ensureDocTooltip = () => {
+        if (runtimeState.docTooltip) return runtimeState.docTooltip;
+        const tooltip = document.createElement('div');
+        tooltip.className = 'browser-notebook__doc-tooltip';
+        tooltip.hidden = true;
+        document.body.appendChild(tooltip);
+        runtimeState.docTooltip = tooltip;
+        return tooltip;
+      };
+
+      const hideDocTooltip = () => {
+        if (!runtimeState.docTooltip) return;
+        runtimeState.docTooltip.hidden = true;
+        runtimeState.hoveredDocKey = '';
+      };
+
+      const showDocTooltip = (entry, event) => {
+        if (!entry || !entry.name || !entry.doc) {
+          hideDocTooltip();
+          return;
+        }
+
+        const tooltip = ensureDocTooltip();
+        const kindLabel = entry.kind === 'class' ? 'Class' : 'Function';
+        tooltip.innerHTML = `
+          <div class="browser-notebook__doc-tooltip-head">
+            <code>${escapeHtml(entry.name)}</code>
+            <span>${escapeHtml(kindLabel)}${entry.module ? ` · ${escapeHtml(entry.module)}` : ''}</span>
+          </div>
+          <div class="browser-notebook__doc-tooltip-body">${escapeHtml(entry.doc)}</div>
+        `;
+        tooltip.hidden = false;
+
+        const margin = 16;
+        const offset = 18;
+        let left = event.clientX + offset;
+        let top = event.clientY + offset;
+        const rect = tooltip.getBoundingClientRect();
+
+        if (left + rect.width > window.innerWidth - margin) {
+          left = Math.max(margin, window.innerWidth - rect.width - margin);
+        }
+        if (top + rect.height > window.innerHeight - margin) {
+          top = Math.max(margin, event.clientY - rect.height - offset);
+        }
+
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+        runtimeState.hoveredDocKey = entry.name;
+      };
+
+      const findHelperDocAtEvent = (editor, event) => {
+        if (!editor || !event) return null;
+        try {
+          const position = editor.renderer.screenToTextCoordinates(event.clientX, event.clientY);
+          if (!position || position.row == null || position.column == null) return null;
+          const token = editor.session.getTokenAt(position.row, position.column);
+          const tokenValue = token && typeof token.value === 'string' ? token.value : '';
+          if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(tokenValue)) return null;
+          return runtimeState.helperDocs.get(tokenValue) || null;
+        } catch (_) {
+          return null;
+        }
+      };
+
+      const attachEditorDocHover = (editor) => {
+        if (!editor || editor.__docHoverAttached) return;
+        editor.__docHoverAttached = true;
+
+        const handleMove = (event) => {
+          const entry = findHelperDocAtEvent(editor, event);
+          if (!entry) {
+            hideDocTooltip();
+            return;
+          }
+          showDocTooltip(entry, event);
+        };
+
+        const handleLeave = () => {
+          hideDocTooltip();
+        };
+
+        editor.container.addEventListener('mousemove', handleMove);
+        editor.container.addEventListener('mouseleave', handleLeave);
+        editor.container.addEventListener('mousedown', handleLeave);
+        editor.session.on('changeScrollTop', handleLeave);
+        editor.session.on('changeScrollLeft', handleLeave);
+      };
 
       const renderHtmlWithScripts = (container, html) => {
         container.innerHTML = '';
@@ -1267,10 +1546,11 @@ exec(module_source, module.__dict__)
           return;
         }
 
+        ensureHelperDocs(config).catch(() => {});
+
         const notebookId = widget.dataset.notebookId || `notebook-${Math.random().toString(36).slice(2)}`;
         const backendSessionId = `${tabSessionId}:${notebookId}`;
         const storageKey = `browser-notebook:${notebookId}`;
-        const snapshotStorageKey = `${storageKey}:snapshots`;
         const runtimeApiUrls = (Array.isArray(config.runtimeApiUrls) && config.runtimeApiUrls.length
           ? config.runtimeApiUrls
           : defaultRuntimeApiUrls).map(normalizeBaseUrl).filter(Boolean);
@@ -1285,9 +1565,7 @@ exec(module_source, module.__dict__)
         let storedState = null;
         let currentRuntime = null;
         let runtimeReady = false;
-        let shareConsent = false;
         let activeCellId = seedCells[0]?.id || null;
-        let snapshots = [];
         const cellEditors = new Map();
         let demoValues = Object.fromEntries(sliderDemos.map((demo) => [
           demo.id,
@@ -1310,7 +1588,6 @@ exec(module_source, module.__dict__)
               ])),
             ]));
           }
-          shareConsent = Boolean(storedState?.shareConsent);
         } catch (_) {
           storedState = null;
           cells = seedCells.slice();
@@ -1318,13 +1595,6 @@ exec(module_source, module.__dict__)
         const cellOutputs = new Map(Array.isArray(storedState?.outputs)
           ? storedState.outputs.map((entry) => [entry.id, entry.result])
           : []);
-
-        try {
-          const parsedSnapshots = JSON.parse(sessionStorage.getItem(snapshotStorageKey) || '[]');
-          snapshots = Array.isArray(parsedSnapshots) ? parsedSnapshots : [];
-        } catch (_) {
-          snapshots = [];
-        }
 
         const libraryMarkup = libraryCatalog.length
           ? `
@@ -1432,26 +1702,11 @@ exec(module_source, module.__dict__)
               <div class="browser-notebook__progress-actions">
                 <button class="button tiny secondary" type="button" data-action="export-notebook">Export .ipynb</button>
                 <button class="button tiny ghost" type="button" data-action="email-summary">Email summary</button>
-                <button class="button tiny ghost" type="button" data-action="share-notebook" disabled>Share notebook</button>
+                <button class="button tiny ghost" type="button" data-action="share-notebook">Share notebook</button>
               </div>
             </div>
-            <label class="browser-notebook__share-consent">
-              <input type="checkbox" data-share-consent ${shareConsent ? 'checked' : ''} />
-              <span>I agree to share my notebook work with the workshop instructor.</span>
-            </label>
             <div class="browser-notebook__progress-track">
               <div class="browser-notebook__progress-bar" data-progress-bar></div>
-            </div>
-            <div class="browser-notebook__snapshot-tools">
-              <div class="browser-notebook__snapshot-label">Snapshot history</div>
-              <div class="browser-notebook__snapshot-actions">
-                <select class="browser-notebook__snapshot-select" data-snapshot-select>
-                  <option value="">No snapshots yet</option>
-                </select>
-                <button class="button tiny secondary" type="button" data-action="save-snapshot">Save snapshot</button>
-                <button class="button tiny ghost" type="button" data-action="restore-snapshot">Restore</button>
-                <button class="button tiny ghost" type="button" data-action="delete-snapshot">Delete</button>
-              </div>
             </div>
           </div>
           ${sliderMarkup}
@@ -1470,9 +1725,7 @@ exec(module_source, module.__dict__)
         const status = widget.querySelector('[data-notebook-status]');
         const progressLabel = widget.querySelector('[data-progress-label]');
         const progressBar = widget.querySelector('[data-progress-bar]');
-        const shareConsentInput = widget.querySelector('[data-share-consent]');
         const shareNotebookButton = widget.querySelector('[data-action="share-notebook"]');
-        const snapshotSelect = widget.querySelector('[data-snapshot-select]');
 
         const setStatus = (message, type = '') => {
           status.textContent = message;
@@ -1486,71 +1739,7 @@ exec(module_source, module.__dict__)
             cells,
             outputs: Array.from(cellOutputs, ([id, result]) => ({ id, result })),
             demoValues,
-            shareConsent,
           }));
-        };
-
-        const syncShareState = () => {
-          if (shareConsentInput) shareConsentInput.checked = shareConsent;
-          if (shareNotebookButton) shareNotebookButton.disabled = !shareConsent;
-        };
-
-        const persistSnapshots = () => {
-          sessionStorage.setItem(snapshotStorageKey, JSON.stringify(snapshots));
-        };
-
-        const buildSnapshotState = () => ({
-          cells,
-          demoValues,
-          shareConsent,
-        });
-
-        const renderSnapshots = () => {
-          if (!snapshotSelect) return;
-          snapshotSelect.innerHTML = snapshots.length
-            ? snapshots.map((snapshot, index) => `<option value="${escapeHtml(snapshot.id)}">${escapeHtml(snapshot.label || `Snapshot ${index + 1}`)}</option>`).join('')
-            : '<option value="">No snapshots yet</option>';
-        };
-
-        const saveSnapshot = (label = '', { silent = false } = {}) => {
-          const stamp = new Date().toISOString();
-          snapshots.unshift({
-            id: `snapshot-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-            label: label || `Snapshot · ${formatSnapshotTime(stamp)}`,
-            createdAt: stamp,
-            state: buildSnapshotState(),
-          });
-          snapshots = snapshots.slice(0, 6);
-          persistSnapshots();
-          renderSnapshots();
-          if (!silent) setStatus('Snapshot saved in this tab.', 'ready');
-        };
-
-        const restoreSnapshot = () => {
-          const snapshotId = snapshotSelect?.value;
-          const snapshot = snapshots.find((entry) => entry.id === snapshotId);
-          if (!snapshot) {
-            setStatus('Select a snapshot to restore.', 'error');
-            return;
-          }
-          cells = (snapshot.state?.cells || seedCells).map((cell, index) => makeCell(cell, index));
-          demoValues = snapshot.state?.demoValues || demoValues;
-          shareConsent = Boolean(snapshot.state?.shareConsent);
-          syncShareState();
-          persist();
-          renderCells();
-          renderSnapshots();
-          updateProgress();
-          setStatus(`Restored ${snapshot.label}.`, 'ready');
-        };
-
-        const deleteSnapshot = () => {
-          const snapshotId = snapshotSelect?.value;
-          if (!snapshotId) return;
-          snapshots = snapshots.filter((entry) => entry.id !== snapshotId);
-          persistSnapshots();
-          renderSnapshots();
-          setStatus('Snapshot removed.', 'ready');
         };
 
         const hasMeaningfulCode = (cell) => {
@@ -1699,7 +1888,7 @@ exec(module_source, module.__dict__)
           }
         };
 
-        const buildEmailBody = ({ includeConsent = false } = {}) => {
+        const buildEmailBody = () => {
           const taskCells = cells.filter((cell) => cell.kind === 'task');
           const completed = taskCells.filter((cell) => cell.done).length;
           const lines = [
@@ -1707,7 +1896,7 @@ exec(module_source, module.__dict__)
             '',
             `Page: ${window.location.href}`,
             `Progress: ${completed}/${taskCells.length} tasks completed`,
-            includeConsent ? 'The participant explicitly agreed to share this notebook work with the instructor.' : 'The notebook file was exported from the workshop site.',
+            'The notebook file was exported from the workshop site.',
             '',
             'The .ipynb file should be attached manually if it was not shared automatically by the browser.',
           ];
@@ -1733,19 +1922,15 @@ exec(module_source, module.__dict__)
         };
 
         const shareNotebook = () => {
-          if (!shareConsent) {
-            setStatus('Please confirm that you agree to share your notebook before sending it.', 'error');
-            return;
-          }
           const file = buildNotebookFile();
           if (canShareFile(file)) {
             navigator.share({
               title: `${title} notebook shared by participant`,
-              text: 'The participant explicitly agreed to share this notebook work with the instructor.',
+              text: 'The notebook file was exported from the workshop site.',
               files: [file],
             }).catch(() => {
               downloadNotebookFile();
-              openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+              openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody());
               setStatus('Native sharing was unavailable. Your notebook file was downloaded instead; please attach it manually.', 'ready');
             });
             analytics.track('share_notebook', {
@@ -1756,7 +1941,7 @@ exec(module_source, module.__dict__)
             return;
           }
           downloadNotebookFile();
-          openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody({ includeConsent: true }));
+          openMailClient(notebookShareEmail, `${title} notebook shared by participant`, buildEmailBody());
           analytics.track('share_notebook', {
             notebook_id: notebookId,
             section: window.location.pathname,
@@ -1765,10 +1950,15 @@ exec(module_source, module.__dict__)
           setStatus('Your notebook file was downloaded. Please attach it manually before sending it to the instructor.', 'ready');
         };
 
-        const compileTemplate = (template, values) => String(template || '').replace(/\{\{(\w+)\}\}/g, (_, key) => {
-          const value = values[key];
-          return Number.isFinite(value) ? String(value) : '0';
-        });
+        const compileTemplate = (template, values) => String(template || '')
+          .replace(/\[\[(\w+)\]\]/g, (_, key) => {
+            const value = values[key];
+            return Number.isFinite(value) ? String(value) : '0';
+          })
+          .replace(/\{\{(\w+)\}\}/g, (_, key) => {
+            const value = values[key];
+            return Number.isFinite(value) ? String(value) : '0';
+          });
 
         const parseControlValue = (rawValue, control, { clamp = true } = {}) => {
           const normalized = String(rawValue ?? '').trim().replace(',', '.');
@@ -2022,10 +2212,8 @@ exec(module_source, module.__dict__)
               runtime_mode: runtime.kind === 'backend' ? describeBackendTarget(runtime.baseUrl).toLowerCase() : 'browser',
               cell_label: cell.label,
               cell_id: cell.id,
-              shared: shareConsent,
             });
             renderOutput(cellEl, result || {});
-            saveSnapshot(`${cell.label} run`, { silent: true });
             setStatus(result && result.success === false
               ? 'The selected cell raised an error. Review the traceback below and keep iterating.'
               : runtime.kind === 'backend'
@@ -2063,10 +2251,8 @@ exec(module_source, module.__dict__)
               session_id: backendSessionId,
               runtime_mode: runtime.kind === 'backend' ? describeBackendTarget(runtime.baseUrl).toLowerCase() : 'browser',
               demo_id: demo.id,
-              shared: shareConsent,
             });
             renderOutput(demoEl, result || {});
-            saveSnapshot(`${demo.title} updated`, { silent: true });
             output.classList.remove('is-empty');
             setStatus(runtime.kind === 'backend'
               ? `Interactive demo executed through ${describeBackendTarget(runtime.baseUrl)} backend.`
@@ -2214,6 +2400,7 @@ exec(module_source, module.__dict__)
                 bindKey: { win: 'Shift-Enter', mac: 'Shift-Enter' },
                 exec: () => runCell(cell.id),
               });
+              attachEditorDocHover(editor);
             }).catch(() => {
               fallbackTextarea.style.display = 'block';
             });
@@ -2243,7 +2430,6 @@ exec(module_source, module.__dict__)
                 cell.outputCollapsed = false;
                 cellOutputs.delete(cell.id);
                 persist();
-                saveSnapshot(`${cell.label} reset`, { silent: true });
                 renderCells();
                 updateProgress();
               });
@@ -2315,7 +2501,6 @@ exec(module_source, module.__dict__)
           cells = seedCells.map((cell, index) => makeCell(cell, index));
           cellOutputs.clear();
           sessionStorage.removeItem(storageKey);
-          saveSnapshot('Notebook reset', { silent: true });
           renderCells();
           try {
             runtimeReady = false;
@@ -2325,23 +2510,12 @@ exec(module_source, module.__dict__)
           }
         });
 
-        widget.querySelector('[data-action="save-snapshot"]').addEventListener('click', () => saveSnapshot());
-        widget.querySelector('[data-action="restore-snapshot"]').addEventListener('click', restoreSnapshot);
-        widget.querySelector('[data-action="delete-snapshot"]').addEventListener('click', deleteSnapshot);
         widget.querySelectorAll('[data-action="insert-snippet"]').forEach((button) => {
           button.addEventListener('click', () => insertSnippet(button.dataset.snippetId));
         });
         widget.querySelector('[data-action="export-notebook"]').addEventListener('click', exportNotebook);
         widget.querySelector('[data-action="email-summary"]').addEventListener('click', emailSummary);
         if (shareNotebookButton) shareNotebookButton.addEventListener('click', shareNotebook);
-        if (shareConsentInput) {
-          shareConsentInput.addEventListener('change', (event) => {
-            shareConsent = Boolean(event.target.checked);
-            syncShareState();
-            persist();
-          });
-        }
-        syncShareState();
 
         sliderDemos.forEach((demo) => {
           const demoEl = widget.querySelector(`[data-demo-id="${demo.id}"]`);
@@ -2379,7 +2553,6 @@ exec(module_source, module.__dict__)
         });
 
         renderCells();
-        renderSnapshots();
         ensureEditor().then(() => renderCells()).catch(() => {});
         updateProgress();
         initializeNotebook().catch(() => {});

@@ -8,7 +8,7 @@
 ---
 # Latent Ability
 
-This repository contains the current material for a `3-hour` hands-on workshop on latent-ability-aware evaluation in machine learning. The workshop is organized as a progression from classical supervised evaluation to item response theory, then to bounded-response latent models, and finally to clustering scenarios where agreement replaces correctness as the central signal.
+This repository contains the current material for a `3-hour` hands-on workshop on latent-ability-aware evaluation in machine learning. The workshop begins by using classical supervised evaluation as the motivation for item response theory, then moves to bounded-response latent models, and finally to clustering scenarios where agreement replaces correctness as the central signal.
 
 The guiding idea of the workshop is simple: aggregate metrics are useful, but they do not tell the whole story. Across supervised and unsupervised settings, some examples are structurally easier than others, some are much more informative than others, and a good evaluation framework should be able to separate model ability from item difficulty and, when relevant, item discrimination.
 
@@ -19,26 +19,24 @@ This repository is meant to be useful in two ways:
 
 ## Workshop Arc
 
-The workshop is divided into five connected sections:
+The workshop is divided into four connected sections:
 
-1. `Supervised Evaluation`
-   We begin with familiar territory: compact performance summaries and toy classification settings. The key move here is to show that even in a supervised problem, aggregate scores can hide meaningful variation across examples.
-2. `Binary IRT and 2PL`
-   Once local variation is visible, binary IRT provides a language for describing it more explicitly. We introduce ability, difficulty, and discrimination, and use ICCs to make those concepts concrete.
-3. `Beta4-IRT`
+1. `Supervised Evaluation + Binary IRT and 2PL`
+   We begin with familiar supervised evaluation to show that aggregate scores can hide meaningful variation across examples. Once local variation is visible, binary IRT provides a language for describing it more explicitly. We introduce ability, difficulty, and discrimination, and use ICCs to make those concepts concrete.
+2. `Beta4-IRT`
    The third section asks what changes when responses are not binary. Beta4-IRT keeps the latent perspective but adapts it to bounded responses, allowing richer summaries and recovery experiments.
-4. `Unsupervised Evaluation`
+3. `Unsupervised Evaluation`
    We then leave supervised labels behind and ask how evaluation works when clustering models disagree. The main point is that instance-level difficulty does not disappear simply because the setting is unsupervised.
-5. `CLAIRE`
+4. `CLAIRE`
    The final section reframes the problem around agreement-based response matrices. CLAIRE uses model agreement across instances to recover latent structure in a setting where correctness is not directly observed.
 
 ## Suggested Rhythm
 
 For a `3-hour` workshop, the material works best when it is delivered in three larger blocks:
 
-1. `Section 1` on its own
-2. `Sections 2 and 3` together
-3. `Sections 4 and 5` together
+1. supervised evaluation plus `Binary IRT and 2PL`
+2. `Beta4-IRT`
+3. `Unsupervised Evaluation` plus `CLAIRE`
 
 For each block, keep the same cadence:
 
@@ -48,9 +46,9 @@ For each block, keep the same cadence:
 
 This gives:
 
-- `1 hour` for Section 1
-- `1 hour` for Sections 2 and 3 together
-- `1 hour` for Sections 4 and 5 together
+- `1 hour` for supervised evaluation plus Binary IRT and 2PL
+- `1 hour` for Beta4-IRT
+- `1 hour` for unsupervised evaluation plus CLAIRE
 
 Total estimated duration: `3 hours`.
 
@@ -61,32 +59,28 @@ Total estimated duration: `3 hours`.
 - `notebooks/00_workshop_roadmap.ipynb`
   A short framing notebook that introduces the logic of the workshop, the timing, and the path from classical metrics to latent evaluation.
 
-### 1. Supervised Evaluation
+### 1. Supervised Evaluation + Binary IRT and 2PL
 
 - `notebooks/01_00_supervised_evaluation_toy_problems.ipynb`
-  Guided exposition notebook.
-  
-This opening section is now treated as a guided conceptual block. It introduces the problem of example-level difficulty in a familiar supervised setting, but it no longer has a separate public activity or answer page in the site flow.
-
-### 2. Binary IRT and 2PL
-
 - `notebooks/02_00_binary_irt_and_2pl.ipynb`
 - `notebooks/02_01_activities.ipynb`
 - `notebooks/02_02_answer.ipynb`
 
-### 3. Beta4-IRT
+The supervised notebook is no longer a separate public activity block. It is the guided motivation inside the first section: use it to show why aggregate metrics hide example-level difficulty, then move directly into the Binary IRT and 2PL notebook. The first participant activity is `02_01_activities.ipynb`.
+
+### 2. Beta4-IRT
 
 - `notebooks/03_00_beta4_irt.ipynb`
 - `notebooks/03_01_activities.ipynb`
 - `notebooks/03_02_answer.ipynb`
 
-### 4. Unsupervised Evaluation
+### 3. Unsupervised Evaluation
 
 - `notebooks/04_00_unsupervised_evaluation_toy_problems.ipynb`
 - `notebooks/04_01_activities.ipynb`
 - `notebooks/04_02_answer.ipynb`
 
-### 5. CLAIRE
+### 4. CLAIRE
 
 - `notebooks/05_00_claire.ipynb`
 - `notebooks/05_01_extra_negative_disc.ipynb`
@@ -101,10 +95,10 @@ The simplest reading path is:
 
 1. open the roadmap notebook;
 2. follow the overview page or main notebook of the current section;
-3. from Section 2 onward, move to the corresponding activity notebook;
+3. move to the corresponding activity notebook, starting with `02_01_activities.ipynb`;
 4. compare your work with the answer notebook only after discussion or consolidation.
 
-The activity notebooks are designed as working spaces from Section 2 onward. They are intentionally lighter on exposition so that the conceptual narrative stays in the overview material and the guided section notebooks.
+The activity notebooks are designed as working spaces after the guided exposition. They are intentionally lighter on text so that the conceptual narrative stays in the overview material and the main section notebooks.
 
 ### If you are delivering the workshop
 

@@ -1,14 +1,27 @@
 ---
 layout: default
-title: Section 1
+title: Supervised Evaluation
 eyebrow: Supervised Evaluation
-lead: Before latent-variable modeling, we begin with a familiar setting and ask which examples remain genuinely hard even when labels are available.
+lead: This material is now folded into the Binary IRT and 2PL section as the motivating supervised example.
 permalink: /section-1/
 ---
 
 <div class="button-row">
-  <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb">Open guided notebook</a>
+  <a class="button" href="{{ '/section-2/' | relative_url }}">Go to Binary IRT and 2PL</a>
+  <a class="button secondary" href="{{ site.repo_url }}/blob/main/notebooks/01_00_supervised_evaluation_toy_problems.ipynb">Open supervised notebook</a>
 </div>
+
+<div class="notice">
+  The standalone supervised evaluation page is kept as a reference, but the workshop now treats this material as the opening motivation inside the Binary IRT and 2PL section.
+</div>
+
+## Associated Notebook
+
+If you want to run this overview locally, the associated notebook is:
+
+- `01_00_supervised_evaluation_toy_problems.ipynb`, which contains the guided supervised motivation used as the opening example for the workshop.
+
+The same local environment can import the shared workshop helpers from `utils/handson.py`.
 
 ## Supervised evaluation and example difficulty
 
@@ -70,7 +83,7 @@ The first section does not yet introduce latent ability, item difficulty, or dis
 
 A strong model is one that behaves well not only on easy examples but also near the ambiguous region. A hard example is one that repeatedly attracts hesitation, disagreement, or unstable classification behavior. And an informative example is one whose response pattern reveals something meaningful about differences between models.
 
-Those are already the ingredients of the language that comes next. IRT does not appear out of nowhere in Section 2. It arrives as a disciplined way of naming distinctions that the room has already started to notice here.
+Those are already the ingredients of the language that comes next. IRT does not appear out of nowhere. It arrives as a disciplined way of naming distinctions that the room has already started to notice here.
 
 ## Reading this section as a transition
 
