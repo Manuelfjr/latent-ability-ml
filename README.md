@@ -17,6 +17,13 @@ This repository is meant to be useful in two ways:
 - for participants, as the workshop material itself;
 - for the instructor, as a structured sequence of notebooks, activities, and scripts that support a coherent live delivery.
 
+## Deployment Layout
+
+- `main` is the branch used for the GitHub Pages site and the public workshop material.
+- `hf-backend` is the backend-focused branch used for the Hugging Face runtime deployment.
+- The Jekyll site source lives in `site/`, while the Python execution API used by the browser notebooks lives in `backend/`.
+- In production, the GitHub Pages site points its notebook runtime to the Hugging Face backend space.
+
 ## Workshop Arc
 
 The workshop is divided into four connected sections:
@@ -100,6 +107,16 @@ The simplest reading path is:
 
 The activity notebooks are designed as working spaces after the guided exposition. They are intentionally lighter on text so that the conceptual narrative stays in the overview material and the main section notebooks.
 
+The guided notebooks, activities, and answers can be opened in three complementary ways:
+
+- through the workshop site;
+- directly on GitHub;
+- in Google Colab.
+
+The overview pages on the site expose both GitHub and Colab links for the guided notebooks. The activity and answer pages do the same for their corresponding notebooks.
+
+When you open one of the workshop notebooks in Colab, run the first setup cell before the rest of the notebook. That cell clones this repository into `/content/latent-ability-ml`, installs the core Python dependencies, and adds `notebooks/`, `utils/`, and `src/` to `sys.path` so the shared workshop helpers can be imported normally.
+
 ### If you are delivering the workshop
 
 The scripts that support the live delivery are stored locally in:
@@ -114,7 +131,16 @@ These files are not part of the public site flow. They are instructor-oriented n
 ```text
 .
 ├── README.md
-├── pyproject.toml
+├── _config.yml
+├── backend/
+│   ├── README.md
+│   ├── app.py
+│   ├── executor.py
+│   ├── run_huggingface.sh
+│   └── run_local.sh
+├── data/
+│   ├── 99_script_portuguese.md
+│   └── 99_script_english.md
 ├── notebooks/
 │   ├── 00_workshop_roadmap.ipynb
 │   ├── 01_00_supervised_evaluation_toy_problems.ipynb
@@ -132,9 +158,13 @@ These files are not part of the public site flow. They are instructor-oriented n
 │   ├── 05_02_activities.ipynb
 │   ├── 05_03_answer.ipynb
 │   └── nb_utils.py
-├── data/
-│   ├── 99_script_portuguese.md
-│   └── 99_script_english.md
+├── pyproject.toml
+├── site/
+│   ├── _config.yml
+│   ├── _layouts/
+│   ├── _data/
+│   ├── assets/
+│   └── *.md
 └── utils/
     ├── __init__.py
     ├── handson.py
@@ -169,17 +199,20 @@ poetry install
 poetry run jupyter notebook
 ```
 
-To run the workshop site locally:
+To serve the workshop site locally from the repository root:
 
 ```bash
 jekyll serve --config _config.yml --host 127.0.0.1 --port 4000
 ```
 
-If you also want the local backend for `birt-gd`:
+If you also want the local Python backend for `birt-gd` and the browser notebooks:
 
 ```bash
 ./backend/run_local.sh
+jekyll serve --source site --config site/_config.yml,site/_config.local.yml --host 127.0.0.1 --port 4000
 ```
+
+The Hugging Face deployment entrypoint is `backend/run_huggingface.sh`, and the container build used for that branch is defined in `Dockerfile`.
 
 ---
 
