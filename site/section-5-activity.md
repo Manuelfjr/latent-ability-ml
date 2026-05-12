@@ -2,7 +2,7 @@
 layout: default
 title: Activity
 eyebrow: Activity Notebook
-lead: Participants generate a synthetic dataset, build the response matrix, inspect CLAIRE quantities, and connect the workflow back to the theory.
+lead: Participants generate a synthetic dataset, build the response matrix, inspect CLAIRE quantities, and work through the main activity of the integrated final block.
 permalink: /section-5-activity/
 ---
 
@@ -34,7 +34,7 @@ Inside the browser notebook editor, hovering one of these helper names now shows
 
 ## Notebook
 
-- Activity notebook: `05_02_activities.ipynb`
+- Main final-block activity notebook: `05_02_activities.ipynb`
 - Goal: inspect individual items and connect the practical workflow back to the CLAIRE theory
 
 ## What Participants Should Do

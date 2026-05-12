@@ -2,7 +2,7 @@
 layout: default
 title: Answer
 eyebrow: Answer Notebook
-lead: This page links to the worked answer notebook for Section 5.
+lead: This page links to the worked answer notebook for the main CLAIRE activity in the integrated final block.
 permalink: /section-5-answer/
 ---
 

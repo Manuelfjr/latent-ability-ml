@@ -3,11 +3,11 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Activity | Latent Ability</title>
+    <title>Legacy Activity | Latent Ability</title>
     <meta name="description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
     <link rel="icon" type="image/png" href="/assets/icon_bristol.png" />
     <link rel="apple-touch-icon" href="/assets/icon_bristol.png" />
-    <meta property="og:title" content="Activity | Latent Ability" />
+    <meta property="og:title" content="Legacy Activity | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
     <meta property="og:image" content="http://localhost:4000/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
@@ -164,42 +164,6 @@
           
           <div class="nav-group">
             
-            <details class="nav-disclosure" open>
-              <summary class="nav-link nav-summary active">
-                Unsupervised Evaluation
-              </summary>
-              <div class="nav-children">
-                
-                <a
-                  href="/section-4/"
-                  class="nav-sublink"
-                >
-                  Overview
-                </a>
-                
-                <a
-                  href="/section-4-activity/"
-                  class="nav-sublink active"
-                >
-                  Activity
-                </a>
-                
-                <a
-                  href="/section-4-answer/"
-                  class="nav-sublink"
-                >
-                  Answer
-                </a>
-                
-              </div>
-            </details>
-            
-          </div>
-          
-          
-          
-          <div class="nav-group">
-            
             <details class="nav-disclosure">
               <summary class="nav-link nav-summary">
                 CLAIRE
@@ -313,131 +277,23 @@
           <div class="page-search-suggestions" id="page-search-suggestions" role="listbox" aria-label="Search suggestions"></div>
         </div>
         
-        <div class="eyebrow">Activity Notebook</div>
+        <div class="eyebrow">Moved Content</div>
         
-        <h1>Activity</h1>
+        <h1>Legacy Activity</h1>
         
-        <p class="lead">Participants create or adapt a clustering scenario and inspect how aggregate metrics can mask hard instances.</p>
+        <p class="lead">The standalone unsupervised activity is no longer the main participant path. The final block now uses the CLAIRE activity as its primary exercise.</p>
         
-        <h2 id="browser-lab">Browser Lab</h2>
-
-<p>This page now includes executable Python cells directly in the site. Students can edit code, add new cells, delete cells, import the workshop helpers, and work through the activity without leaving the page.</p>
-
-<h2 id="shared-helpers-you-can-use">Shared Helpers You Can Use</h2>
-
-<p>This activity already has the shared workshop helpers available in the browser runtime, and the same imports work in the local notebook and in Colab.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">utils.handson</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">evaluate_clustering_models_on_dataset</span><span class="p">,</span>
-    <span class="n">get_default_clustering_models</span><span class="p">,</span>
-    <span class="n">make_toy_clustering_dataset</span><span class="p">,</span>
-    <span class="n">plot_clustering_dataset</span><span class="p">,</span>
-    <span class="n">plot_clustering_instance_difficulty</span><span class="p">,</span>
-    <span class="n">summarize_clustering_instance_difficulty</span><span class="p">,</span>
-    <span class="n">summarize_clustering_results</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div></div>
+        <h2 id="current-recommendation">Current Recommendation</h2>
 
 <ul>
-  <li><code class="language-plaintext highlighter-rouge">make_toy_clustering_dataset</code> gives you ready-made geometric scenarios that you can keep or adapt.</li>
-  <li><code class="language-plaintext highlighter-rouge">get_default_clustering_models</code> and <code class="language-plaintext highlighter-rouge">evaluate_clustering_models_on_dataset</code> provide a fast way to compare a small heterogeneous model pool.</li>
-  <li><code class="language-plaintext highlighter-rouge">summarize_clustering_results</code> builds the aggregate metrics table for the same assignments.</li>
-  <li><code class="language-plaintext highlighter-rouge">summarize_clustering_instance_difficulty</code> and <code class="language-plaintext highlighter-rouge">plot_clustering_instance_difficulty</code> make the agreement-based hard-instance analysis explicit.</li>
-</ul>
-
-<p>Inside the browser notebook editor, hovering one of these helper names now shows its docstring.</p>
-
-<h2 id="notebook">Notebook</h2>
-
-<ul>
-  <li>Activity notebook: <code class="language-plaintext highlighter-rouge">04_01_activities.ipynb</code></li>
-  <li>Goal: analyze a synthetic clustering scenario with a more instance-aware perspective</li>
-</ul>
-
-<h2 id="what-participants-should-do">What Participants Should Do</h2>
-
-<ul>
-  <li>create or adapt a toy clustering dataset;</li>
-  <li>compare clustering models;</li>
-  <li>inspect hard instances rather than relying only on summary metrics.</li>
+  <li>Main participant activity: <code class="language-plaintext highlighter-rouge">05_02_activities.ipynb</code></li>
+  <li>Legacy standalone unsupervised activity: <code class="language-plaintext highlighter-rouge">04_01_activities.ipynb</code></li>
 </ul>
 
 <div class="button-row">
-  <a class="button" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/04_01_activities.ipynb">Open activity notebook</a>
-  <a class="button secondary" href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/04_01_activities.ipynb" target="_blank" rel="noreferrer">Open in Colab</a>
-  <a class="button secondary" href="/section-4/">Back to section</a>
-</div>
-
-<div class="browser-notebook" data-notebook-id="section-4-activity">
-  <script type="application/json" class="browser-notebook__seed">
-{
-  "title": "Section 4 browser notebook",
-  "lead": "Run clustering experiments directly in the page, then compare model-level metrics with item-level difficulty.",
-  "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
-  "micropipPackages": ["seaborn", "plotly", "statsmodels", "openpyxl"],
-  "pythonFiles": [
-    {"url": "/assets/python/utils/transform.py", "path": "utils/transform.py"},
-    {"url": "/assets/python/utils/handson.py", "path": "utils/handson.py"}
-  ],
-  "browserNote": "Available imports include numpy, pandas, matplotlib, scipy, scikit-learn, seaborn, plotly, statsmodels, openpyxl, utils.handson, and utils.transform.",
-  "libraryCatalog": [
-    {"name": "numpy"},
-    {"name": "pandas"},
-    {"name": "matplotlib"},
-    {"name": "scipy"},
-    {"name": "scikit-learn"},
-    {"name": "plotly"},
-    {"name": "statsmodels"},
-    {"name": "openpyxl"}
-  ],
-  "quickInserts": [
-    {"id": "clustering-starter", "label": "Insert clustering starter", "description": "Quick clustering imports.", "code": "from utils.handson import make_toy_clustering_dataset, evaluate_clustering_models_on_dataset, summarize_clustering_instance_difficulty\nimport matplotlib.pyplot as plt\n"},
-    {"id": "plotly-clusters", "label": "Insert Plotly clusters", "description": "Interactive scatter example.", "code": "import plotly.express as px\nfig = px.scatter(x=[-1, 0, 1], y=[0.2, 0.5, 0.9], color=['a', 'b', 'a'])\nfig\n"}
-  ],
-  "sliderDemos": [
-    {
-      "id": "clustering-noise-lab",
-      "title": "Interactive clustering geometry lab",
-      "lead": "Increase the moon noise level and see how quickly the geometry becomes harder to separate.",
-      "buttonLabel": "Update dataset",
-      "template": "import matplotlib.pyplot as plt\nfrom sklearn.datasets import make_moons\nX, y = make_moons(n_samples={{samples}}, noise={{noise}}, random_state=7)\nfig, ax = plt.subplots(figsize=(7, 4))\nax.scatter(X[:,0], X[:,1], c=y, cmap='coolwarm', s=28, alpha=0.85)\nax.set_title('Interactive clustering geometry')\nax.set_xlabel('feature_1')\nax.set_ylabel('feature_2')\nax.grid(alpha=0.2)\nprint(f'samples={{samples}}, noise={{noise}}')\nplt.show()\n",
-      "controls": [
-        {"name": "samples", "label": "Samples", "min": 120, "max": 500, "step": 20, "value": 240},
-        {"name": "noise", "label": "Noise", "min": 0.02, "max": 0.35, "step": 0.01, "value": 0.12}
-      ]
-    }
-  ],
-  "cells": [
-    {
-      "label": "Task 1",
-      "lead": "Create or adapt a toy clustering dataset.",
-      "code": "# answer\n",
-      "hints": [
-        "You can begin with a simple geometric setting and then make it harder through noise, overlap, or curved structure.",
-        "A two-dimensional dataset is usually enough for visual discussion."
-      ]
-    },
-    {
-      "label": "Task 2",
-      "lead": "Compare clustering models on the dataset.",
-      "code": "# answer\n",
-      "hints": [
-        "Pick models with different assumptions, such as centroid-based, connectivity-based, or spectral approaches.",
-        "Keep the model outputs so you can compare both summary metrics and pairwise agreement."
-      ]
-    },
-    {
-      "label": "Task 3",
-      "lead": "Inspect hard instances through agreement rather than only aggregate metrics.",
-      "code": "# answer\n",
-      "hints": [
-        "The most interesting instances are usually those around ambiguous boundaries or local geometric irregularities.",
-        "Try to identify points where model disagreement concentrates rather than being spread uniformly."
-      ]
-    }
-  ]
-}
-  </script>
+  <a class="button" href="/section-5-activity/">Open the main CLAIRE activity</a>
+  <a class="button secondary" href="https://github.com/manuelfjr/latent-ability-ml/blob/main/notebooks/04_01_activities.ipynb">Open the legacy unsupervised activity notebook</a>
+  <a class="button secondary" href="/section-5/">Go to the integrated CLAIRE overview</a>
 </div>
 
       </main>

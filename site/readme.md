@@ -16,14 +16,14 @@ This project contains the full material for a hands-on workshop on latent-abilit
 - even in supervised settings, local example difficulty matters;
 - IRT makes ability, difficulty, and discrimination explicit;
 - Beta4-IRT extends that logic to bounded responses;
+- unsupervised disagreement becomes the bridge into CLAIRE;
 - CLAIRE turns model agreement into a latent-evaluation workflow for clustering.
 
 ## Main Sections
 
 1. Supervised evaluation as motivation, followed by Binary IRT, 1PL intuition, 2PL-IRT, and ICC interpretation.
 2. Beta4-IRT for bounded responses and synthetic recovery checks.
-3. Unsupervised evaluation and the limitation of weighting clustering instances equally.
-4. CLAIRE as an agreement-based latent-evaluation framework.
+3. CLAIRE as the final block, beginning with unsupervised evaluation and then moving into agreement-based latent analysis.
 
 ## Full Guide
 

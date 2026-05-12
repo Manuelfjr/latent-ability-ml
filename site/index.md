@@ -6,7 +6,7 @@ lead: A browsable workshop site for the latent-ability-aware evaluation material
 permalink: /
 ---
 
-The workshop now progresses through four connected blocks. The opening block joins supervised evaluation with Binary IRT and 2PL: first we see that examples are not equally difficult, then we introduce a latent language for ability, difficulty, and discrimination. From there, the workshop moves to Beta4-IRT, unsupervised evaluation, and finally CLAIRE.
+The workshop now progresses through three connected blocks. The opening block joins supervised evaluation with Binary IRT and 2PL: first we see that examples are not equally difficult, then we introduce a latent language for ability, difficulty, and discrimination. From there, the workshop moves to Beta4-IRT, and the final block begins with unsupervised evaluation before folding that intuition directly into CLAIRE.
 
 ## Workshop Structure
 
@@ -29,15 +29,7 @@ The workshop now progresses through four connected blocks. The opening block joi
   </div>
   <div class="card">
     <h3>Section 3</h3>
-    <p>Unsupervised evaluation and the limitation of treating all clustering instances as equally difficult.</p>
-    <div class="button-row">
-      <a class="button" href="{{ '/section-4/' | relative_url }}">Open section</a>
-      <a class="button secondary" href="{{ '/section-4-activity/' | relative_url }}">Open activity</a>
-    </div>
-  </div>
-  <div class="card">
-    <h3>Section 4</h3>
-    <p>CLAIRE, agreement-based response matrices, and latent evaluation of clustering models.</p>
+    <p>CLAIRE, starting from unsupervised disagreement and ending with agreement-based latent evaluation of clustering models.</p>
     <div class="button-row">
       <a class="button" href="{{ '/section-5/' | relative_url }}">Open section</a>
       <a class="button secondary" href="{{ '/section-5-activity/' | relative_url }}">Open activity</a>
@@ -51,7 +43,7 @@ A realistic way to run this workshop in a `3-hour` slot is to group the material
 
 1. `Section 1`: supervised evaluation as motivation, then Binary IRT and 2PL.
 2. `Section 2`: Beta4-IRT as the bounded-response extension.
-3. `Sections 3 and 4`: unsupervised evaluation first, then CLAIRE as the agreement-based latent framework.
+3. `Section 3`: a CLAIRE block that opens with unsupervised evaluation and then turns agreement into the latent framework.
 
 For each block, keep the same classroom cadence:
 
@@ -63,7 +55,7 @@ That gives:
 
 - `1 hour` for supervised evaluation plus Binary IRT and 2PL
 - `1 hour` for Beta4-IRT
-- `1 hour` for unsupervised evaluation plus CLAIRE
+- `1 hour` for the integrated CLAIRE block
 
 Total estimated duration: `3 hours`.
 

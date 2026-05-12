@@ -20,14 +20,6 @@
       url: /section-3-activity/
     - title: Answer
       url: /section-3-answer/
-- title: Unsupervised Evaluation
-  children:
-    - title: Overview
-      url: /section-4/
-    - title: Activity
-      url: /section-4-activity/
-    - title: Answer
-      url: /section-4-answer/
 - title: CLAIRE
   children:
     - title: Overview

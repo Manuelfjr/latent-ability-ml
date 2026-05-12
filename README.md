@@ -26,16 +26,14 @@ This repository is meant to be useful in two ways:
 
 ## Workshop Arc
 
-The workshop is divided into four connected sections:
+The workshop is divided into three connected sections:
 
 1. `Supervised Evaluation + Binary IRT and 2PL`
    We begin with familiar supervised evaluation to show that aggregate scores can hide meaningful variation across examples. Once local variation is visible, binary IRT provides a language for describing it more explicitly. We introduce ability, difficulty, and discrimination, and use ICCs to make those concepts concrete.
 2. `Beta4-IRT`
-   The third section asks what changes when responses are not binary. Beta4-IRT keeps the latent perspective but adapts it to bounded responses, allowing richer summaries and recovery experiments.
-3. `Unsupervised Evaluation`
-   We then leave supervised labels behind and ask how evaluation works when clustering models disagree. The main point is that instance-level difficulty does not disappear simply because the setting is unsupervised.
-4. `CLAIRE`
-   The final section reframes the problem around agreement-based response matrices. CLAIRE uses model agreement across instances to recover latent structure in a setting where correctness is not directly observed.
+   The second section asks what changes when responses are not binary. Beta4-IRT keeps the latent perspective but adapts it to bounded responses, allowing richer summaries and recovery experiments.
+3. `CLAIRE`
+   The final section now begins with unsupervised evaluation as a geometric and agreement-based bridge, then reframes the problem around response matrices. CLAIRE uses model agreement across instances to recover latent structure in a setting where correctness is not directly observed.
 
 ## Suggested Rhythm
 
@@ -43,7 +41,7 @@ For a `3-hour` workshop, the material works best when it is delivered in three l
 
 1. supervised evaluation plus `Binary IRT and 2PL`
 2. `Beta4-IRT`
-3. `Unsupervised Evaluation` plus `CLAIRE`
+3. `CLAIRE`, opening with unsupervised evaluation and then moving into the agreement-based latent workflow
 
 For each block, keep the same cadence:
 
@@ -55,7 +53,7 @@ This gives:
 
 - `1 hour` for supervised evaluation plus Binary IRT and 2PL
 - `1 hour` for Beta4-IRT
-- `1 hour` for unsupervised evaluation plus CLAIRE
+- `1 hour` for the integrated CLAIRE block
 
 Total estimated duration: `3 hours`.
 
@@ -81,18 +79,18 @@ The supervised notebook is no longer a separate public activity block. It is the
 - `notebooks/03_01_activities.ipynb`
 - `notebooks/03_02_answer.ipynb`
 
-### 3. Unsupervised Evaluation
+### 3. CLAIRE
 
 - `notebooks/04_00_unsupervised_evaluation_toy_problems.ipynb`
-- `notebooks/04_01_activities.ipynb`
-- `notebooks/04_02_answer.ipynb`
-
-### 4. CLAIRE
-
 - `notebooks/05_00_claire.ipynb`
 - `notebooks/05_01_extra_negative_disc.ipynb`
 - `notebooks/05_02_activities.ipynb`
 - `notebooks/05_03_answer.ipynb`
+
+The unsupervised notebook is now treated as the opening bridge inside the CLAIRE block rather than as a standalone public section in the main site flow. The old standalone unsupervised activity and answer notebooks are still available if you want an extra exercise:
+
+- `notebooks/04_01_activities.ipynb`
+- `notebooks/04_02_answer.ipynb`
 
 ## How To Use This Repository
 

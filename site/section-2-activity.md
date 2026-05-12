@@ -116,7 +116,7 @@ Inside the browser notebook editor, hovering one of these helper names now shows
     },
     {
       "label": "Task 2",
-      "lead": "Change difficulty and see how the location of the curve moves.",
+      "lead": "Select instances with different difficulties and see how the location of the curve moves.",
       "code": "# answer\n",
       "hints": [
         "Difficulty mainly shifts the curve left or right along the ability axis.",
@@ -125,7 +125,7 @@ Inside the browser notebook editor, hovering one of these helper names now shows
     },
     {
       "label": "Task 3",
-      "lead": "Change discrimination and compare sharper and flatter ICCs.",
+      "lead": "The same from the task 2, but consider the discrimination and compare the ICCs.",
       "code": "# answer\n",
       "hints": [
         "Discrimination changes the steepness of the transition region more than the general location.",
