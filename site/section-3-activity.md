@@ -2,47 +2,42 @@
 layout: default
 title: Activity
 eyebrow: Activity Notebook
-lead: Participants simulate a synthetic setting, build a bounded response matrix, fit Beta4-IRT, and interpret the resulting latent quantities.
+lead: Participants generate a synthetic Beta4 `pij`, inspect ICCs for specific instances, train Beta4, and check parameter recovery.
 permalink: /section-3-activity/
 ---
 
 ## Browser Lab
 
-This page includes executable Python cells directly in the site. When a notebook backend is available, `birt` can be imported here; otherwise the page falls back to the pure-Python workshop helpers and the Colab notebook remains the companion environment.
+This page includes executable Python cells directly in the site. You can construct the synthetic `pij` matrix and inspect ICCs directly in the browser runtime. When a notebook backend is connected, `from birt import Beta4` is also available so the same page can train Beta4 and check parameter recovery.
 
 ## Shared Helpers You Can Use
 
-The activity notebook, Colab, and the in-page runtime can all use the same shared helpers. This section is designed so that you can mix the latent-response helpers with the partition-to-response-matrix utilities.
+The activity notebook, Colab, and the in-page runtime can all use the same shared helpers. This section is designed to keep the focus on Beta4 itself: latent parameter sampling, bounded-response construction, ICC interpretation, and recovery.
 
 ```python
 from utils.handson import (
-    evaluate_clustering_models_on_dataset,
-    get_default_clustering_models,
-    make_beta4_item_bank,
-    make_toy_clustering_dataset,
-    plot_beta4_iccs,
+    beta4_expected_response,
+    plot_beta4_family,
 )
-from utils.transform import TransformPairwise
 ```
 
-- `make_toy_clustering_dataset` creates a small clustering problem that you can adapt before building bounded responses.
-- `get_default_clustering_models` and `evaluate_clustering_models_on_dataset` help you generate a compact pool of partitions for the activity.
-- `make_beta4_item_bank` and `plot_beta4_iccs` let you inspect Beta4 item behavior without rebuilding the plotting code from scratch.
-- `TransformPairwise` converts model partitions into the `pij` matrix that you can pass to the rest of the Beta4 workflow.
+- `beta4_expected_response` lets you evaluate ICCs from specific Beta4 parameters.
+- `plot_beta4_family` is useful when you want to compare several Beta4 parameter settings quickly.
+- When the backend is connected, `from birt import Beta4` is available for the training and recovery steps.
 
 Inside the browser notebook editor, hovering one of these helper names now shows its docstring.
 
 ## Notebook
 
 - Activity notebook: `03_01_activities.ipynb`
-- Goal: inspect Beta4-IRT before moving to agreement-based evaluation
+- Goal: understand Beta4 as a bounded-response model before the workshop moves to agreement-based evaluation
 
 ## What Participants Should Do
 
-- generate a synthetic dataset with medium to high variability;
-- train a small pool of clustering models;
-- build the bounded response matrix `pij`;
-- fit Beta4-IRT and inspect the resulting latent quantities.
+- generate a synthetic bounded-response matrix `pij` from the parameter distributions shown in the section;
+- generate ICCs for specific instances, such as the easiest and the hardest;
+- train Beta4 on the synthetic `pij` and recover the latent parameters;
+- compare the original and estimated parameters, especially through recovery plots such as `theta_i` versus `theta_i_hat`.
 
 <div class="button-row">
   <a class="button" href="{{ site.repo_url }}/blob/main/notebooks/03_01_activities.ipynb">Open activity notebook</a>
@@ -54,14 +49,19 @@ Inside the browser notebook editor, hovering one of these helper names now shows
   <script type="application/json" class="browser-notebook__seed">
 {
   "title": "Section 3 browser notebook",
-  "lead": "Simulate bounded responses in the page, then inspect the Beta4 latent quantities.",
+  "lead": "Construct a synthetic Beta4 `pij`, inspect ICCs for specific instances, and train Beta4 when the backend is available.",
   "packages": ["numpy", "pandas", "matplotlib", "scipy", "scikit-learn", "micropip"],
   "micropipPackages": ["seaborn", "plotly", "statsmodels", "openpyxl"],
   "pythonFiles": [
     {"url": "{{ '/assets/python/utils/transform.py' | relative_url }}", "path": "utils/transform.py"},
     {"url": "{{ '/assets/python/utils/handson.py' | relative_url }}", "path": "utils/handson.py"}
   ],
-  "browserNote": "When a notebook backend is connected, imports such as `from birt import Beta4` are available. In both modes, students can also use numpy, pandas, matplotlib, seaborn, plotly, statsmodels, openpyxl, and the workshop helpers. Without the backend, keep the pure-Python helpers and use Colab for the full Beta4 fitting pipeline.",
+  "browserNote": "You can construct the synthetic `pij` matrix and inspect ICCs directly in the browser runtime. When a notebook backend is connected, `from birt import Beta4` is available for the training and recovery steps. Without it, use Colab for the fitting stage.",
+  "quickInserts": [
+    {"id": "beta4-imports", "label": "Insert Beta4 starter", "description": "Starter imports for simulation and fitting.", "code": "import numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nfrom utils.handson import beta4_expected_response, plot_beta4_family\nfrom birt import Beta4\n"},
+    {"id": "beta4-latent-sampler", "label": "Insert latent sampler", "description": "Sample theta, delta, and a from the section distributions.", "code": "rng = np.random.default_rng(7)\nn_models = 10\nn_items = 120\nsigma0 = 1.0\ntheta_true = rng.beta(1, 1, size=n_models)\ndelta_true = rng.beta(1, 1, size=n_items)\na_true = rng.normal(loc=1.0, scale=sigma0, size=n_items)\na_true = np.where(np.abs(a_true) < 0.05, np.sign(a_true) * 0.05 + (a_true == 0) * 0.05, a_true)\ntau_true = np.sign(a_true)\nomega_true = np.abs(a_true)\n"},
+    {"id": "beta4-recovery-plot", "label": "Insert recovery plot", "description": "Scatter true versus estimated parameters.", "code": "fig, ax = plt.subplots(figsize=(5, 5))\nax.scatter(theta_true, theta_hat, alpha=0.8)\nax.plot([0, 1], [0, 1], linestyle='--', color='black')\nax.set_xlabel('theta_true')\nax.set_ylabel('theta_hat')\nax.set_title('Ability recovery')\nax.spines[['top', 'right']].set_visible(False)\nplt.show()\n"}
+  ],
   "sliderDemos": [
     {
       "id": "beta4-curve-lab",
@@ -79,38 +79,38 @@ Inside the browser notebook editor, hovering one of these helper names now shows
   "cells": [
     {
       "label": "Task 1",
-      "lead": "Generate a synthetic dataset with medium to high variability.",
+      "lead": "Generate a synthetic bounded-response matrix `pij` from the latent parameter distributions.",
       "code": "# answer\n",
       "hints": [
-        "Keep the geometry simple enough to visualize, but add enough overlap or variability to make the latent structure interesting.",
-        "A medium-to-high variability setting is more informative if different models do not all behave identically."
+        "Use the distributions shown in the section: sample `theta_i` and `delta_j` from Beta laws and sample effective discrimination from a Normal law.",
+        "After sampling the latent quantities, build `alpha_ij`, `beta_ij`, and the bounded-response matrix `pij`."
       ]
     },
     {
       "label": "Task 2",
-      "lead": "Train a small pool of clustering models.",
+      "lead": "Generate ICCs for specific instances, such as the easiest and the hardest.",
       "code": "# answer\n",
       "hints": [
-        "The pool should contain models with different inductive biases so disagreement becomes meaningful.",
-        "Store each partition in a form that you can later turn into a model-by-instance response matrix."
+        "Use the true item parameters to identify the easiest and hardest instances before plotting.",
+        "A useful comparison is to plot both ICCs on the same latent ability grid and interpret the contrast."
       ]
     },
     {
       "label": "Task 3",
-      "lead": "Generate the bounded response matrix `pij`.",
+      "lead": "Train Beta4 on the synthetic `pij` and recover the latent parameters.",
       "code": "# answer\n",
       "hints": [
-        "The matrix should contain values in (0, 1), not just binary outcomes.",
-        "Think of each row as a model and each column as an item before fitting Beta4."
+        "When the backend is connected, import `Beta4` from `birt` and fit it on the matrix you constructed.",
+        "Keep the true parameters around so you can compare them with the fitted estimates afterward."
       ]
     },
     {
       "label": "Task 4",
-      "lead": "Fit Beta4-IRT and inspect abilities, difficulties, and discriminations.",
+      "lead": "Check whether the recovery succeeded and visualize true versus estimated parameters.",
       "code": "# answer\n",
       "hints": [
-        "If the backend is connected, you can import `Beta4` directly from `birt`.",
-        "After fitting, compare the resulting latent quantities with what you expected from the synthetic construction."
+        "Start with a recovery plot such as `theta_i` versus `theta_i_hat` and add the diagonal as a reference line.",
+        "If possible, repeat the same logic for difficulty and discrimination so you can judge recovery more broadly."
       ]
     }
   ]

@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="/assets/icon_bristol.png" />
     <meta property="og:title" content="Supervised Evaluation | Latent Ability" />
     <meta property="og:description" content="Browsable workshop site with section notes, activities, and answers for latent-ability-aware evaluation in machine learning." />
-    <meta property="og:image" content="http://localhost:4000/assets/icon_bristol.png" />
+    <meta property="og:image" content="http://127.0.0.1:4000/assets/icon_bristol.png" />
     <meta property="og:type" content="website" />
     <link rel="stylesheet" href="/assets/css/style.css" />
     <script>
@@ -745,8 +745,8 @@
   <script>
     (() => {
       const analyticsEnabled = Boolean(true);
-      const defaultAnalyticsApiUrls = Array.isArray(["https://manuelfjr-latent-ability-backend.hf.space"])
-        ? ["https://manuelfjr-latent-ability-backend.hf.space"]
+      const defaultAnalyticsApiUrls = Array.isArray(["http://127.0.0.1:8765"])
+        ? ["http://127.0.0.1:8765"]
         : [];
 
       const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/$/, '');
@@ -799,8 +799,8 @@
       const widgets = Array.from(document.querySelectorAll('.browser-notebook'));
       if (!widgets.length) return;
 
-      const defaultRuntimeApiUrls = Array.isArray(["https://manuelfjr-latent-ability-backend.hf.space"])
-        ? ["https://manuelfjr-latent-ability-backend.hf.space"]
+      const defaultRuntimeApiUrls = Array.isArray(["http://127.0.0.1:8765"])
+        ? ["http://127.0.0.1:8765"]
         : [];
       const notebookShareEmail = "ferreira.jr.ufpb@gmail.com";
       const analytics = window.__workshopAnalytics || { enabled: false, track: async () => {} };
