@@ -1,126 +1,112 @@
 # Workshop Backend
 
-This directory contains an isolated Python backend for executing notebook cells outside GitHub Pages.
+Python backend that runs the workshop site's notebook cells with the full project
+environment (`birt-gd`, `utils`, the notebooks helpers). The site tries it first and
+falls back to the in-browser Pyodide runtime when it is unreachable.
 
-## What it does
+## How it works
 
-- exposes a small JSON API for code execution;
-- keeps a Python session per `session_id`;
-- captures `stdout`, `stderr`, and matplotlib figures;
-- reuses the project environment, including `utils`, `src`, notebooks helpers, and `birt-gd` when available.
+```text
+site (GitHub Pages) ──HTTP/JSON──▶ backend.app (ThreadingHTTPServer)
+                                      │
+                                      └─ backend.sessions.SessionManager
+                                           ├─ worker process for tab A:notebook   (backend.worker)
+                                           ├─ worker process for tab B:notebook
+                                           └─ …  (at most WORKSHOP_MAX_WORKERS)
+```
+
+- **One Python process per session** (`session_id` = browser tab + notebook). Output,
+  figures and variables never mix between participants.
+- **Time limit per cell.** When a cell runs past `WORKSHOP_EXECUTION_TIMEOUT`, it is
+  interrupted (`KeyboardInterrupt`) and the session **keeps its variables**. If it does
+  not stop, the worker is killed and the participant gets a clear message.
+- **Idle sessions close** after `WORKSHOP_SESSION_IDLE_MINUTES`. When the pool is full,
+  the least recently used idle session gives up its slot. Either way, the participant's
+  next cell starts a fresh session and the output explains that earlier cells must be
+  re-run.
+- **Secrets stay out of user code.** Variables that look like credentials
+  (`*PASSWORD*`, `*TOKEN*`, `WORKSHOP_ADMIN_*`, …) are read at start-up and then
+  removed from the environment before any worker starts.
+- Rich output: trailing expressions and `display(...)` render pandas tables and Plotly
+  figures as HTML, matplotlib figures (including `plt.show()`) as PNG.
+
+Memory guide: a worker uses ~100 MB, or ~500 MB once it imports `birt` (TensorFlow).
+The defaults (20 workers) fit the free Hugging Face CPU tier (16 GB) for ~30 people.
 
 ## Endpoints
 
-- `GET /health`
-- `POST /session/init`
-- `POST /session/reset`
-- `POST /execute`
-- `DELETE /session?session_id=...`
+| Method | Path | Purpose |
+|---|---|---|
+| `GET` | `/health` | Status and session counts |
+| `POST` | `/session/init` | Start a fresh session (`session_id`, optional `initial_code`) |
+| `POST` | `/session/reset` | Same as init: fresh namespace |
+| `POST` | `/execute` | Run `code` → `{success, stdout, stderr, figures, html}` |
+| `DELETE` | `/session?session_id=…` | Close a session |
+| `POST` | `/analytics/event` | Record a usage event (only when analytics are enabled) |
+| `GET` | `/admin` | Admin dashboard (Basic auth) |
+| `GET` | `/admin/api/events`, `/admin/api/sessions` | Same data as JSON (Basic auth) |
+
+## Configuration
+
+| Variable | Default | |
+|---|---|---|
+| `WORKSHOP_BACKEND_HOST` / `WORKSHOP_BACKEND_PORT` | `0.0.0.0` / `8765` | HF uses `PORT=7860` |
+| `WORKSHOP_BACKEND_ALLOW_ORIGIN` | `*` | Comma-separated list, e.g. `https://manuelfjr.github.io` |
+| `WORKSHOP_MAX_WORKERS` | `20` | Simultaneous Python sessions |
+| `WORKSHOP_SESSION_IDLE_MINUTES` | `20` | Idle time before a session closes |
+| `WORKSHOP_EXECUTION_TIMEOUT` | `180` | Seconds per cell |
+| `WORKSHOP_WORKER_START_TIMEOUT` | `120` | Seconds to start a worker and run `initial_code` |
+| `WORKSHOP_MAX_REQUEST_BYTES` | `1000000` | Request body limit |
+| `WORKSHOP_ENABLE_ADMIN_ANALYTICS` | `false` | Turns on `/analytics/event` and `/admin` |
+| `WORKSHOP_ADMIN_USERNAME` / `WORKSHOP_ADMIN_PASSWORD` | — | Admin credentials |
+| `WORKSHOP_ANALYTICS_FILE` | `backend/data/analytics.jsonl` | Event log (keeps the last `WORKSHOP_ANALYTICS_MAX_ROWS`, default 500) |
+
+Locally, the run scripts load `backend/.env` (start from `backend/.env.example`; it is
+git-ignored). On Hugging Face, set these in the Space settings → *Variables and secrets*.
 
 ## Run locally
 
 ```bash
-poetry run python -m backend.app
+./backend/run_local.sh                       # backend on http://127.0.0.1:8765
+poetry run python -m backend.smoke_test      # end-to-end checks against it
 ```
 
-By default the backend listens on `0.0.0.0:8765`.
-
-## Useful environment variables
-
-- `WORKSHOP_BACKEND_HOST`
-- `WORKSHOP_BACKEND_PORT`
-- `WORKSHOP_BACKEND_ALLOW_ORIGIN`
-- `WORKSHOP_ENABLE_ADMIN_ANALYTICS`
-- `WORKSHOP_ADMIN_USERNAME`
-- `WORKSHOP_ADMIN_PASSWORD`
-- `WORKSHOP_ANALYTICS_FILE`
-
-## Local `.env`
-
-For local development, the backend scripts automatically load `backend/.env` if it exists.
-
-Start from the example:
+Serve the site against the local backend:
 
 ```bash
-cp backend/.env.example backend/.env
+RBENV_VERSION=3.2.2 jekyll serve --source site --config site/_config.yml,site/_config.local.yml --host 127.0.0.1 --port 4000
 ```
 
-Then edit the credentials and flags there. The `.env` file is ignored by Git.
-
-Example:
+### Admin dashboard preview
 
 ```bash
-WORKSHOP_BACKEND_HOST=0.0.0.0 \
-WORKSHOP_BACKEND_PORT=8765 \
-WORKSHOP_BACKEND_ALLOW_ORIGIN="https://manuelfjr.github.io" \
-poetry run python -m backend.app
+./backend/run_preview.sh                     # http://127.0.0.1:8765/admin
+PREVIEW_PORT=8766 ./backend/run_preview.sh   # another port
 ```
 
-To enable the private admin route locally:
+It fills `backend/data/demo-analytics.jsonl` with sample events and enables the admin
+route (credentials from `backend/.env`, or `admin` / `preview`).
+
+## Deploy to Hugging Face
+
+`main` is the source of truth; the `hf-backend` branch is what the Space builds
+(it carries the Space README/metadata and the backend runtime files only).
 
 ```bash
-WORKSHOP_ENABLE_ADMIN_ANALYTICS=true
-WORKSHOP_ADMIN_USERNAME=admin
-WORKSHOP_ADMIN_PASSWORD=change-me
+git commit ...                                # commit on main first
+./backend/sync_hf_space.sh                    # copy backend/utils/notebooks/... into hf-backend and commit
+./backend/sync_hf_space.sh --push             # …and push to the Space (hf/main)
+poetry run python -m backend.smoke_test https://manuelfjr-latent-ability-backend.hf.space --quick
 ```
 
-The route will then be available at:
+## Cluster deployment
 
-```text
-http://127.0.0.1:8765/admin
-```
+Run `./backend/run_cluster.sh` inside `tmux`/`screen`, expose it over HTTPS (reverse
+proxy or SSH tunnel), then point the site to it by layering a copy of
+`site/_config.cluster.example.yml` on top of `site/_config.yml`.
 
-## Cluster-oriented deployment idea
+## Limits worth knowing
 
-On a cluster accessed by SSH, a practical first step is:
-
-1. clone the repository on the cluster;
-2. create the Poetry environment;
-3. start the backend inside `tmux` or `screen`;
-4. expose the service through the institution's reverse proxy or an SSH tunnel;
-5. point the workshop site to the backend URL.
-
-Example with `tmux`:
-
-```bash
-tmux new -s latent-runtime
-cd /path/to/latent-ability-ml
-poetry install
-WORKSHOP_BACKEND_HOST=0.0.0.0 WORKSHOP_BACKEND_PORT=8765 poetry run python -m backend.app
-```
-
-Then use your cluster ingress or a reverse proxy to publish the endpoint safely over HTTPS.
-
-## Site integration
-
-### Local development
-
-Start the backend:
-
-```bash
-./backend/run_local.sh
-```
-
-Start the site with the local backend config:
-
-```bash
-RBENV_VERSION=3.2.2 /Users/manuelfjr/.rbenv/versions/3.2.2/bin/jekyll serve --source site --config site/_config.yml,site/_config.local.yml --host 127.0.0.1 --port 4000
-```
-
-### Cluster deployment
-
-1. Run the backend on the cluster with `./backend/run_cluster.sh`.
-2. Expose it over HTTPS.
-3. Copy `site/_config.cluster.example.yml` to a real config file and set the cluster URL.
-4. Build or serve Jekyll with that extra config layered on top of `site/_config.yml`.
-
-### Hugging Face / production
-
-For Hugging Face or any production deployment, do not rely on a checked-in `.env`.
-Set the credentials and flags through the platform secrets / environment configuration instead:
-
-- `WORKSHOP_ENABLE_ADMIN_ANALYTICS=true`
-- `WORKSHOP_ADMIN_USERNAME=...`
-- `WORKSHOP_ADMIN_PASSWORD=...`
-
-This keeps the admin route protected without exposing credentials in the repository.
+Workers run as the same OS user as the server. They cannot read its secrets, but they
+can read files the server can read and could signal it. This is fine for a workshop,
+not a hostile multi-tenant sandbox.

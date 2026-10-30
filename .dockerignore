@@ -10,3 +10,6 @@ docs
 assets
 README.md
 poetry.lock
+backend/.env
+backend/data
+site

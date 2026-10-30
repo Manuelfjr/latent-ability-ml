@@ -16,3 +16,5 @@ site/.env.*
 *99*.ipynb
 *99*
 *.
+
+backend/data/
