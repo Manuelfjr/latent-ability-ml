@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Redirecting…</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href="{{ page.redirect_to | absolute_url }}" />
+    <meta http-equiv="refresh" content="0; url={{ page.redirect_to | relative_url }}" />
+    <script>
+      // Keep ?query and #anchor so old shared links land on the same spot.
+      location.replace("{{ page.redirect_to | relative_url }}" + location.search + location.hash);
+    </script>
+  </head>
+  <body>
+    <p>This page moved to <a href="{{ page.redirect_to | relative_url }}">{{ page.redirect_to | relative_url }}</a>.</p>
+  </body>
+</html>

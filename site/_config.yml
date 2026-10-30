@@ -9,4 +9,17 @@ repo_url: https://github.com/manuelfjr/latent-ability-ml
 
 notebook_runtime_api_urls:
   - "https://manuelfjr-latent-ability-backend.hf.space"
-admin_analytics_enabled: false
+admin_analytics_enabled: true
+
+# Root (/) and the pre-edition URLs redirect here.
+default_edition: bristol
+defaults:
+  - scope:
+      path: "bristol"
+    values:
+      edition: bristol
+  - scope:
+      path: "ita"
+    values:
+      edition: ita
+      layout: ita

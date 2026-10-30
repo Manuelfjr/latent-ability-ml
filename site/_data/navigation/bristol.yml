@@ -1,0 +1,38 @@
+- title: Home
+  url: /bristol/
+- title: Guide
+  url: /bristol/readme/
+- title: Roadmap
+  url: /bristol/roadmap/
+- title: Supervised Evaluation + IRT
+  children:
+    - title: Overview
+      url: /bristol/section-2/
+    - title: Activity
+      url: /bristol/section-2-activity/
+    - title: Answer
+      url: /bristol/section-2-answer/
+- title: Beta4-IRT
+  children:
+    - title: Overview
+      url: /bristol/section-3/
+    - title: Activity
+      url: /bristol/section-3-activity/
+    - title: Answer
+      url: /bristol/section-3-answer/
+- title: CLAIRE
+  children:
+    - title: Overview
+      url: /bristol/section-5/
+    - title: Extra
+      url: /bristol/section-5-extra/
+    - title: Activity
+      url: /bristol/section-5-activity/
+    - title: Answer
+      url: /bristol/section-5-answer/
+- title: References
+  url: /bristol/references/
+- title: Authors
+  url: /bristol/authors/
+- title: Contact me
+  url: /bristol/contact/

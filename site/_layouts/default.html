@@ -1,15 +1,21 @@
+{%- assign edition_key = page.edition | default: site.default_edition -%}
+{%- assign edition = site.data.editions[edition_key] -%}
+{%- assign navigation = site.data.navigation[edition_key] -%}
+{%- capture page_title -%}{% if page.url == edition.home %}{{ site.title }} · {{ edition.name }}{% else %}{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}{% endif %}{%- endcapture -%}
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% if page.url == '/' %}{{ site.title }}{% else %}{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}{% endif %}</title>
+    <title>{{ page_title }}</title>
     <meta name="description" content="{{ site.description }}" />
-    <link rel="icon" type="image/png" href="{{ '/assets/icon_bristol.png' | relative_url }}" />
-    <link rel="apple-touch-icon" href="{{ '/assets/icon_bristol.png' | relative_url }}" />
-    <meta property="og:title" content="{% if page.url == '/' %}{{ site.title }}{% else %}{% if page.title %}{{ page.title }} | {% endif %}{{ site.title }}{% endif %}" />
+    {% if edition.logo != "" %}
+    <link rel="icon" type="image/png" href="{{ edition.logo | relative_url }}" />
+    <link rel="apple-touch-icon" href="{{ edition.logo | relative_url }}" />
+    <meta property="og:image" content="{{ edition.logo | absolute_url }}" />
+    {% endif %}
+    <meta property="og:title" content="{{ page_title }}" />
     <meta property="og:description" content="{{ site.description }}" />
-    <meta property="og:image" content="{{ '/assets/icon_bristol.png' | absolute_url }}" />
     <meta property="og:type" content="website" />
     <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
     <script>
@@ -30,13 +36,17 @@
       <aside class="sidebar">
         <div class="sidebar-brand">
           <div class="sidebar-brand-top">
-            <a href="https://www.bristol.ac.uk/" target="_blank" rel="noreferrer">
+            {% if edition.logo != "" %}
+            <a href="{{ edition.logo_url }}" target="_blank" rel="noreferrer">
               <img
-                src="{{ '/assets/icon_bristol.png' | relative_url }}"
-                alt="University of Bristol"
+                src="{{ edition.logo | relative_url }}"
+                alt="{{ edition.logo_alt }}"
                 class="sidebar-logo"
               />
             </a>
+            {% else %}
+            <a href="{{ edition.home | relative_url }}" class="sidebar-edition">{{ edition.name }}</a>
+            {% endif %}
             <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Collapse sidebar" aria-expanded="true">
               <span></span>
               <span></span>
@@ -48,7 +58,7 @@
         </div>
 
         <nav class="sidebar-nav" aria-label="Workshop navigation">
-          {% for item in site.data.navigation %}
+          {% for item in navigation %}
           {% assign has_active_child = false %}
           {% if item.children %}
             {% for child in item.children %}
@@ -375,7 +385,9 @@
         fetch("{{ '/search.json' | relative_url }}")
           .then((response) => response.json())
           .then((data) => {
-            searchIndex = Array.isArray(data) ? data : [];
+            // Only search the edition being viewed (/bristol/ or /ita/).
+            const currentEdition = {{ edition_key | jsonify }};
+            searchIndex = (Array.isArray(data) ? data : []).filter((entry) => !entry.edition || entry.edition === currentEdition);
             if (input.value.trim()) {
               renderSuggestions(input.value.trim());
             }
@@ -468,6 +480,18 @@
       const normalizeBaseUrl = (url) => String(url || '').trim().replace(/\/$/, '');
       const analyticsApiUrls = defaultAnalyticsApiUrls.map(normalizeBaseUrl).filter(Boolean);
 
+      // Same per-tab id the notebook runtime uses, so the admin view can count visitors.
+      let tabSessionId = '';
+      try {
+        tabSessionId = sessionStorage.getItem('browser-notebook:tab-session-id') || '';
+        if (!tabSessionId) {
+          tabSessionId = `tab-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+          sessionStorage.setItem('browser-notebook:tab-session-id', tabSessionId);
+        }
+      } catch (_) {
+        // Storage can be blocked; analytics then simply has no tab id.
+      }
+
       const track = async (eventType, payload = {}) => {
         if (!analyticsEnabled || !analyticsApiUrls.length) return;
         const body = JSON.stringify({
@@ -481,6 +505,7 @@
           viewport_height: window.innerHeight,
           screen_width: window.screen?.width || '',
           screen_height: window.screen?.height || '',
+          session_id: tabSessionId,
           ...payload,
         });
 
@@ -642,38 +667,57 @@ import ast
 import base64
 import io
 import traceback
+import warnings
 from contextlib import redirect_stdout, redirect_stderr
 NOTEBOOK_CONTEXTS = {}
+_DISPLAY_HTML = []
+warnings.filterwarnings('ignore', message='.*non-interactive.*')
+
+def display(*values):
+    # Same behaviour as the Python backend: rich HTML when available, repr otherwise.
+    for value in values:
+        if value is None:
+            continue
+        html = _collect_html_outputs(value)
+        if html:
+            _DISPLAY_HTML.extend(html)
+        else:
+            print(repr(value))
+
+def _new_context():
+    return {'__builtins__': __builtins__, '__name__': '__main__', 'display': display}
 
 def init_notebook_context(notebook_id, initial_code=''):
-    ctx = {'__builtins__': __builtins__}
+    ctx = _new_context()
     NOTEBOOK_CONTEXTS[notebook_id] = ctx
     if initial_code and initial_code.strip():
         exec(initial_code, ctx, ctx)
     return True
 
 def _collect_html_outputs(value):
-    if value is None:
+    if value is None or isinstance(value, type):
         return []
-    try:
-        module_name = value.__class__.__module__
-    except Exception:
-        return []
-    if not module_name.startswith('plotly'):
-        return []
-    if not hasattr(value, 'to_html'):
-        return []
-    try:
-        return [value.to_html(include_plotlyjs='cdn', full_html=False)]
-    except Exception:
-        return []
+    module_name = getattr(value.__class__, '__module__', '') or ''
+    if module_name.startswith('plotly') and hasattr(value, 'to_html'):
+        try:
+            return [value.to_html(include_plotlyjs='cdn', full_html=False)]
+        except Exception:
+            return []
+    repr_html = getattr(value, '_repr_html_', None)
+    if callable(repr_html):
+        try:
+            html = repr_html()
+        except Exception:
+            return []
+        return [html] if isinstance(html, str) and html else []
+    return []
 
 def run_notebook_cell(notebook_id, user_code):
-    ctx = NOTEBOOK_CONTEXTS.setdefault(notebook_id, {'__builtins__': __builtins__})
+    ctx = NOTEBOOK_CONTEXTS.setdefault(notebook_id, _new_context())
+    _DISPLAY_HTML.clear()
     stdout_buffer = io.StringIO()
     stderr_buffer = io.StringIO()
     figures = []
-    html_outputs = []
     success = True
     try:
         tree = ast.parse(user_code, mode='exec')
@@ -686,11 +730,7 @@ def run_notebook_cell(notebook_id, user_code):
         with redirect_stdout(stdout_buffer), redirect_stderr(stderr_buffer):
             exec(compiled_exec, ctx, ctx)
             if compiled_expr is not None:
-                last_value = eval(compiled_expr, ctx, ctx)
-                if last_value is not None:
-                    html_outputs = _collect_html_outputs(last_value)
-                    if not html_outputs:
-                        print(last_value)
+                display(eval(compiled_expr, ctx, ctx))
     except Exception:
         success = False
         stderr_buffer.write(traceback.format_exc())
@@ -713,7 +753,7 @@ def run_notebook_cell(notebook_id, user_code):
         'stdout': stdout_buffer.getvalue(),
         'stderr': stderr_buffer.getvalue(),
         'figures': figures,
-        'html': html_outputs,
+        'html': list(_DISPLAY_HTML),
     }
           `);
           runtimeState.pyodide = pyodide;
@@ -825,6 +865,7 @@ exec(module_source, module.__dict__)
           id: cell.id || `cell-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
           label: cell.label || `Cell ${index + 1}`,
           lead: cell.lead || 'Use this cell as scratch space during the activity.',
+          question: typeof cell.question === 'string' ? cell.question : '',
           code: typeof cell.code === 'string' ? cell.code : seedCode,
           seedCode,
           hints: Array.isArray(cell.hints) ? cell.hints.filter(Boolean) : [],
@@ -915,6 +956,9 @@ exec(module_source, module.__dict__)
         '"': '&quot;',
         "'": '&#39;',
       }[character]));
+
+      // Escaped text with `inline code` rendered as <code>.
+      const formatInline = (value) => escapeHtml(value).replace(/`([^`]+)`/g, '<code>$1</code>');
 
       const fetchPythonSource = async (file) => {
         if (!file || !file.url || !file.path) return '';
@@ -1241,7 +1285,7 @@ exec(module_source, module.__dict__)
                   <div>
                     <p class="browser-notebook__cell-label">Interactive lab</p>
                     <h3>${escapeHtml(demo.title)}</h3>
-                    <p class="browser-notebook__cell-lead">${escapeHtml(demo.lead)}</p>
+                    <p class="browser-notebook__cell-lead">${formatInline(demo.lead)}</p>
                   </div>
                   <div class="browser-notebook__demo-actions">
                     <button class="button tiny secondary" type="button" data-action="run-demo">${escapeHtml(demo.buttonLabel)}</button>
@@ -1409,6 +1453,7 @@ exec(module_source, module.__dict__)
                 metadata: {
                   label: cell.label,
                   lead: cell.lead,
+                  question: cell.question,
                   done: cell.done,
                 },
                 execution_count: null,
@@ -1635,7 +1680,7 @@ exec(module_source, module.__dict__)
           list.innerHTML = cell.hints.slice(0, cell.shownHints).map((hint, index) => `
             <div class="browser-notebook__hint-item">
               <strong>Hint ${index + 1}</strong>
-              <p>${escapeHtml(hint)}</p>
+              <p>${formatInline(hint)}</p>
             </div>
           `).join('');
           reveal.textContent = cell.shownHints >= cell.hints.length ? 'All hints shown' : `Show hint ${cell.shownHints + 1}`;
@@ -1889,7 +1934,8 @@ exec(module_source, module.__dict__)
               <div class="browser-notebook__cell-header">
                 <div>
                   <p class="browser-notebook__cell-label">${escapeHtml(cell.label)}</p>
-                  <p class="browser-notebook__cell-lead">${escapeHtml(cell.lead)}</p>
+                  <p class="browser-notebook__cell-lead">${formatInline(cell.lead)}</p>
+                  ${cell.question ? `<p class="browser-notebook__cell-question"><strong>Question</strong> ${formatInline(cell.question)}</p>` : ''}
                 </div>
                 <div class="browser-notebook__cell-actions">
                   ${isTask ? `<button class="button tiny secondary" type="button" data-action="reset-task">Reset task</button>` : ''}
@@ -2153,45 +2199,6 @@ exec(module_source, module.__dict__)
         initializeNotebook().catch(() => {});
       });
     })();
-  </script>
-  <script>
-  (function () {
-    const BACKEND_URL = "https://manuelfjr-latent-ability-backend.hf.space";
-
-    const session_id =
-      localStorage.getItem("sid") || crypto.randomUUID();
-
-    localStorage.setItem("sid", session_id);
-
-    function track(event_type) {
-      fetch(`${BACKEND_URL}/analytics/event`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          event_type: event_type,
-          page: window.location.pathname,
-          title: document.title,
-          session_id: session_id,
-          platform: navigator.platform,
-          language: navigator.language,
-          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-          viewport_width: window.innerWidth,
-          viewport_height: window.innerHeight,
-          screen_width: screen.width,
-          screen_height: screen.height
-        })
-      }).catch(() => {});
-    }
-
-    // evita múltiplos eventos por página
-    if (!sessionStorage.getItem("tracked")) {
-      sessionStorage.setItem("tracked", "1");
-      track("page_view");
-    }
-
-  })();
   </script>
   </body>
 </html>

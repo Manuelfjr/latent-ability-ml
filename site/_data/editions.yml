@@ -1,0 +1,14 @@
+# One entry per event that has its own copy of the site under /<key>/.
+# Pages get `edition` from the folder they live in (see `defaults` in _config.yml).
+bristol:
+  name: Bristol Workshop
+  home: /bristol/
+  logo: /assets/icon_bristol.png
+  logo_alt: University of Bristol
+  logo_url: https://www.bristol.ac.uk/
+ita:
+  name: Tutorial no ITA
+  home: /ita/
+  logo: ""  # add e.g. /assets/icon_ita.png when the approved logo is available
+  logo_alt: Instituto Tecnológico de Aeronáutica
+  logo_url: https://www.ita.br/

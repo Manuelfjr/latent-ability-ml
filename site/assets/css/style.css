@@ -560,6 +560,7 @@ ol {
 }
 
 .site-shell.sidebar-collapsed .sidebar-logo,
+.site-shell.sidebar-collapsed .sidebar-edition,
 .site-shell.sidebar-collapsed .sidebar-title,
 .site-shell.sidebar-collapsed .sidebar-subtitle {
   display: none;
@@ -1086,6 +1087,34 @@ figcaption {
   max-width: 58ch;
 }
 
+.browser-notebook__cell-question {
+  margin: 10px 0 0;
+  padding: 8px 12px;
+  max-width: 58ch;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 10px 10px 0;
+  background: #fbf3f1;
+  color: var(--ink);
+}
+
+.browser-notebook__cell-question strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.browser-notebook__cell-lead code,
+.browser-notebook__cell-question code,
+.browser-notebook__hint-item code {
+  padding: 1px 5px;
+  border-radius: 6px;
+  background: #f1ebe2;
+  font-size: 0.88em;
+}
+
 .browser-notebook__cell-hints {
   padding: 12px 20px 0;
 }
@@ -1378,8 +1407,74 @@ figcaption {
   overflow-x: auto;
 }
 
+.browser-notebook__html-block table.dataframe {
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.browser-notebook__html-block table.dataframe th,
+.browser-notebook__html-block table.dataframe td {
+  padding: 6px 12px;
+  border-bottom: 1px solid #efe7db;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.browser-notebook__html-block table.dataframe thead th {
+  color: var(--muted);
+  font-weight: 600;
+  border-bottom: 1px solid #dfd5c5;
+}
+
+.browser-notebook__html-block table.dataframe tbody tr:hover {
+  background: #faf6ef;
+}
+
 @media (max-width: 920px) {
   .browser-notebook__library-chip {
     width: 100%;
   }
+}
+
+.sidebar-edition {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.sidebar-edition:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+}
+
+main details {
+  margin: 12px 0 30px;
+  padding: 12px 16px;
+  border: 1px solid #e9e1d5;
+  border-radius: 14px;
+  background: var(--panel);
+}
+
+main details > summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+main details[open] > summary {
+  margin-bottom: 10px;
+}
+
+main .button-row + h3 {
+  margin-top: 32px;
 }

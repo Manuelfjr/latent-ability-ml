@@ -3,10 +3,11 @@ layout: null
 permalink: /search.json
 ---
 [
-{% assign docs = site.html_pages | sort: "url" %}
+{% assign docs = site.html_pages | where_exp: "p", "p.edition" | sort: "url" %}
 {% for p in docs %}
 {
   "title": {{ p.title | default: site.title | jsonify }},
+  "edition": {{ p.edition | jsonify }},
   "eyebrow": {{ p.eyebrow | default: "" | jsonify }},
   "lead": {{ p.lead | default: "" | jsonify }},
   "url": {{ p.url | relative_url | jsonify }},
