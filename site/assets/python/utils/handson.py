@@ -1462,3 +1462,212 @@ def plot_latent_accuracy(summary: pd.DataFrame, ax: plt.Axes | None = None) -> p
     ax.set_ylim(0, 1.05)
     ax.legend()
     return ax
+
+
+# ---------------------------------------------------------------------------
+# Model populations and a lightweight 2PL fit (ITA tutorial, Part 2)
+# ---------------------------------------------------------------------------
+
+
+class SubsampleClassifier:
+    """Train a classifier on a random fraction of the training set.
+
+    Training the same model family on less data is a simple way to build a
+    population of respondents with genuinely different abilities.
+
+    Parameters
+    ----------
+    base : object
+        Unfitted scikit-learn classifier with ``predict_proba``.
+    fraction : float, default=1.0
+        Fraction of the training rows used to fit ``base``. At least six rows
+        covering both classes are always used.
+    random_state : int, default=0
+        Seed of the row subsample.
+
+    Examples
+    --------
+    >>> model = SubsampleClassifier(LogisticRegression(), fraction=0.1)
+    >>> model.fraction
+    0.1
+    """
+
+    def __init__(self, base: object, fraction: float = 1.0, random_state: int = 0):
+        """Store the base estimator and the subsampling configuration."""
+        self.base = base
+        self.fraction = fraction
+        self.random_state = random_state
+
+    def fit(self, X: pd.DataFrame | np.ndarray, y: pd.Series | np.ndarray) -> "SubsampleClassifier":
+        """Fit a fresh copy of ``base`` on a random subsample of ``(X, y)``.
+
+        Parameters
+        ----------
+        X : pandas.DataFrame or numpy.ndarray
+            Training features.
+        y : pandas.Series or numpy.ndarray
+            Binary training labels.
+
+        Returns
+        -------
+        SubsampleClassifier
+            The fitted instance.
+        """
+        from sklearn.base import clone
+
+        features, labels = np.asarray(X), np.asarray(y)
+        rng = np.random.default_rng(self.random_state)
+        size = min(len(labels), max(6, int(round(self.fraction * len(labels)))))
+        while True:
+            rows = rng.choice(len(labels), size, replace=False)
+            if len(np.unique(labels[rows])) == 2:
+                break
+        self.model_ = clone(self.base).fit(features[rows], labels[rows])
+        self.classes_ = self.model_.classes_
+        return self
+
+    def predict_proba(self, X: pd.DataFrame | np.ndarray) -> np.ndarray:
+        """Return class probabilities from the fitted base model."""
+        return self.model_.predict_proba(np.asarray(X))
+
+    def predict(self, X: pd.DataFrame | np.ndarray) -> np.ndarray:
+        """Return class predictions from the fitted base model."""
+        return self.model_.predict(np.asarray(X))
+
+
+def make_model_population(
+    fractions: tuple[float, ...] = (0.03, 0.06, 0.12, 0.25, 0.5, 1.0),
+    random_state: int = 0,
+) -> dict[str, object]:
+    """Build a population of classifiers with a spread of abilities.
+
+    Four model families (logistic regression, 3-nearest neighbours, a depth-4
+    tree and Gaussian naive Bayes) are each trained on several fractions of
+    the training set, giving ``4 * len(fractions)`` respondents.
+
+    Parameters
+    ----------
+    fractions : tuple[float, ...], default=(0.03, 0.06, 0.12, 0.25, 0.5, 1.0)
+        Fractions of the training set given to each family.
+    random_state : int, default=0
+        Seed forwarded to the subsampling and to stochastic estimators.
+
+    Returns
+    -------
+    dict[str, object]
+        Mapping from a readable model name, such as
+        ``'logística · 25% dos dados'``, to an unfitted classifier. It can be
+        passed as ``models=`` to :func:`evaluate_models_on_dataset`.
+
+    Examples
+    --------
+    >>> len(make_model_population(fractions=(0.5, 1.0)))
+    8
+    """
+    from sklearn.naive_bayes import GaussianNB
+
+    families = {
+        "logística": LogisticRegression(),
+        "k-vizinhos": KNeighborsClassifier(n_neighbors=3),
+        "árvore": DecisionTreeClassifier(max_depth=4, random_state=random_state),
+        "naive Bayes": GaussianNB(),
+    }
+    return {
+        f"{name} · {fraction:.0%} dos dados": SubsampleClassifier(base, fraction, random_state=random_state)
+        for name, base in families.items()
+        for fraction in fractions
+    }
+
+
+def flip_labels(df: pd.DataFrame, fraction: float = 0.08, random_state: int = 0) -> pd.DataFrame:
+    """Swap the label of a random fraction of examples, keeping a record.
+
+    Parameters
+    ----------
+    df : pandas.DataFrame
+        Dataset with a binary ``label`` column, such as the output of
+        :func:`make_toy_classification_dataset`.
+    fraction : float, default=0.08
+        Fraction of rows whose label is swapped.
+    random_state : int, default=0
+        Seed used to choose the rows.
+
+    Returns
+    -------
+    pandas.DataFrame
+        Copy of ``df`` with the swapped labels and a boolean
+        ``label_flipped`` column marking them.
+
+    Examples
+    --------
+    >>> df = make_toy_classification_dataset(n_samples=100, flip_y=0.0)
+    >>> int(flip_labels(df, fraction=0.1)["label_flipped"].sum())
+    10
+    """
+    noisy = df.copy()
+    rng = np.random.default_rng(random_state)
+    rows = rng.choice(len(noisy), int(round(fraction * len(noisy))), replace=False)
+    noisy["label_flipped"] = False
+    noisy.loc[noisy.index[rows], "label_flipped"] = True
+    noisy.loc[noisy.index[rows], "label"] = 1 - noisy.loc[noisy.index[rows], "label"]
+    return noisy
+
+
+def fit_binary_2pl(
+    responses: pd.DataFrame,
+    n_iter: int = 3000,
+    learning_rate: float = 0.05,
+) -> tuple[pd.Series, pd.DataFrame]:
+    """Fit a 2PL IRT model to a binary response matrix.
+
+    Joint maximum a posteriori estimation with Adam, using weak Gaussian
+    priors (ability ~ N(0, 1), difficulty ~ N(0, 2), discrimination ~ N(1, 1))
+    so that items everyone answers correctly still get finite estimates.
+    Discrimination is not constrained to be positive.
+
+    Parameters
+    ----------
+    responses : pandas.DataFrame
+        Respondent-by-item matrix of 0/1 values (models in the rows, test
+        examples in the columns).
+    n_iter : int, default=3000
+        Number of gradient steps.
+    learning_rate : float, default=0.05
+        Adam step size.
+
+    Returns
+    -------
+    tuple[pandas.Series, pandas.DataFrame]
+        Abilities indexed by respondent, and a DataFrame indexed by item with
+        ``difficulty`` and ``discrimination`` columns.
+
+    Examples
+    --------
+    >>> matrix = pd.DataFrame([[1, 1, 0], [1, 0, 0], [1, 1, 1]], index=["a", "b", "c"])
+    >>> abilities, items = fit_binary_2pl(matrix, n_iter=200)
+    >>> list(items.columns)
+    ['difficulty', 'discrimination']
+    """
+    observed = responses.to_numpy(dtype=float)
+    n_respondents, n_items = observed.shape
+    theta, delta, alpha = np.zeros(n_respondents), np.zeros(n_items), np.ones(n_items)
+    params = [theta, delta, alpha]
+    first = [np.zeros_like(p) for p in params]
+    second = [np.zeros_like(p) for p in params]
+    for step in range(1, n_iter + 1):
+        gap = theta[:, None] - delta[None, :]
+        residual = observed - 1.0 / (1.0 + np.exp(-alpha[None, :] * gap))
+        grads = [
+            (residual * alpha[None, :]).sum(axis=1) - theta,
+            -(residual * alpha[None, :]).sum(axis=0) - delta / 4.0,
+            (residual * gap).sum(axis=0) - (alpha - 1.0),
+        ]
+        for index, (param, grad) in enumerate(zip(params, grads)):
+            first[index] = 0.9 * first[index] + 0.1 * grad
+            second[index] = 0.999 * second[index] + 0.001 * grad**2
+            m_hat = first[index] / (1 - 0.9**step)
+            v_hat = second[index] / (1 - 0.999**step)
+            param += learning_rate * m_hat / (np.sqrt(v_hat) + 1e-8)
+    abilities = pd.Series(theta, index=responses.index, name="ability")
+    items = pd.DataFrame({"difficulty": delta, "discrimination": alpha}, index=responses.columns)
+    return abilities, items

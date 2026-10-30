@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import hmac
+import itertools
 import json
 import os
 import re
@@ -17,6 +18,7 @@ from urllib.parse import parse_qs, urlparse
 
 from backend.admin import render_admin_html
 from backend.analytics import AnalyticsStore, clip
+from backend.chat import ChatService, ChatUnavailable
 from backend.sessions import BackendBusy, SessionManager
 
 
@@ -41,6 +43,14 @@ EXECUTION_TIMEOUT = _env_float("WORKSHOP_EXECUTION_TIMEOUT", 180)
 WORKER_START_TIMEOUT = _env_float("WORKSHOP_WORKER_START_TIMEOUT", 120)
 MAX_REQUEST_BYTES = int(os.getenv("WORKSHOP_MAX_REQUEST_BYTES", str(1_000_000)))
 
+# Tutorial assistant (Claude). Read before the secrets are stripped below.
+CHAT_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+CHAT_MODEL = os.getenv("WORKSHOP_CHAT_MODEL", "claude-opus-5-5")
+CHAT_EFFORT = os.getenv("WORKSHOP_CHAT_EFFORT", "low")
+CHAT_MAX_TOKENS = int(os.getenv("WORKSHOP_CHAT_MAX_TOKENS", "8000"))
+CHAT_MAX_CONCURRENT = int(os.getenv("WORKSHOP_CHAT_MAX_CONCURRENT", "8"))
+CHAT_PER_HOUR = int(os.getenv("WORKSHOP_CHAT_PER_HOUR", "60"))
+
 # Anything that looks like a credential is removed from the environment once it
 # has been read, so session workers (which run participants' code) never see it.
 _SECRET_NAME = re.compile(r"PASSWORD|SECRET|TOKEN|API_KEY|PRIVATE_KEY|^WORKSHOP_ADMIN_", re.IGNORECASE)
@@ -49,6 +59,7 @@ for _name in [name for name in os.environ if _SECRET_NAME.search(name)]:
 
 ANALYTICS = AnalyticsStore(ANALYTICS_FILE, ANALYTICS_MAX_ROWS)
 SESSIONS: SessionManager | None = None
+CHAT: ChatService | None = None
 
 
 def _harden_process() -> None:
@@ -90,6 +101,7 @@ def _collect_request_metadata(handler: BaseHTTPRequestHandler) -> dict[str, Any]
     client_ip = forwarded_ip or (handler.client_address[0] if handler.client_address else "")
     return {
         "ip_masked": _mask_client_ip(client_ip),
+        "_client_ip": client_ip,
         "user_agent": clip(handler.headers.get("User-Agent", "")),
         "accept_language": clip(handler.headers.get("Accept-Language", ""), 100),
         "referer": clip(handler.headers.get("Referer", "")),
@@ -115,7 +127,7 @@ def _analytics_record(payload: dict[str, Any], handler: BaseHTTPRequestHandler) 
         "cell_label": clip(payload.get("cell_label"), 120),
         "demo_id": clip(payload.get("demo_id"), 120),
         "shared": bool(payload.get("shared") or False),
-        **_collect_request_metadata(handler),
+        **{key: value for key, value in _collect_request_metadata(handler).items() if not key.startswith("_")},
     }
 
 
@@ -246,6 +258,7 @@ class NotebookRuntimeHandler(BaseHTTPRequestHandler):
                     "port": PORT,
                     "admin_analytics_enabled": ENABLE_ADMIN_ANALYTICS,
                     "execution_timeout_seconds": EXECUTION_TIMEOUT,
+                    "chat_enabled": CHAT is not None,
                     "sessions": {"active": stats["active"], "busy": stats["busy"], "max_workers": stats["max_workers"]},
                 }
             )
@@ -279,6 +292,8 @@ class NotebookRuntimeHandler(BaseHTTPRequestHandler):
             else:
                 result = _sessions().execute(session_id, code)
             self._write_json({"ok": True, "session_id": session_id, **result})
+        elif path == "/chat":
+            self._handle_chat(payload, session_id)
         elif path == "/analytics/event":
             if not ENABLE_ADMIN_ANALYTICS:
                 raise RequestError(HTTPStatus.NOT_FOUND, "Analytics disabled.")
@@ -286,6 +301,29 @@ class NotebookRuntimeHandler(BaseHTTPRequestHandler):
             self._write_json({"ok": True})
         else:
             raise RequestError(HTTPStatus.NOT_FOUND, "Not found")
+
+    def _handle_chat(self, payload: dict[str, Any], session_id: str) -> None:
+        if CHAT is None:
+            raise RequestError(HTTPStatus.SERVICE_UNAVAILABLE, "O assistente ainda não foi configurado (falta a chave da API).")
+        client_ip = _collect_request_metadata(self)["_client_ip"]
+        try:
+            events = CHAT.stream(payload.get("messages"), payload.get("context"), [f"s:{session_id}", f"ip:{client_ip}"])
+            first = next(events)
+        except ValueError as error:
+            raise RequestError(HTTPStatus.BAD_REQUEST, str(error)) from error
+        except ChatUnavailable as error:
+            self._write_json({"ok": False, "error": str(error)}, status=HTTPStatus.TOO_MANY_REQUESTS, extra={"Retry-After": "20"})
+            return
+        if ENABLE_ADMIN_ANALYTICS:
+            ANALYTICS.append(_analytics_record({"event_type": "chat_message", "session_id": session_id, "page": (payload.get("context") or {}).get("page_path")}, self))
+        # Server-sent events; the connection closes when the answer ends (HTTP/1.0).
+        self._set_headers(content_type="text/event-stream; charset=utf-8", extra={"X-Accel-Buffering": "no"})
+        try:
+            for event in itertools.chain([first], events):
+                self.wfile.write(f"data: {json.dumps(event, ensure_ascii=False)}\n\n".encode("utf-8"))
+                self.wfile.flush()
+        finally:
+            events.close()  # frees the concurrency slot even if the browser disconnects
 
     def _handle_delete(self) -> None:
         parsed = urlparse(self.path)
@@ -297,8 +335,10 @@ class NotebookRuntimeHandler(BaseHTTPRequestHandler):
 
 
 def run() -> None:
-    global SESSIONS
+    global SESSIONS, CHAT
     _harden_process()
+    if CHAT_API_KEY:
+        CHAT = ChatService(CHAT_API_KEY, CHAT_MODEL, CHAT_EFFORT, CHAT_MAX_TOKENS, CHAT_MAX_CONCURRENT, CHAT_PER_HOUR)
     SESSIONS = SessionManager(
         max_workers=MAX_WORKERS,
         idle_ttl=SESSION_IDLE_MINUTES * 60,
@@ -314,7 +354,8 @@ def run() -> None:
     signal.signal(signal.SIGTERM, _stop)
     print(
         f"Notebook backend listening on http://{HOST}:{PORT} "
-        f"(max {MAX_WORKERS} workers, {SESSION_IDLE_MINUTES:g} min idle, {EXECUTION_TIMEOUT:g} s per cell)",
+        f"(max {MAX_WORKERS} workers, {SESSION_IDLE_MINUTES:g} min idle, {EXECUTION_TIMEOUT:g} s per cell; "
+        f"assistant {'on, ' + CHAT_MODEL if CHAT else 'off'})",
         flush=True,
     )
     try:

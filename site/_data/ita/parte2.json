@@ -1,103 +1,104 @@
 {
   "number": 2,
-  "title": "Lendo curvas da IRT",
+  "title": "Da matriz de respostas à IRT",
   "minutes": 20,
-  "goal": "O modelo logístico de dois parâmetros (2PL), um parâmetro por vez: a dificuldade δ posiciona a curva, a discriminação a controla a inclinação, e as duas juntas determinam quais itens separam modelos fortes de fracos.",
+  "goal": "Uma população de 24 modelos faz a mesma prova de 90 exemplos, alguns com rótulo trocado de propósito. Ajustamos um modelo de IRT de dois parâmetros (2PL) e lemos o que ele diz sobre modelos e exemplos.",
   "notebook": "02_parte2_atividade.ipynb",
   "answer_notebook": "02_parte2_respostas.ipynb",
   "tasks": [
     {
       "id": "parte2-t1",
-      "title": "Um item, uma curva",
+      "title": "Leia três itens",
       "minutes": 3,
       "optional": false,
-      "do": "No 2PL, a probabilidade de um respondente com habilidade θ acertar o item j é P(θ) = 1 / (1 + exp(−aⱼ(θ − δⱼ))). Use `binary_irt_probability` para traçar a curva característica do item (CCI) com δ = 0 e a = 1.",
-      "question": "Por que P = 0,5 exatamente quando θ = δ? Que interpretação isso dá a δ?",
-      "code": "import numpy as np\nfrom utils.handson import binary_irt_probability\n\ntheta = np.linspace(-3, 3, 200)   # habilidade latente\np = binary_irt_probability(theta, difficulty=___, discrimination=___)   # δ = 0, a = 1\n\nfig, ax = plt.subplots()\nax.plot(theta, p)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Uma curva característica do item\")\nplt.show()\n\nprint(\"P(acerto) com θ = 0:\", binary_irt_probability(0.0, difficulty=0.0, discrimination=1.0))\n",
+      "do": "Três curvas características do item (CCI) do 2PL, P(θ) = 1 / (1 + exp(−a(θ − δ))). A faixa cinza marca modelos com habilidade entre 0 e 1.",
+      "question": "Qual item você usaria para distinguir um modelo com θ = 0 de outro com θ = 1? E qual usaria para separar modelos muito fracos? Justifique lendo as curvas e a tabela.",
+      "explore": "No simulador acima, crie um item que não serve para comparar ninguém. Que combinações de δ e a produzem isso?",
+      "code": "import numpy as np\nimport pandas as pd\nfrom utils.handson import binary_irt_probability\n\ntheta = np.linspace(-3, 3, 200)   # habilidade latente\nitens = {\"A\": (-1.0, 1.0), \"B\": (0.5, 1.0), \"C\": (0.5, 4.0)}   # nome: (dificuldade δ, discriminação a)\n\nfig, ax = plt.subplots()\nax.axvspan(0, 1, color=\"#B4ADA4\", alpha=0.25, label=\"modelos entre θ = 0 e θ = 1\")\nfor nome, (d, a) in itens.items():\n    ax.plot(theta, binary_irt_probability(theta, d, a), label=f\"item {nome}: δ = {d}, a = {a}\")\nax.axhline(0.5, color=\"#B4ADA4\", linestyle=\"--\", linewidth=1)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Três itens, três comportamentos\")\nax.legend(fontsize=8)\nplt.show()\n\npd.DataFrame({nome: binary_irt_probability(np.array([-1.0, 0.0, 1.0]), d, a) for nome, (d, a) in itens.items()},\n             index=[\"θ = −1\", \"θ = 0\", \"θ = 1\"]).round(2)\n",
       "hints": [
-        "O modelo 2PL é P = 1 / (1 + exp(−a(θ − δ))).",
-        "Com θ = δ o expoente vale zero, e 1 / (1 + 1) = 0,5."
+        "Um item separa bem dois respondentes quando as probabilidades de acerto deles são muito diferentes.",
+        "Olhe a linha θ = 0 e a linha θ = 1 da tabela, coluna por coluna."
       ],
-      "answer": "Com θ = δ o expoente se anula e P = 1 / (1 + 1) = 1/2. A dificuldade é a habilidade em que acertar vira cara ou coroa. Como δ e θ estão na mesma escala, faz sentido dizer que um item é \"difícil para modelos desse nível\".",
-      "solution": "import numpy as np\nfrom utils.handson import binary_irt_probability\n\ntheta = np.linspace(-3, 3, 200)   # habilidade latente\np = binary_irt_probability(theta, difficulty=0.0, discrimination=1.0)   # δ = 0, a = 1\n\nfig, ax = plt.subplots()\nax.plot(theta, p)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Uma curva característica do item\")\nplt.show()\n\nprint(\"P(acerto) com θ = 0:\", binary_irt_probability(0.0, difficulty=0.0, discrimination=1.0))\n"
+      "answer": "Uma leitura possível: o item C (δ = 0,5, a = 4) vai de 0,12 em θ = 0 para 0,88 em θ = 1: é o melhor para essa comparação, porque sua dificuldade está entre os dois e a curva é íngreme. O item A, centrado em θ = −1, é mais útil para separar modelos fracos. Itens inúteis têm a próxima de zero (curva achatada) ou δ muito longe das habilidades de interesse (todos acertam ou todos erram). Em termos formais, a informação de Fisher de um item, a²·P(1 − P), é máxima em θ = δ e cresce com a².",
+      "solution": ""
     },
     {
       "id": "parte2-t2",
-      "title": "A dificuldade move a curva",
+      "title": "Uma população de modelos",
       "minutes": 3,
       "optional": false,
-      "do": "Três itens que só diferem na dificuldade. Complete a chamada com a dificuldade da curva da vez, execute, acrescente `2.0` à lista e execute de novo.",
-      "question": "Qual item é o mais difícil, e como isso se lê no gráfico? Para um θ fixo, o que muda?",
-      "code": "dificuldades = [-1.0, 0.0, 1.0]   # <- acrescente 2.0\n\nfig, ax = plt.subplots()\nfor d in dificuldades:\n    ax.plot(theta, binary_irt_probability(theta, difficulty=___, discrimination=1.0), label=f\"δ = {d}\")\nax.axhline(0.5, color=\"#B4ADA4\", linestyle=\"--\", linewidth=1)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Mesma forma, posições diferentes\")\nax.legend()\nplt.show()\n",
+      "do": "O mesmo tipo de problema, agora com 8% dos rótulos trocados de propósito (e registrados). Quatro famílias de classificadores, cada uma treinada com 3%, 6%, 12%, 25%, 50% ou 100% do conjunto de treino: 24 respondentes para a mesma prova.",
+      "question": "Quais modelos você esperava no topo e na base? A acurácia separa bem os modelos do meio da tabela?",
+      "explore": "Passe o mouse sobre `make_model_population` e `flip_labels` e veja o que dá para mudar. O que você espera que aconteça com mais rótulos trocados?",
+      "code": "from utils.handson import (\n    evaluate_models_on_dataset,\n    flip_labels,\n    make_model_population,\n    make_toy_classification_dataset,\n)\n\ndados = make_toy_classification_dataset(n_samples=300, class_sep=1.4, flip_y=0.0, random_state=56)\ndados = flip_labels(dados, fraction=0.08, random_state=0)   # 8% dos rótulos trocados, de propósito\n\npopulacao = make_model_population()   # 4 famílias × 6 frações do conjunto de treino = 24 modelos\nres = evaluate_models_on_dataset(dados, scenario=\"ita\", models=populacao, random_state=56)\nR = res.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\nprint(R.shape, \"→ (modelos, exemplos de teste)\")\n\nacuracia = R.mean(axis=1).sort_values()\nfig, ax = plt.subplots(figsize=(7, 6))\nax.barh(acuracia.index, acuracia.values, color=\"#4392D2\", height=0.7)\nax.set_xlim(0.4, 1.0)\nax.set_xlabel(\"acurácia no teste\")\nax.set_title(\"24 modelos, uma prova de 90 questões\")\nax.tick_params(axis=\"y\", labelsize=8)\nplt.show()\n",
       "hints": [
-        "A variável do laço `d` é a dificuldade de cada curva.",
-        "Todas as curvas têm a mesma forma: só a posição muda.",
-        "Veja onde cada curva cruza a linha tracejada de 0,5."
+        "Quantos modelos têm acurácia entre 0,85 e 0,90?"
       ],
-      "answer": "δ é um parâmetro de posição: aumentá-lo translada a CCI para a direita sem mudar sua forma. O item mais difícil é o mais à direita; para um θ fixo, sua probabilidade de acerto é a menor.",
-      "solution": "dificuldades = [-1.0, 0.0, 1.0]   # <- acrescente 2.0\n\nfig, ax = plt.subplots()\nfor d in dificuldades:\n    ax.plot(theta, binary_irt_probability(theta, difficulty=d, discrimination=1.0), label=f\"δ = {d}\")\nax.axhline(0.5, color=\"#B4ADA4\", linestyle=\"--\", linewidth=1)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Mesma forma, posições diferentes\")\nax.legend()\nplt.show()\n"
+      "answer": "Uma leitura possível: os modelos treinados com 3% dos dados ficam na base, perto do acaso, como esperado. Mas, a partir de uns 12% dos dados, quase todos ficam entre 0,85 e 0,90, e a acurácia praticamente não separa os modelos do meio. Também não é verdade que mais dados sempre dão acurácia maior: o ruído de rótulo e o tamanho do teste embaralham a ordem.",
+      "solution": ""
     },
     {
       "id": "parte2-t3",
-      "title": "A discriminação muda a inclinação",
-      "minutes": 3,
+      "title": "Habilidade não é acurácia",
+      "minutes": 4,
       "optional": false,
-      "do": "Agora a dificuldade fica fixa em `0` e só a discriminação muda. Complete a chamada, execute e acrescente `5.0` à lista.",
-      "question": "Qual curva separa melhor alguém com θ = −0,5 de alguém com θ = 0,5?",
-      "code": "discriminacoes = [0.5, 1.0, 3.0]   # <- acrescente 5.0\n\nfig, ax = plt.subplots()\nfor a in discriminacoes:\n    ax.plot(theta, binary_irt_probability(theta, difficulty=0.0, discrimination=___), label=f\"a = {a}\")\nax.axvspan(-0.5, 0.5, color=\"#B4ADA4\", alpha=0.25)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Mesmo ponto central, inclinações diferentes\")\nax.legend()\nplt.show()\n",
+      "do": "Ajustamos o 2PL na matriz 24 × 90 com `fit_binary_2pl`, que estima uma habilidade θ por modelo e uma dificuldade δ e uma discriminação a por exemplo. A função `compara` mostra a dificuldade dos exemplos que só um de dois modelos acerta.",
+      "question": "Habilidade e acurácia contam a mesma história? Encontre dois modelos com acurácia (quase) igual e θ diferente: o que explica a diferença?",
+      "explore": "Use `compara` com outros pares. Você consegue achar um par em que o modelo de menor acurácia tem θ maior?",
+      "code": "from utils.handson import fit_binary_2pl\n\nhabilidade, itens = fit_binary_2pl(R)   # θ por modelo; δ e a por exemplo de teste\n\ncomparacao = pd.DataFrame({\"acurácia\": R.mean(axis=1), \"habilidade θ\": habilidade}).sort_values(\"habilidade θ\")\nprint(\"correlação de Spearman:\", round(comparacao.corr(method=\"spearman\").iloc[0, 1], 2))\n\nfig, ax = plt.subplots()\nax.scatter(comparacao[\"acurácia\"], comparacao[\"habilidade θ\"], s=40, color=\"#4392D2\", edgecolor=\"#1C2127\", linewidth=0.5)\nax.set_xlabel(\"acurácia\")\nax.set_ylabel(\"habilidade θ\")\nax.set_title(\"Mesma prova, duas réguas\")\nplt.show()\n\n\ndef compara(a, b):\n    \"\"\"Dificuldade dos exemplos que só um dos dois modelos acerta.\"\"\"\n    so_a = R.columns[(R.loc[a] == 1) & (R.loc[b] == 0)]\n    so_b = R.columns[(R.loc[a] == 0) & (R.loc[b] == 1)]\n    print(f\"só {a} acerta:\", itens.loc[so_a, \"difficulty\"].round(2).tolist())\n    print(f\"só {b} acerta:\", itens.loc[so_b, \"difficulty\"].round(2).tolist())\n\n\ncompara(\"logística · 100% dos dados\", \"árvore · 50% dos dados\")   # <- troque os nomes\ncomparacao.round(2)\n",
       "hints": [
-        "A variável do laço `a` é a discriminação de cada curva.",
-        "Todas cruzam 0,5 no mesmo ponto: a dificuldade não mudou.",
-        "Olhe quanto cada curva sobe dentro da faixa cinza."
+        "\"logística · 100% dos dados\" e \"árvore · 50% dos dados\" têm a mesma acurácia.",
+        "Olhe o sinal das dificuldades que só um deles acerta."
       ],
-      "answer": "A curva mais inclinada (maior a) vai de perto de 0 a perto de 1 dentro da faixa cinza, então separa bem habilidades próximas; uma curva achatada quase não as distingue. Formalmente, a inclinação em θ = δ vale a/4, e a informação de Fisher do item, a²·P(1 − P), é máxima ali: itens muito discriminativos medem com precisão, mas numa faixa estreita de habilidades.",
-      "solution": "discriminacoes = [0.5, 1.0, 3.0]   # <- acrescente 5.0\n\nfig, ax = plt.subplots()\nfor a in discriminacoes:\n    ax.plot(theta, binary_irt_probability(theta, difficulty=0.0, discrimination=a), label=f\"a = {a}\")\nax.axvspan(-0.5, 0.5, color=\"#B4ADA4\", alpha=0.25)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Mesmo ponto central, inclinações diferentes\")\nax.legend()\nplt.show()\n"
+      "answer": "Uma leitura possível: a correlação de Spearman é 0,86, então as duas réguas concordam no geral, mas discordam no detalhe. \"logística · 100% dos dados\" e \"árvore · 50% dos dados\" acertam ambos 87% da prova, e θ vale 1,42 e 1,93. A diferença está em *quais* exemplos: a logística acerta 4 exemplos fáceis que a árvore erra (δ ≈ −2,7 a −1,5), enquanto a árvore acerta 4 exemplos difíceis que a logística erra (δ ≈ 1,3 a 2,4). A IRT pondera cada acerto pelo que ele revela sobre a habilidade; a acurácia conta todos igual.",
+      "solution": ""
     },
     {
       "id": "parte2-t4",
-      "title": "Probabilidades numa tabela",
-      "minutes": 3,
+      "title": "O que torna um exemplo difícil?",
+      "minutes": 4,
       "optional": false,
-      "do": "Um banco com três itens (`make_binary_item_bank`), suas curvas (`plot_binary_iccs`) e a probabilidade de acerto de três respondentes (linhas) em cada item (colunas). Complete a tabela com os parâmetros de cada item.",
-      "question": "Qual item separa melhor o respondente com θ = 0 do respondente com θ = 1?",
-      "code": "import pandas as pd\nfrom utils.handson import make_binary_item_bank, plot_binary_iccs\n\nbanco = make_binary_item_bank([\n    {\"item\": \"fácil\",   \"difficulty\": -1.0, \"discrimination\": 1.0},\n    {\"item\": \"médio\",   \"difficulty\": 0.0,  \"discrimination\": 1.0},\n    {\"item\": \"difícil\", \"difficulty\": 1.0,  \"discrimination\": 2.0},\n])\nplot_binary_iccs(banco, theta=theta, title=\"Três itens\")\nplt.show()\n\nhabilidades = np.array([-1.0, 0.0, 1.0])\ntabela = pd.DataFrame(\n    {item.item: binary_irt_probability(habilidades, ___, ___) for item in banco.itertuples()},\n    index=[f\"θ = {t:+.0f}\" for t in habilidades],\n)\ntabela.round(2)\n",
+      "do": "A dificuldade δ estimada de cada exemplo de teste, no plano das features. Os × marcam os rótulos que trocamos de propósito, uma informação que a IRT *não* viu.",
+      "question": "Onde ficam os exemplos mais difíceis? Quantos dos mais difíceis são rótulos trocados, e o que explica os demais? Que uso prático você vê nisso?",
+      "explore": "Procure os × que *não* estão entre os mais difíceis. Olhe a discriminação deles na tarefa seguinte.",
+      "code": "teste = dados.set_index(\"example_id\").loc[R.columns].assign(\n    dificuldade=itens[\"difficulty\"], discriminacao=itens[\"discrimination\"]\n)\n\nfig, ax = plt.subplots()\npontos = ax.scatter(teste.feature_1, teste.feature_2, c=teste.dificuldade, cmap=\"kunumi_azul\",\n                    s=40, edgecolor=\"#5E5E5E\", linewidth=0.3)\ntrocados = teste[teste.label_flipped]\nax.scatter(trocados.feature_1, trocados.feature_2, marker=\"x\", s=110, linewidth=2.2, color=\"#F04E44\",\n           label=\"rótulo trocado\")\nfig.colorbar(pontos, ax=ax, label=\"dificuldade δ\")\nax.set_title(\"Dificuldade de cada exemplo de teste\")\nax.legend(fontsize=8)\nplt.show()\n\nteste.sort_values(\"dificuldade\", ascending=False).head(8)[[\"dificuldade\", \"discriminacao\", \"label\", \"label_flipped\"]].round(2)\n",
       "hints": [
-        "Cada `item` do laço tem os atributos `item.difficulty` e `item.discrimination`.",
-        "Em cada coluna, compare a linha θ = +0 com a linha θ = +1.",
-        "O item com o maior salto entre essas duas linhas é o que mais separa os dois."
+        "Compare a coluna `label_flipped` da tabela com a ordem da dificuldade.",
+        "Os mais difíceis que não são rótulos trocados estão em que região?"
       ],
-      "answer": "O item *difícil* salta de 0,12 para 0,50 entre θ = 0 e θ = 1: sua dificuldade está nessa faixa e ele é o mais discriminativo. O item fácil já está perto de 1 para os dois. O item mais útil depende de *quem* se quer comparar, e é isso que permite montar testes sob medida (testes adaptativos).",
-      "solution": "import pandas as pd\nfrom utils.handson import make_binary_item_bank, plot_binary_iccs\n\nbanco = make_binary_item_bank([\n    {\"item\": \"fácil\",   \"difficulty\": -1.0, \"discrimination\": 1.0},\n    {\"item\": \"médio\",   \"difficulty\": 0.0,  \"discrimination\": 1.0},\n    {\"item\": \"difícil\", \"difficulty\": 1.0,  \"discrimination\": 2.0},\n])\nplot_binary_iccs(banco, theta=theta, title=\"Três itens\")\nplt.show()\n\nhabilidades = np.array([-1.0, 0.0, 1.0])\ntabela = pd.DataFrame(\n    {item.item: binary_irt_probability(habilidades, item.difficulty, item.discrimination) for item in banco.itertuples()},\n    index=[f\"θ = {t:+.0f}\" for t in habilidades],\n)\ntabela.round(2)\n"
+      "answer": "Uma leitura possível: os quatro exemplos mais difíceis (δ = 3,68, que nenhum modelo acerta) são todos rótulos trocados; a IRT os encontrou sem saber disso. Os seguintes ficam na região de sobreposição: são difíceis por ambiguidade real, não por erro de anotação. Na prática, ordenar exemplos por dificuldade é uma forma barata de priorizar revisão de rótulos, mas ela não distingue sozinha \"rótulo errado\" de \"exemplo ambíguo\"; para isso é preciso olhar a geometria, ou a discriminação.",
+      "solution": ""
     },
     {
       "id": "parte2-t5",
-      "title": "Uma curva ao contrário",
+      "title": "Que exemplos realmente medem algo?",
       "minutes": 3,
       "optional": false,
-      "do": "Um item com discriminação negativa. Escolha um valor negativo para `a`, por exemplo −1,5.",
-      "question": "Numa avaliação de modelos, o que um exemplo com essa curva sugere sobre os dados?",
-      "code": "p = binary_irt_probability(theta, difficulty=0.0, discrimination=___)   # a < 0\n\nfig, ax = plt.subplots()\nax.plot(theta, p)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Discriminação negativa\")\nplt.show()\n",
+      "do": "Exemplos que todos acertam ou todos erram não separam ninguém. Para os demais, vemos dificuldade e discriminação juntas.",
+      "question": "Que fração da prova realmente informa? Se você só pudesse aplicar 15 exemplos para ranquear novos modelos, quais escolheria, e o que faria com os de discriminação negativa?",
+      "explore": "Os exemplos com discriminação negativa são acertados mais por modelos fracos do que por fortes. Quantos deles são rótulos trocados (tarefa anterior)?",
+      "code": "print(\"todos acertam:\", int((R.min(axis=0) == 1).sum()))\nprint(\"todos erram:  \", int((R.max(axis=0) == 0).sum()))\ninformativos = R.columns[(R.min(axis=0) == 0) & (R.max(axis=0) == 1)]   # pelo menos um acerto e um erro\nprint(\"informativos: \", len(informativos), \"de\", R.shape[1])\n\nfig, ax = plt.subplots()\nax.scatter(itens.loc[informativos, \"difficulty\"], itens.loc[informativos, \"discrimination\"],\n           s=40, color=\"#4392D2\", edgecolor=\"#1C2127\", linewidth=0.5)\nax.axhline(0, color=\"#B4ADA4\", linewidth=1)\nax.set_xlabel(\"dificuldade δ\")\nax.set_ylabel(\"discriminação a\")\nax.set_title(\"Os exemplos que separam os modelos\")\nplt.show()\n\nitens.loc[informativos].sort_values(\"discrimination\").head(10).round(2)\n",
       "hints": [
-        "Aqui, quem tem mais habilidade acerta *menos*.",
-        "Pense num exemplo com rótulo errado no conjunto de teste."
+        "Discriminação negativa: a curva desce com θ.",
+        "Um bom item para ranquear tem a alto e δ na faixa de habilidade que interessa."
       ],
-      "answer": "Modelos melhores erram mais esse exemplo. Na prática, isso sinaliza um exemplo suspeito, tipicamente com rótulo errado: o modelo bom prevê a classe verdadeira e é contado como erro. A discriminação estimada funciona, assim, como um diagnóstico automático de qualidade dos dados.",
-      "solution": "p = binary_irt_probability(theta, difficulty=0.0, discrimination=-1.5)   # a < 0\n\nfig, ax = plt.subplots()\nax.plot(theta, p)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Discriminação negativa\")\nplt.show()\n"
+      "answer": "Uma leitura possível: 27 exemplos são acertados por todos e 4 errados por todos; só 59 de 90 informam alguma coisa, e muitos deles têm parâmetros quase idênticos (são redundantes). Para um teste curto, escolheria exemplos com a alto e δ espalhado na faixa das habilidades que quero separar (por volta de 0 a 2), evitando duplicatas. Os de discriminação negativa saem da prova: dos quatro, dois são justamente os rótulos trocados que não estavam entre os mais difíceis. Rótulo trocado aparece, portanto, de duas formas: dificuldade extrema (ninguém acerta) ou discriminação negativa (só os fracos \"acertam\").",
+      "solution": ""
     },
     {
       "id": "parte2-t6",
-      "title": "Desafio: projete um item",
+      "title": "Livre: sua análise",
       "minutes": 5,
       "optional": true,
-      "do": "Escolha δ e a para que o item separe um modelo fraco (θ = 0) de um forte (θ = 1): o fraco deve acertar no máximo 30% das vezes e o forte, pelo menos 90%.",
-      "question": "Que combinação funcionou? Por que você precisou mexer nos dois parâmetros?",
-      "code": "dificuldade = 0.0      # <- mude aqui\ndiscriminacao = 1.0    # <- e aqui\n\nfraco, forte = binary_irt_probability(np.array([0.0, 1.0]), dificuldade, discriminacao)\nprint(f\"modelo fraco (θ=0): {fraco:.2f}   modelo forte (θ=1): {forte:.2f}\")\nprint(\"Conseguiu!\" if fraco <= 0.30 and forte >= 0.90 else \"Ainda não: busque fraco ≤ 0,30 e forte ≥ 0,90\")\n",
+      "do": "Todos os objetos das tarefas anteriores continuam disponíveis (`R`, `habilidade`, `itens`, `teste`, `fit_binary_2pl`). O código abaixo é só um ponto de partida: tira da prova os exemplos suspeitos e reajusta o modelo.",
+      "question": "Que pergunta você investigou, como, e o que concluiu? O ranking dos modelos mudou ao limpar a prova?",
+      "explore": "Outras ideias: monte uma prova curta com os k melhores itens e compare o ranking com o da prova completa; aumente a fração de rótulos trocados e veja quantos a IRT ainda acha; troque o critério de suspeito.",
+      "code": "# Um ponto de partida: o ranking dos modelos muda se tirarmos da prova os exemplos suspeitos?\nsuspeitos = itens.index[(itens.discrimination < 0) | (itens.difficulty > itens.difficulty.quantile(0.95))]\nhabilidade_sem, _ = fit_binary_2pl(R.drop(columns=suspeitos))\n\nprint(len(suspeitos), \"exemplos removidos; deles,\", int(teste.loc[suspeitos, \"label_flipped\"].sum()), \"tinham rótulo trocado\")\npd.DataFrame({\n    \"posição antes\": habilidade.rank(ascending=False).astype(int),\n    \"posição depois\": habilidade_sem.rank(ascending=False).astype(int),\n}).sort_values(\"posição depois\")\n",
       "hints": [
-        "Coloque a dificuldade entre as duas habilidades, por exemplo perto de 0,5.",
-        "Depois aumente a discriminação até a curva ficar íngreme o suficiente entre θ = 0 e θ = 1."
+        "Para comparar dois rankings, `scipy.stats.spearmanr` ou `.corr(method=\"spearman\")`."
       ],
-      "answer": "Por exemplo, dificuldade 0,5 e discriminação 5 dão cerca de 0,08 para o fraco e 0,92 para o forte. A dificuldade posiciona a transição entre os dois modelos; a discriminação deixa essa transição abrupta o bastante.",
-      "solution": "dificuldade = 0.5\ndiscriminacao = 5.0\n\nfraco, forte = binary_irt_probability(np.array([0.0, 1.0]), dificuldade, discriminacao)\nprint(f\"modelo fraco (θ=0): {fraco:.2f}   modelo forte (θ=1): {forte:.2f}\")\nprint(\"Conseguiu!\" if fraco <= 0.30 and forte >= 0.90 else \"Ainda não: busque fraco ≤ 0,30 e forte ≥ 0,90\")\n"
+      "answer": "Não há resposta única. No ponto de partida, saem 9 exemplos, 6 deles com rótulo trocado (todos os do teste), e o topo do ranking se reorganiza: modelos que dependiam de \"acertar\" exemplos com rótulo errado perdem posições. A base do ranking não muda. Mensagem geral: a avaliação de modelos depende da qualidade da prova, e a IRT dá ferramentas para auditar a prova junto com os modelos.",
+      "solution": ""
     }
   ]
 }

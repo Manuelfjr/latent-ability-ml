@@ -2,7 +2,7 @@
 title: Gabarito
 permalink: /ita/gabarito/
 kicker: Para conferir depois
-lead: As perguntas das duas partes, com a resposta esperada e o código de cada tarefa. Tente responder antes de abrir.
+lead: Uma leitura possível de cada pergunta, para comparar com a sua. Não é a única resposta certa; o que vale é a análise.
 ---
 {% if site.ita_gabarito %}
 {% assign keys = "parte1,parte2" | split: "," %}
@@ -14,11 +14,11 @@ lead: As perguntas das duas partes, com a resposta esperada e o código de cada 
   <ol class="ita-key">
     {% for task in part.tasks %}
     <li class="ita-key__item" id="gabarito-{{ task.id }}">
-      <h3><span>{% if task.optional %}Desafio{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>{{ task.title }}</h3>
+      <h3><span>{% if task.optional %}Livre{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>{{ task.title }}</h3>
       <div class="ita-key__q">{{ task.question | markdownify }}</div>
-      <div class="ita-key__a">{{ task.answer | prepend: "**Gabarito.** " | markdownify }}</div>
+      <div class="ita-key__a">{{ task.answer | prepend: "**Uma leitura possível.** " | markdownify }}</div>
       <details>
-        <summary>Código{% if task.solution != "" %} (solução){% endif %}</summary>
+        <summary>Código</summary>
         <pre><code>{% if task.solution != "" %}{{ task.solution | xml_escape }}{% else %}{{ task.code | xml_escape }}{% endif %}</code></pre>
       </details>
     </li>
@@ -29,6 +29,6 @@ lead: As perguntas das duas partes, com a resposta esperada e o código de cada 
 {% endfor %}
 {% else %}
 <section class="ita-section">
-  <p>O gabarito será liberado ao fim do tutorial. Enquanto isso, escreva a sua resposta em cada tarefa: ela fica salva neste navegador.</p>
+  <p>O gabarito será liberado ao fim do tutorial. Enquanto isso, escreva a sua análise em cada tarefa: ela fica salva neste navegador.</p>
 </section>
 {% endif %}

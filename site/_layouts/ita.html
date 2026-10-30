@@ -43,6 +43,7 @@
             <img src="{{ '/assets/parceiros/cin-ufpe.png' | relative_url }}" alt="Centro de Informática · Universidade Federal de Pernambuco" />
           </a>
         </div>
+        <p class="ita-side__motto" lang="la">sic <span aria-hidden="true">•</span> parvis <span aria-hidden="true">•</span> magna</p>
       </aside>
 
       <div class="ita-content">
@@ -98,6 +99,11 @@
         });
       })();
     </script>
+    {% include ita-chat.html %}
+    <script type="application/json" id="ita-chat-config">
+      {"apiUrls": {{ site.notebook_runtime_api_urls | default: empty | jsonify }}}
+    </script>
+    <script src="{{ '/assets/ita/chat.js' | relative_url }}"></script>
     {% if page.lab %}
     <script type="application/json" id="ita-lab-config">
       {

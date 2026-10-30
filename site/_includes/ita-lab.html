@@ -24,13 +24,14 @@
       <span class="ita-task__num">{% if task.optional %}★{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>
       <div class="ita-task__titles">
         <h3 class="ita-task__title">{{ task.title }}</h3>
-        <span class="ita-task__meta">{% if task.optional %}Opcional · {% endif %}~{{ task.minutes }} min</span>
+        <span class="ita-task__meta">{% if task.optional %}Livre · opcional · {% endif %}~{{ task.minutes }} min</span>
       </div>
       <span class="ita-task__state" data-task-state aria-live="polite"></span>
     </header>
     <div class="ita-task__body">
       <div class="ita-task__do">{{ task.do | markdownify }}</div>
       <div class="ita-task__question"><span>Pergunta</span>{{ task.question | markdownify }}</div>
+      {% if task.explore != "" %}<div class="ita-task__explore"><span>Para explorar</span>{{ task.explore | markdownify }}</div>{% endif %}
       <script type="text/plain" data-question>{{ task.question }}</script>
       <div class="ita-task__editor" data-editor>
         <textarea spellcheck="false" aria-label="Código da tarefa {{ forloop.index }}">{{ task.code | xml_escape }}</textarea>
@@ -48,12 +49,12 @@
       </div>
       <div class="ita-output" data-output hidden></div>
       <label class="ita-task__response">
-        <span>Sua resposta</span>
-        <textarea data-response rows="3" placeholder="Escreva aqui, em uma ou duas frases. Fica salvo neste navegador."></textarea>
+        <span>Sua análise</span>
+        <textarea data-response rows="4" placeholder="O que você observou, o que conclui, que dúvida ficou. Fica salvo neste navegador."></textarea>
       </label>
       {% if site.ita_gabarito %}
       <div class="ita-note ita-note--answer" data-answer hidden>
-        <strong>Gabarito</strong>{{ task.answer | markdownify }}
+        <strong>Gabarito · uma leitura possível</strong>{{ task.answer | markdownify }}
       </div>
       {% endif %}
     </div>

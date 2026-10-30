@@ -15,6 +15,8 @@ from tasks import PARTS, THEME  # noqa: E402
 REPO = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO / "site" / "_data" / "ita"
 NB_DIR = REPO / "notebooks" / "ita"
+CHAT_CONTEXT = REPO / "backend" / "tutorial_context.md"
+HELPERS = REPO / "utils" / "handson.py"
 
 SETUP = """import subprocess
 import sys
@@ -49,6 +51,7 @@ def site_data(part: dict, number: int) -> dict:
                 "optional": bool(task.get("optional")),
                 "do": task["do"],
                 "question": task["question"],
+                "explore": task.get("explore", ""),
                 "code": task["code"],
                 "hints": task["hints"],
                 "answer": task["answer"],
@@ -72,18 +75,19 @@ def notebook(part: dict, number: int, answers: bool) -> dict:
     cells = [
         md(f"# Parte {number} · {part['title']}{suffix}\n\n**Avaliação com habilidade latente · Instituto Kunumi**\n\n{part['goal']}"),
         md(
-            "**Execute a célula de preparação primeiro.** Depois siga as tarefas em ordem: complete as lacunas `___` "
-            "usando as funções de `utils/handson.py` (no Jupyter e no Colab, `help(funcao)` ou Shift + Tab mostram a "
-            "documentação), execute e responda à pergunta."
+            "**Execute a célula de preparação primeiro.** Depois siga as tarefas em ordem. O código já está pronto: "
+            "execute, observe e escreva a sua análise. Mude o que quiser para testar hipóteses; as funções de "
+            "`utils/handson.py` estão documentadas (`help(funcao)` ou Shift + Tab no Jupyter e no Colab)."
         ),
         code(SETUP),
         code(THEME),
     ]
     for index, task in enumerate(part["tasks"], 1):
-        label = "Desafio" if task.get("optional") else f"Tarefa {index}"
-        cells.append(md(f"## {label} · {task['title']} (~{task['minutes']} min)\n\n{task['do']}\n\n**Pergunta.** {task['question']}"))
+        label = "Livre" if task.get("optional") else f"Tarefa {index}"
+        explore = f"\n\n**Para explorar.** {task['explore']}" if task.get("explore") else ""
+        cells.append(md(f"## {label} · {task['title']} (~{task['minutes']} min)\n\n{task['do']}\n\n**Pergunta.** {task['question']}{explore}"))
         cells.append(code((task.get("solution") or task["code"]) if answers else task["code"]))
-        cells.append(md(f"**Gabarito.** {task['answer']}" if answers else "*Sua resposta:* "))
+        cells.append(md(f"**Gabarito.** {task['answer']}" if answers else "*Sua análise:* "))
     if part.get("epilogue"):
         cells.append(md(part["epilogue"]))
     return {
@@ -95,6 +99,55 @@ def notebook(part: dict, number: int, answers: bool) -> dict:
         "nbformat": 4,
         "nbformat_minor": 5,
     }
+
+
+def helper_summaries() -> str:
+    """One line per public helper in utils/handson.py: signature and first docstring line."""
+    import ast
+
+    tree = ast.parse(HELPERS.read_text(encoding="utf-8"))
+    lines = []
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef)) and not node.name.startswith("_"):
+            doc = (ast.get_docstring(node) or "").split("\n")[0]
+            args = ", ".join(a.arg for a in node.args.args) if isinstance(node, ast.FunctionDef) else ""
+            lines.append(f"- `{node.name}({args})`: {doc}")
+    return "\n".join(lines)
+
+
+def chat_context() -> str:
+    """Reference material for the tutorial assistant (backend/chat.py)."""
+    claire = json.loads((DATA_DIR / "claire.json").read_text(encoding="utf-8"))
+    out = ["# Material do tutorial", ""]
+    for number, part in enumerate(PARTS, 1):
+        out += [f"## Parte {number} · {part['title']} (~{part['minutes']} min)", "", part["goal"], ""]
+        for index, task in enumerate(part["tasks"], 1):
+            label = "Livre" if task.get("optional") else f"Tarefa {index}"
+            out += [
+                f"### {label} · {task['title']}",
+                f"Enunciado: {task['do']}",
+                f"Pergunta: {task['question']}",
+                *( [f"Para explorar: {task['explore']}"] if task.get("explore") else [] ),
+                "Código:",
+                "```python",
+                task["code"].rstrip(),
+                "```",
+                f"Gabarito (uma leitura possível): {task['answer']}",
+                "",
+            ]
+    out += [
+        "## Demonstração do CLAIRE (fim da Parte 2, sem exercício)",
+        f"{claire['n_points']} pontos em três grupos de dispersões diferentes, {claire['n_models']} algoritmos de agrupamento. "
+        "A concordância entre partições vira uma matriz de respostas contínuas e o β4-IRT estima a habilidade de cada "
+        f"algoritmo e a dificuldade de cada ponto, sem rótulos. Correlação de Spearman entre habilidade CLAIRE e ARI: "
+        f"{claire['spearman_ari']}; entre habilidade e silhueta: {claire['spearman_silhouette']}.",
+        "Referência: Ferreira-Junior et al. (2025), CLAIRE, Machine Learning 114, 256. doi:10.1007/s10994-025-06911-0",
+        "",
+        "## Funções disponíveis (utils/handson.py)",
+        helper_summaries(),
+        "",
+    ]
+    return "\n".join(out)
 
 
 def main() -> None:
@@ -109,6 +162,7 @@ def main() -> None:
         for answers, name in ((False, data["notebook"]), (True, data["answer_notebook"])):
             content = json.dumps(notebook(part, number, answers), indent=1, ensure_ascii=False) + "\n"
             (NB_DIR / name).write_text(content, encoding="utf-8")
+    CHAT_CONTEXT.write_text(chat_context(), encoding="utf-8")
     print("dados:", sorted(p.name for p in DATA_DIR.glob("*.json")))
     print("notebooks:", sorted(p.name for p in NB_DIR.glob("*.ipynb")))
 

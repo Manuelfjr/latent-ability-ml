@@ -1,0 +1,35 @@
+<div class="ita-chat" data-chat>
+  <section class="ita-chat__panel" data-chat-panel hidden role="dialog" aria-label="Assistente do tutorial">
+    <header class="ita-chat__head">
+      <div>
+        <strong>Assistente do tutorial</strong>
+        <span>Claude · pergunte sobre IRT, os gráficos ou a sua análise</span>
+      </div>
+      <button type="button" class="ita-chat__icon" data-chat-close aria-label="Fechar o assistente">×</button>
+    </header>
+    <div class="ita-chat__log" data-chat-log aria-live="polite">
+      <div class="ita-chat__intro">
+        <p>Olá! Posso ajudar a interpretar o que aparece na tela, explicar conceitos de IRT ou discutir a sua análise. Eu vejo a tarefa em que você está.</p>
+        <div class="ita-chat__suggestions">
+          <button type="button" data-chat-suggestion>O que devo observar nesta tarefa?</button>
+          <button type="button" data-chat-suggestion>Explique dificuldade e discriminação com um exemplo.</button>
+          <button type="button" data-chat-suggestion>Minha análise faz sentido?</button>
+        </div>
+      </div>
+    </div>
+    <p class="ita-chat__status" data-chat-status hidden></p>
+    <div class="ita-chat__context">
+      <span data-chat-context>Contexto: esta página</span>
+      <button type="button" data-chat-context-toggle>Remover</button>
+      <button type="button" data-chat-clear>Nova conversa</button>
+    </div>
+    <form class="ita-chat__form" data-chat-form>
+      <textarea data-chat-input rows="2" placeholder="Escreva a sua pergunta. Enter envia, Shift + Enter quebra a linha." aria-label="Sua pergunta"></textarea>
+      <button class="ita-button" type="submit" data-chat-send>Enviar</button>
+    </form>
+    <p class="ita-chat__note">Respostas geradas por IA podem conter erros. A conversa fica só nesta aba.</p>
+  </section>
+  <button type="button" class="ita-chat__open" data-chat-open aria-expanded="false">
+    <span aria-hidden="true">?</span> Assistente
+  </button>
+</div>
