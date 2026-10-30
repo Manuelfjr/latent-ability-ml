@@ -148,6 +148,7 @@
     const base = await checkAvailable();
     if (!base) {
       setStatus('O assistente ainda não está disponível. Avise o instrutor.');
+      input.value = text;
       return;
     }
     busy = true;
