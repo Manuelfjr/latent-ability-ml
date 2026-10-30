@@ -1,0 +1,56 @@
+{%- assign part = site.data.ita[include.part] -%}
+{%- assign required = part.tasks | where: "optional", false -%}
+{%- assign colab = "https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/ita/" -%}
+<section class="ita-lab" id="tarefas" data-lab-part="{{ include.part }}">
+  <div class="ita-lab__bar" data-lab-bar>
+    <div class="ita-lab__progress">
+      <strong data-progress-label>0 de {{ required.size }} tarefas</strong>
+      <span class="ita-lab__track"><span class="ita-lab__fill" data-progress-fill></span></span>
+    </div>
+    <ol class="ita-lab__steps">
+      {% for task in part.tasks %}
+      <li><a href="#{{ task.id }}" data-step="{{ task.id }}" title="{{ task.title }}">{% if task.optional %}★{% else %}{{ forloop.index }}{% endif %}</a></li>
+      {% endfor %}
+    </ol>
+    <div class="ita-lab__links">
+      <a href="{{ colab }}{{ part.notebook }}" target="_blank" rel="noreferrer">Abrir no Colab</a>
+    </div>
+  </div>
+
+  {% for task in part.tasks %}
+  <article class="ita-task{% if task.optional %} ita-task--optional{% endif %}" id="{{ task.id }}" data-task="{{ task.id }}">
+    <header class="ita-task__head">
+      <span class="ita-task__num">{% if task.optional %}★{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>
+      <div class="ita-task__titles">
+        <h3 class="ita-task__title">{{ task.title }}</h3>
+        <span class="ita-task__meta">{% if task.optional %}Opcional · {% endif %}~{{ task.minutes }} min</span>
+      </div>
+      <span class="ita-task__state" data-task-state aria-live="polite"></span>
+    </header>
+    <div class="ita-task__body">
+      <div class="ita-task__do">{{ task.do | markdownify }}</div>
+      <div class="ita-task__question"><span>Pergunta</span>{{ task.question | markdownify }}</div>
+      <div class="ita-task__editor" data-editor>
+        <textarea spellcheck="false" aria-label="Código da tarefa {{ forloop.index }}">{{ task.code | xml_escape }}</textarea>
+      </div>
+      <div class="ita-task__actions">
+        <button class="ita-button" type="button" data-action="run">Executar</button>
+        {% if task.hints.size > 0 %}<button class="ita-button ita-button--quiet" type="button" data-action="hint" data-hint-total="{{ task.hints.size }}">Dica</button>{% endif %}
+        <button class="ita-button ita-button--quiet" type="button" data-action="answer">Resposta</button>
+        <button class="ita-button ita-button--quiet" type="button" data-action="reset">Restaurar código</button>
+        <span class="ita-task__shortcut">Shift + Enter executa</span>
+      </div>
+      <div class="ita-task__hints" data-hints hidden>
+        {% for hint in task.hints %}<div class="ita-note" data-hint hidden><strong>Dica {{ forloop.index }}</strong>{{ hint | markdownify }}</div>{% endfor %}
+      </div>
+      <div class="ita-note ita-note--answer" data-answer hidden>
+        <strong>Resposta</strong>{{ task.answer | markdownify }}
+        {% if task.solution != "" %}<button class="ita-button ita-button--quiet" type="button" data-action="solution">Carregar solução no editor</button>{% endif %}
+      </div>
+      <div class="ita-output" data-output hidden></div>
+    </div>
+    <script type="text/plain" data-seed>{{ task.code }}</script>
+    {% if task.solution != "" %}<script type="text/plain" data-solution>{{ task.solution }}</script>{% endif %}
+  </article>
+  {% endfor %}
+</section>

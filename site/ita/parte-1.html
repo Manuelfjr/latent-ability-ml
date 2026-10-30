@@ -1,0 +1,21 @@
+---
+title: Nem todo exemplo é igualmente difícil
+permalink: /ita/parte-1/
+kicker: Parte 1 · 15 minutos de hands-on
+lead: Três classificadores com quase a mesma acurácia erram justamente nos mesmos poucos exemplos. A tabela de acertos e erros que aparece aqui é a matéria-prima da IRT.
+lab: parte1
+---
+<section class="ita-section">
+  <p class="ita-kicker">A ideia em um minuto</p>
+  <ul class="ita-ideas">
+    <li><strong>A média esconde o lugar do erro.</strong> Acurácia e F1 resumem bem um modelo, mas não dizem em quais exemplos ele falha.</li>
+    <li><strong>A dificuldade é local.</strong> Os erros se concentram na fronteira entre as classes, onde o rótulo é ambíguo.</li>
+    <li><strong>Já é uma tabela de IRT.</strong> Modelos nas linhas, exemplos nas colunas, acerto ou erro nas células.</li>
+  </ul>
+</section>
+
+{% include ita-lab.html part="parte1" %}
+
+<div class="ita-actions">
+  <a class="ita-button" href="{{ '/ita/parte-2/' | relative_url }}">Seguir para a Parte 2</a>
+</div>

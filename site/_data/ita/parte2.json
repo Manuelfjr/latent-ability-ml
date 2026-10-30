@@ -1,0 +1,100 @@
+{
+  "number": 2,
+  "title": "Lendo curvas da IRT",
+  "minutes": 20,
+  "goal": "Um parâmetro de cada vez: a dificuldade move a curva, a discriminação muda a inclinação, e as duas juntas decidem quais itens separam modelos fortes de fracos.",
+  "notebook": "02_parte2_atividade.ipynb",
+  "answer_notebook": "02_parte2_respostas.ipynb",
+  "tasks": [
+    {
+      "id": "parte2-t1",
+      "title": "Um item, uma curva",
+      "minutes": 3,
+      "optional": false,
+      "do": "Execute. A curva característica do item (CCI) dá a probabilidade de acerto para cada habilidade θ.",
+      "question": "Por que a probabilidade é exatamente 0,5 quando a habilidade é igual à dificuldade?",
+      "code": "import numpy as np\nfrom utils.handson import binary_irt_probability\n\ntheta = np.linspace(-3, 3, 200)   # habilidade latente\np = binary_irt_probability(theta, difficulty=0.0, discrimination=1.0)\n\nfig, ax = plt.subplots()\nax.plot(theta, p)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Uma curva característica do item\")\nplt.show()\n\nprint(\"P(acerto) com θ = 0:\", binary_irt_probability(0.0, difficulty=0.0, discrimination=1.0))\n",
+      "hints": [
+        "O modelo 2PL é P = 1 / (1 + exp(−a(θ − δ))).",
+        "Com θ = δ o expoente vale zero, e 1 / (1 + 1) = 0,5."
+      ],
+      "answer": "Em P = 1 / (1 + exp(−a(θ − δ))), θ = δ zera o expoente e P = 1/2. A dificuldade é a habilidade em que acertar vira cara ou coroa.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t2",
+      "title": "A dificuldade move a curva",
+      "minutes": 3,
+      "optional": false,
+      "do": "Execute para ver três itens que só diferem na dificuldade. Depois acrescente `2.0` à lista e execute de novo.",
+      "question": "Qual item é o mais difícil? Como você percebe isso só olhando?",
+      "code": "dificuldades = [-1.0, 0.0, 1.0]   # <- acrescente 2.0\n\nfig, ax = plt.subplots()\nfor d in dificuldades:\n    ax.plot(theta, binary_irt_probability(theta, difficulty=d, discrimination=1.0), label=f\"δ = {d}\")\nax.axhline(0.5, color=\"#B4ADA4\", linestyle=\"--\", linewidth=1)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Mesma forma, posições diferentes\")\nax.legend()\nplt.show()\n",
+      "hints": [
+        "Todas as curvas têm a mesma forma: só a posição muda.",
+        "Veja onde cada curva cruza a linha tracejada de 0,5."
+      ],
+      "answer": "Aumentar a dificuldade desloca a curva para a direita. O item mais difícil é o mais à direita: exige mais habilidade para a probabilidade subir.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t3",
+      "title": "A discriminação muda a inclinação",
+      "minutes": 3,
+      "optional": false,
+      "do": "Agora a dificuldade fica fixa em `0` e só a discriminação muda. Execute e depois acrescente `5.0` à lista.",
+      "question": "Qual curva separa melhor alguém com θ = −0,5 de alguém com θ = 0,5?",
+      "code": "discriminacoes = [0.5, 1.0, 3.0]   # <- acrescente 5.0\n\nfig, ax = plt.subplots()\nfor a in discriminacoes:\n    ax.plot(theta, binary_irt_probability(theta, difficulty=0.0, discrimination=a), label=f\"a = {a}\")\nax.axvspan(-0.5, 0.5, color=\"#B4ADA4\", alpha=0.25)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Mesmo ponto central, inclinações diferentes\")\nax.legend()\nplt.show()\n",
+      "hints": [
+        "Todas cruzam 0,5 no mesmo ponto: a dificuldade não mudou.",
+        "Olhe quanto cada curva sobe dentro da faixa cinza."
+      ],
+      "answer": "A curva mais inclinada (maior discriminação) sai de baixo para cima dentro da faixa cinza, então separa bem habilidades próximas. Uma curva achatada quase não distingue as duas.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t4",
+      "title": "Probabilidades numa tabela",
+      "minutes": 3,
+      "optional": false,
+      "do": "Execute. A tabela mostra a probabilidade de acerto de três respondentes (linhas) em três itens (colunas).",
+      "question": "Qual item separa melhor o respondente com θ = 0 do respondente com θ = 1?",
+      "code": "import pandas as pd\n\nitens = {                # nome: (dificuldade, discriminação)\n    \"fácil\":   (-1.0, 1.0),\n    \"médio\":   (0.0, 1.0),\n    \"difícil\": (1.0, 2.0),\n}\nhabilidades = np.array([-1.0, 0.0, 1.0])\n\ntabela = pd.DataFrame(\n    {nome: binary_irt_probability(habilidades, d, a) for nome, (d, a) in itens.items()},\n    index=[f\"θ = {t:+.0f}\" for t in habilidades],\n)\ntabela.round(2)\n",
+      "hints": [
+        "Em cada coluna, compare a linha θ = +0 com a linha θ = +1.",
+        "O item com o maior salto entre essas duas linhas é o que mais separa os dois."
+      ],
+      "answer": "O item *difícil* salta de 0,12 para 0,50 entre θ = 0 e θ = 1: sua dificuldade está nessa faixa e ele é o mais discriminativo. O item fácil já está perto de 1 para os dois.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t5",
+      "title": "Uma curva ao contrário",
+      "minutes": 3,
+      "optional": false,
+      "do": "Execute. O item tem discriminação negativa.",
+      "question": "Numa avaliação de modelos, o que significaria um exemplo se comportar assim?",
+      "code": "p = binary_irt_probability(theta, difficulty=0.0, discrimination=-1.5)\n\nfig, ax = plt.subplots()\nax.plot(theta, p)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"P(acerto)\")\nax.set_title(\"Discriminação negativa\")\nplt.show()\n",
+      "hints": [
+        "Aqui, quem tem mais habilidade acerta *menos*.",
+        "Pense num exemplo com rótulo errado no conjunto de teste."
+      ],
+      "answer": "Modelos melhores erram mais esse exemplo. Na prática, isso sinaliza um exemplo suspeito — por exemplo, com rótulo errado: o modelo bom acerta a classe verdadeira e é contado como erro.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t6",
+      "title": "Desafio: projete um item",
+      "minutes": 5,
+      "optional": true,
+      "do": "Escolha dificuldade e discriminação para que o item separe um modelo fraco (θ = 0) de um forte (θ = 1): o fraco deve acertar no máximo 30% das vezes e o forte pelo menos 90%.",
+      "question": "Que combinação funcionou? Por que você precisou mexer nos dois parâmetros?",
+      "code": "dificuldade = 0.0      # <- mude aqui\ndiscriminacao = 1.0    # <- e aqui\n\nfraco, forte = binary_irt_probability(np.array([0.0, 1.0]), dificuldade, discriminacao)\nprint(f\"modelo fraco (θ=0): {fraco:.2f}   modelo forte (θ=1): {forte:.2f}\")\nprint(\"Conseguiu!\" if fraco <= 0.30 and forte >= 0.90 else \"Ainda não: busque fraco ≤ 0,30 e forte ≥ 0,90\")\n",
+      "hints": [
+        "Coloque a dificuldade entre as duas habilidades, por exemplo perto de 0,5.",
+        "Depois aumente a discriminação até a curva ficar íngreme o suficiente entre θ = 0 e θ = 1."
+      ],
+      "answer": "Por exemplo, dificuldade 0,5 e discriminação 5 dão cerca de 0,08 para o fraco e 0,92 para o forte. A dificuldade posiciona a transição entre os dois modelos; a discriminação deixa essa transição abrupta o bastante.",
+      "solution": "dificuldade = 0.5\ndiscriminacao = 5.0\n\nfraco, forte = binary_irt_probability(np.array([0.0, 1.0]), dificuldade, discriminacao)\nprint(f\"modelo fraco (θ=0): {fraco:.2f}   modelo forte (θ=1): {forte:.2f}\")\nprint(\"Conseguiu!\" if fraco <= 0.30 and forte >= 0.90 else \"Ainda não: busque fraco ≤ 0,30 e forte ≥ 0,90\")\n"
+    }
+  ]
+}

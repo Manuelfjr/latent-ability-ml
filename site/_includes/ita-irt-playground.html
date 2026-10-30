@@ -1,0 +1,27 @@
+<section class="ita-playground" data-playground aria-labelledby="playground-title">
+  <div class="ita-playground__text">
+    <p class="ita-kicker">Laboratório · sem código</p>
+    <h2 class="ita-h2" id="playground-title">Brinque com uma curva</h2>
+    <p>Arraste os controles. A curva vermelha é o item que você está montando; a tracejada é um item de referência com δ = 0 e a = 1.</p>
+    <div class="ita-playground__controls">
+      <label>
+        <span>Dificuldade δ <output data-out="delta">0,0</output></span>
+        <input type="range" min="-2" max="2" step="0.1" value="0" data-param="delta" />
+      </label>
+      <label>
+        <span>Discriminação a <output data-out="a">1,0</output></span>
+        <input type="range" min="-3" max="5" step="0.1" value="1" data-param="a" />
+      </label>
+      <label>
+        <span>Habilidade θ do respondente <output data-out="theta">1,0</output></span>
+        <input type="range" min="-3" max="3" step="0.1" value="1" data-param="theta" />
+      </label>
+    </div>
+    <p class="ita-playground__readout" data-readout aria-live="polite"></p>
+    <button class="ita-button ita-button--quiet" type="button" data-action="reset-playground">Voltar ao início</button>
+  </div>
+  <figure class="ita-playground__chart">
+    <svg viewBox="0 0 640 380" role="img" aria-labelledby="playground-title" data-chart></svg>
+    <figcaption>P(acerto) = 1 / (1 + e<sup>−a(θ − δ)</sup>)</figcaption>
+  </figure>
+</section>

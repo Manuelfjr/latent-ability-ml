@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% if page.url == '/ita/' %}Avaliação com habilidade latente · Instituto Kunumi{% else %}{{ page.title }} · Avaliação com habilidade latente{% endif %}</title>
+    <meta name="description" content="{{ page.lead | default: 'Tutorial prático de avaliação de modelos com Teoria de Resposta ao Item.' | strip_html }}" />
+    <meta property="og:title" content="{{ page.title }} · Avaliação com habilidade latente" />
+    <meta property="og:description" content="{{ page.lead | strip_html }}" />
+    <meta property="og:image" content="{{ '/assets/instituto/instituto-gamma-waves-01.png' | absolute_url }}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+    <link rel="stylesheet" href="{{ '/assets/ita/ita.css' | relative_url }}" />
+  </head>
+  <body class="ita">
+    {%- assign nav = site.data.navigation.ita -%}
+    <div class="ita-shell">
+      <aside class="ita-side" aria-label="Navegação do tutorial">
+        <div class="ita-side__top">
+          <a class="ita-side__brand" href="{{ '/ita/' | relative_url }}" aria-label="Início">
+            <img src="{{ '/assets/instituto/instituto-positive-complete.png' | relative_url }}" alt="Instituto Kunumi" />
+          </a>
+          <button class="ita-side__toggle" type="button" aria-expanded="false" aria-controls="ita-side-nav" data-side-toggle>Menu</button>
+        </div>
+        <p class="ita-side__name">Avaliação com habilidade latente</p>
+        <nav class="ita-side__nav" id="ita-side-nav">
+          {% for item in nav %}
+          <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>
+            <span class="ita-side__label">{% if item.num %}<span class="ita-side__num">{{ item.num }}</span>{% endif %}{{ item.title }}</span>
+            {% if item.subtitle %}<span class="ita-side__sub">{{ item.subtitle }}</span>{% endif %}
+          </a>
+          {% endfor %}
+        </nav>
+        <span class="ita-runtime" data-runtime-status hidden></span>
+        <div class="ita-side__partners">
+          <span>Em parceria com</span>
+          <a href="https://portal.cin.ufpe.br/" target="_blank" rel="noreferrer">
+            <img src="{{ '/assets/parceiros/cin-ufpe.png' | relative_url }}" alt="Centro de Informática · Universidade Federal de Pernambuco" />
+          </a>
+        </div>
+      </aside>
+
+      <div class="ita-content">
+        {% if page.hero %}
+        <section class="ita-hero">
+          <div class="ita-hero__inner">
+            <p class="ita-kicker ita-kicker--light">{{ page.kicker }}</p>
+            <h1 class="ita-hero__title">{{ page.hero }}</h1>
+            <p class="ita-hero__lead">{{ page.lead }}</p>
+            {% if page.cta_url %}
+            <div class="ita-actions">
+              <a class="ita-button" href="{{ page.cta_url | relative_url }}">{{ page.cta_label }}</a>
+              {% if page.cta2_url %}<a class="ita-button ita-button--ghost-light" href="{{ page.cta2_url }}">{{ page.cta2_label }}</a>{% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </section>
+        {% else %}
+        <section class="ita-pagehead">
+          <div class="ita-pagehead__inner">
+            {% if page.kicker %}<p class="ita-kicker">{{ page.kicker }}</p>{% endif %}
+            <h1 class="ita-title">{{ page.title }}</h1>
+            {% if page.lead %}<p class="ita-lead">{{ page.lead }}</p>{% endif %}
+          </div>
+        </section>
+        {% endif %}
+
+        <main class="ita-main">
+          {{ content }}
+        </main>
+
+        <footer class="ita-footer">
+          <div class="ita-footer__inner">
+            <div class="ita-footer__marks">
+              <img src="{{ '/assets/instituto/instituto-positive-complete.png' | relative_url }}" alt="Instituto Kunumi" class="ita-footer__kunumi" />
+              <img src="{{ '/assets/parceiros/cin-ufpe.png' | relative_url }}" alt="Centro de Informática · Universidade Federal de Pernambuco" class="ita-footer__partner" />
+            </div>
+            <p>Material de Manuel Ferreira Junior (Instituto Kunumi · CIn/UFPE) e Ricardo Prudêncio (CIn/UFPE). Código e notebooks em <a href="{{ site.repo_url }}">github.com/manuelfjr/latent-ability-ml</a>.</p>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        const toggle = document.querySelector('[data-side-toggle]');
+        const side = document.querySelector('.ita-side');
+        if (!toggle || !side) return;
+        toggle.addEventListener('click', () => {
+          const open = side.classList.toggle('is-open');
+          toggle.setAttribute('aria-expanded', String(open));
+          toggle.textContent = open ? 'Fechar' : 'Menu';
+        });
+      })();
+    </script>
+    {% if page.lab %}
+    <script type="application/json" id="ita-lab-config">
+      {
+        "pageId": {{ page.lab | jsonify }},
+        "apiUrls": {{ site.notebook_runtime_api_urls | default: empty | jsonify }},
+        "analytics": {{ site.admin_analytics_enabled | default: false | jsonify }},
+        "themeCode": {{ site.data.ita.theme.code | jsonify }},
+        "pythonFiles": [
+          {"url": {{ '/assets/python/utils/__init__.py' | relative_url | jsonify }}, "path": "utils/__init__.py"},
+          {"url": {{ '/assets/python/utils/transform.py' | relative_url | jsonify }}, "path": "utils/transform.py"},
+          {"url": {{ '/assets/python/utils/handson.py' | relative_url | jsonify }}, "path": "utils/handson.py"}
+        ]
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <script src="{{ '/assets/ita/lab.js' | relative_url }}"></script>
+    {% endif %}
+    {% if page.playground %}
+    <script src="{{ '/assets/ita/irt-playground.js' | relative_url }}"></script>
+    {% endif %}
+  </body>
+</html>

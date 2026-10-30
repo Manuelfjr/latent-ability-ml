@@ -1,0 +1,77 @@
+---
+title: Início
+permalink: /ita/
+kicker: Tutorial · 60 minutos
+hero: Quão difícil é cada exemplo?
+lead: Uma introdução prática à avaliação de modelos com Teoria de Resposta ao Item. Vinte minutos de conversa e quarenta de mão na massa, direto no navegador.
+cta_url: /ita/parte-1/
+cta_label: Começar pela Parte 1
+cta2_url: "#agenda"
+cta2_label: Ver a agenda
+---
+<section class="ita-section" id="agenda">
+  <p class="ita-kicker">Agenda</p>
+  <h2 class="ita-h2">Como vamos usar a hora</h2>
+  <p>Começamos com uma conversa curta sobre por que a acurácia não conta a história toda. Depois, cada pessoa segue as tarefas no próprio computador, no seu ritmo.</p>
+  <div class="ita-agenda" role="list">
+    <div class="ita-agenda__slot ita-agenda__slot--talk" role="listitem" style="--minutes: 20">
+      <span class="ita-agenda__time">20 min</span>
+      <span class="ita-agenda__label">Apresentação</span>
+    </div>
+    <div class="ita-agenda__slot ita-agenda__slot--hands" role="listitem" style="--minutes: 15">
+      <span class="ita-agenda__time">15 min</span>
+      <span class="ita-agenda__label">Parte 1 · avaliação supervisionada</span>
+    </div>
+    <div class="ita-agenda__slot ita-agenda__slot--hands" role="listitem" style="--minutes: 20">
+      <span class="ita-agenda__time">20 min</span>
+      <span class="ita-agenda__label">Parte 2 · curvas da IRT</span>
+    </div>
+    <div class="ita-agenda__slot" role="listitem" style="--minutes: 5">
+      <span class="ita-agenda__time">5 min</span>
+      <span class="ita-agenda__label">Fechamento</span>
+    </div>
+  </div>
+  <p class="ita-agenda-legend">Preto: conversa. Vermelho: hands-on.</p>
+</section>
+
+<section class="ita-section">
+  <p class="ita-kicker">Hands-on</p>
+  <h2 class="ita-h2">Duas partes, uma pergunta</h2>
+  <div class="ita-parts">
+    <a class="ita-part" href="{{ '/ita/parte-1/' | relative_url }}">
+      <span class="ita-part__num">01</span>
+      <h3 class="ita-part__title">{{ site.data.ita.parte1.title }}</h3>
+      <p>Três classificadores com quase a mesma acurácia e os poucos exemplos que realmente os separam.</p>
+      <span class="ita-part__meta">{{ site.data.ita.parte1.tasks.size | minus: 1 }} tarefas + 1 desafio · <span>~{{ site.data.ita.parte1.minutes }} min</span></span>
+    </a>
+    <a class="ita-part" href="{{ '/ita/parte-2/' | relative_url }}">
+      <span class="ita-part__num">02</span>
+      <h3 class="ita-part__title">{{ site.data.ita.parte2.title }}</h3>
+      <p>Habilidade, dificuldade e discriminação, lidas em curvas que você mesmo monta e modifica.</p>
+      <span class="ita-part__meta">{{ site.data.ita.parte2.tasks.size | minus: 1 }} tarefas + 1 desafio · <span>~{{ site.data.ita.parte2.minutes }} min</span></span>
+    </a>
+  </div>
+</section>
+
+<section class="ita-section">
+  <p class="ita-kicker">Como funciona</p>
+  <h2 class="ita-h2">Cada tarefa leva dois ou três minutos</h2>
+  <ol class="ita-steps">
+    <li class="ita-step">
+      <h3 class="ita-step__title">Execute</h3>
+      <p>O código de cada tarefa já está pronto. Clique em <strong>Executar</strong> ou use Shift + Enter.</p>
+    </li>
+    <li class="ita-step">
+      <h3 class="ita-step__title">Mude uma coisa</h3>
+      <p>Quando a tarefa pedir, altere um único valor — ele vem marcado com <code># &lt;- mude aqui</code>.</p>
+    </li>
+    <li class="ita-step">
+      <h3 class="ita-step__title">Responda</h3>
+      <p>Cada tarefa termina numa pergunta. Travou? Abra uma dica. Terminou? Confira a resposta.</p>
+    </li>
+  </ol>
+  <p>Tudo roda no navegador, sem instalar nada. Se preferir, as mesmas tarefas estão no Colab:
+    <a href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/ita/{{ site.data.ita.parte1.notebook }}" target="_blank" rel="noreferrer">Parte 1</a> ·
+    <a href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/ita/{{ site.data.ita.parte2.notebook }}" target="_blank" rel="noreferrer">Parte 2</a>.
+  </p>
+</section>
