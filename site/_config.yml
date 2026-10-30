@@ -11,6 +11,10 @@ notebook_runtime_api_urls:
   - "https://manuelfjr-latent-ability-backend.hf.space"
 admin_analytics_enabled: true
 
+# ITA tutorial: false hides the "Gabarito" buttons and the /ita/gabarito/ page
+# (useful while the room is still working; flip to true to release the answers).
+ita_gabarito: true
+
 # Root (/) and the pre-edition URLs redirect here.
 default_edition: bristol
 defaults:

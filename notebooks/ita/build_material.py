@@ -68,10 +68,14 @@ def code(text: str) -> dict:
 
 
 def notebook(part: dict, number: int, answers: bool) -> dict:
-    suffix = " — respostas" if answers else ""
+    suffix = " — gabarito" if answers else ""
     cells = [
         md(f"# Parte {number} · {part['title']}{suffix}\n\n**Avaliação com habilidade latente · Instituto Kunumi**\n\n{part['goal']}"),
-        md("**Execute a célula de preparação primeiro.** Depois siga as tarefas em ordem: em cada uma, mude *uma* coisa, observe o resultado e responda *uma* pergunta."),
+        md(
+            "**Execute a célula de preparação primeiro.** Depois siga as tarefas em ordem: complete as lacunas `___` "
+            "usando as funções de `utils/handson.py` (no Jupyter e no Colab, `help(funcao)` ou Shift + Tab mostram a "
+            "documentação), execute e responda à pergunta."
+        ),
         code(SETUP),
         code(THEME),
     ]
@@ -79,7 +83,9 @@ def notebook(part: dict, number: int, answers: bool) -> dict:
         label = "Desafio" if task.get("optional") else f"Tarefa {index}"
         cells.append(md(f"## {label} · {task['title']} (~{task['minutes']} min)\n\n{task['do']}\n\n**Pergunta.** {task['question']}"))
         cells.append(code((task.get("solution") or task["code"]) if answers else task["code"]))
-        cells.append(md(f"**Resposta.** {task['answer']}" if answers else "*Sua resposta:* "))
+        cells.append(md(f"**Gabarito.** {task['answer']}" if answers else "*Sua resposta:* "))
+    if part.get("epilogue"):
+        cells.append(md(part["epilogue"]))
     return {
         "cells": cells,
         "metadata": {

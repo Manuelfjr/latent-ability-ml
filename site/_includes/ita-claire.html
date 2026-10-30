@@ -1,0 +1,37 @@
+{%- assign claire = site.data.ita.claire -%}
+<section class="ita-showcase" id="claire" aria-labelledby="claire-title">
+  <span class="ita-showcase__tag">Só demonstração · fora do hands-on</span>
+  <h2 class="ita-h2" id="claire-title">E quando não há rótulos?</h2>
+  <p>Em agrupamento não existe “acerto”: sem rótulos, não há a matriz de acertos da Parte 1. O <strong>CLAIRE</strong> contorna isso trocando acerto por <em>concordância</em> entre algoritmos, e então aplica a mesma lógica de IRT.</p>
+  <ol class="ita-steps">
+    <li class="ita-step">
+      <h3 class="ita-step__title">Vários agrupamentos</h3>
+      <p>Algoritmos com vieses diferentes (k-médias, misturas gaussianas, hierárquicos, espectral, DBSCAN) agrupam os mesmos dados.</p>
+    </li>
+    <li class="ita-step">
+      <h3 class="ita-step__title">Concordância vira resposta</h3>
+      <p>Para cada ponto i e algoritmo j, p<sub>ij</sub> ∈ [0, 1] mede quanto j concorda com os demais sobre com quem i foi agrupado.</p>
+    </li>
+    <li class="ita-step">
+      <h3 class="ita-step__title"><span class="ita-nocase">β</span>4-IRT</h3>
+      <p>Como as respostas são contínuas, o β4-IRT estima a habilidade de cada algoritmo e a dificuldade e a discriminação de cada ponto.</p>
+    </li>
+  </ol>
+  <div class="ita-showcase__grid">
+    <figure>
+      <img src="{{ '/assets/ita/claire-blobs.png' | relative_url }}" alt="Dispersão de {{ claire.n_points }} pontos em três grupos, coloridos pela dificuldade CLAIRE: os dois grupos compactos ficam claros, o grupo espalhado fica intermediário e alguns pontos isolados ficam escuros." loading="lazy" />
+      <figcaption>{{ claire.n_points }} pontos em três grupos com dispersões diferentes, {{ claire.n_models }} algoritmos. Grupos compactos são fáceis, o grupo espalhado é intermediário e os pontos que nenhum algoritmo agrupa de forma consistente são os mais difíceis.</figcaption>
+    </figure>
+    <div>
+      <p class="ita-showcase__stat"><strong>{{ claire.spearman_ari }}</strong> de correlação de Spearman entre a habilidade CLAIRE, estimada sem rótulos, e o ARI, que usa os rótulos verdadeiros. A silhueta, que também dispensa rótulos, fica em {{ claire.spearman_silhouette }}.</p>
+      <table class="ita-table">
+        <thead><tr><th scope="col">Algoritmo</th><th scope="col">Habilidade</th><th scope="col">ARI</th></tr></thead>
+        <tbody>
+          {% for model in claire.models %}<tr><td>{{ model.name }}</td><td>{{ model.ability }}</td><td>{{ model.ari }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p>Mais detalhes: Ferreira-Junior et al. (2025), <a href="https://doi.org/10.1007/s10994-025-06911-0"><em>CLAIRE: clustering evaluation based on item response theory and model agreement</em></a>, Machine Learning 114, 256. O passo a passo completo, com notebook, está na <a href="{{ '/bristol/section-5/' | relative_url }}">seção 5 do workshop de Bristol</a>; o código desta figura está em <a href="{{ site.repo_url }}/blob/main/notebooks/ita/claire_demo.py"><code>notebooks/ita/claire_demo.py</code></a>.</p>
+</section>

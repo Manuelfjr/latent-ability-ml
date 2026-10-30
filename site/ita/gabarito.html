@@ -1,0 +1,34 @@
+---
+title: Gabarito
+permalink: /ita/gabarito/
+kicker: Para conferir depois
+lead: As perguntas das duas partes, com a resposta esperada e o código de cada tarefa. Tente responder antes de abrir.
+---
+{% if site.ita_gabarito %}
+{% assign keys = "parte1,parte2" | split: "," %}
+{% for key in keys %}
+{%- assign part = site.data.ita[key] -%}
+<section class="ita-section">
+  <p class="ita-kicker">Parte {{ part.number }}</p>
+  <h2 class="ita-h2">{{ part.title }}</h2>
+  <ol class="ita-key">
+    {% for task in part.tasks %}
+    <li class="ita-key__item" id="gabarito-{{ task.id }}">
+      <h3><span>{% if task.optional %}Desafio{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>{{ task.title }}</h3>
+      <div class="ita-key__q">{{ task.question | markdownify }}</div>
+      <div class="ita-key__a">{{ task.answer | prepend: "**Gabarito.** " | markdownify }}</div>
+      <details>
+        <summary>Código{% if task.solution != "" %} (solução){% endif %}</summary>
+        <pre><code>{% if task.solution != "" %}{{ task.solution | xml_escape }}{% else %}{{ task.code | xml_escape }}{% endif %}</code></pre>
+      </details>
+    </li>
+    {% endfor %}
+  </ol>
+  <p><a href="https://colab.research.google.com/github/manuelfjr/latent-ability-ml/blob/main/notebooks/ita/{{ part.answer_notebook }}" target="_blank" rel="noreferrer">Notebook com o gabarito da Parte {{ part.number }} no Colab</a></p>
+</section>
+{% endfor %}
+{% else %}
+<section class="ita-section">
+  <p>O gabarito será liberado ao fim do tutorial. Enquanto isso, escreva a sua resposta em cada tarefa: ela fica salva neste navegador.</p>
+</section>
+{% endif %}

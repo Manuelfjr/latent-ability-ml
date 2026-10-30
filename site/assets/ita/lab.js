@@ -13,6 +13,11 @@
     set(key, value) { try { sessionStorage.setItem(storageKey(key), value); } catch (_) { /* storage blocked */ } },
     remove(key) { try { sessionStorage.removeItem(storageKey(key)); } catch (_) { /* storage blocked */ } },
   };
+  // Written answers outlive the tab, so a participant can come back to them after the session.
+  const keep = {
+    get(key) { try { return localStorage.getItem(storageKey(key)); } catch (_) { return null; } },
+    set(key, value) { try { localStorage.setItem(storageKey(key), value); } catch (_) { /* storage blocked */ } },
+  };
 
   let tabId = '';
   try {
@@ -277,13 +282,125 @@ def run_cell(code):
     outputEl.hidden = false;
   };
 
+  // ---- helper docs on hover ------------------------------------------------------------
+
+  // Parse `def`/`class` headers and their docstrings out of the workshop helper modules.
+  const parseDocs = (source, moduleName) => {
+    const docs = new Map();
+    const lines = source.replace(/\r\n/g, '\n').split('\n');
+    const indentOf = (line) => (line.match(/^\s*/) || [''])[0].length;
+    for (let i = 0; i < lines.length; i += 1) {
+      const match = lines[i].match(/^(\s*)(def|class)\s+([A-Za-z_]\w*)/);
+      if (!match || match[3].startsWith('_')) continue;
+      const header = [lines[i].trim()];
+      let cursor = i;
+      while (cursor < lines.length - 1 && !/:\s*(#.*)?$/.test(lines[cursor])) {
+        cursor += 1;
+        header.push(lines[cursor].trim());
+      }
+      cursor += 1;
+      while (cursor < lines.length && !lines[cursor].trim()) cursor += 1;
+      if (cursor >= lines.length || indentOf(lines[cursor]) <= match[1].length) continue;
+      const first = lines[cursor].trim();
+      if (!first.startsWith('"""')) continue;
+      const body = [];
+      let rest = first.slice(3);
+      while (!rest.includes('"""') && cursor < lines.length - 1) {
+        body.push(rest);
+        cursor += 1;
+        rest = lines[cursor];
+      }
+      body.push(rest.slice(0, rest.indexOf('"""')));
+      const pad = Math.min(...body.slice(1).filter((l) => l.trim()).map(indentOf), Infinity);
+      const text = body
+        .map((line, index) => (index === 0 || !Number.isFinite(pad) ? line.trim() : line.slice(pad).trimEnd()))
+        .join('\n')
+        .split(/\n\s*Examples\n\s*-{3,}/)[0]
+        .trim();
+      const signature = header.join(' ').replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/,\s*\)/g, ')').replace(/:\s*(#.*)?$/, '');
+      if (!docs.has(match[3])) docs.set(match[3], { name: match[3], kind: match[2], module: moduleName, signature, text });
+    }
+    return docs;
+  };
+
+  const helperDocs = new Map();
+  Promise.all((config.pythonFiles || []).filter((file) => /\.py$/.test(file.path) && !/__init__/.test(file.path)).map(async (file) => {
+    try {
+      const response = await fetch(file.url);
+      if (!response.ok) return;
+      const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
+      parseDocs(await response.text(), moduleName).forEach((entry, name) => helperDocs.set(name, entry));
+    } catch (_) { /* docs are a convenience; the lab works without them */ }
+  }));
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'ita-doc';
+  tooltip.hidden = true;
+  tooltip.setAttribute('role', 'tooltip');
+  document.body.append(tooltip);
+  let hideTimer = null;
+  let shownName = '';
+
+  const hideDoc = (delay = 180) => {
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => { tooltip.hidden = true; shownName = ''; }, delay);
+  };
+  const showDoc = (entry, anchorRect) => {
+    clearTimeout(hideTimer);
+    if (shownName !== entry.name) {
+      tooltip.replaceChildren();
+      const head = document.createElement('div');
+      head.className = 'ita-doc__head';
+      head.textContent = `${entry.kind === 'class' ? 'classe' : 'função'} · ${entry.module}`;
+      const signature = document.createElement('pre');
+      signature.className = 'ita-doc__sig';
+      signature.textContent = entry.signature;
+      const body = document.createElement('pre');
+      body.className = 'ita-doc__body';
+      body.textContent = entry.text;
+      tooltip.append(head, signature, body);
+      tooltip.hidden = false;
+      tooltip.scrollTop = 0;
+      shownName = entry.name;
+      track('show_doc', { cell_label: entry.name });
+    }
+    const margin = 12;
+    const box = tooltip.getBoundingClientRect();
+    let left = Math.min(anchorRect.left, innerWidth - box.width - margin);
+    let top = anchorRect.bottom + 8;
+    if (top + box.height > innerHeight - margin) top = Math.max(margin, anchorRect.top - box.height - 8);
+    tooltip.style.left = `${Math.max(margin, left)}px`;
+    tooltip.style.top = `${top}px`;
+  };
+  tooltip.addEventListener('mouseenter', () => clearTimeout(hideTimer));
+  tooltip.addEventListener('mouseleave', () => hideDoc());
+  addEventListener('scroll', () => hideDoc(0), { passive: true });
+
+  // Code tokens in the editor and `code` names in the task text both open the docs.
+  lab.addEventListener('mouseover', (event) => {
+    const target = event.target;
+    const inEditor = target.closest('.CodeMirror-line span, .CodeMirror-line');
+    const inText = target.closest('.ita-task__do code, .ita-note code');
+    const node = inText || (inEditor && target.tagName === 'SPAN' ? target : null);
+    const name = node ? node.textContent.trim().replace(/\(.*$/, '') : '';
+    const entry = helperDocs.get(name);
+    if (entry) {
+      node.classList.add('has-doc');
+      showDoc(entry, node.getBoundingClientRect());
+    } else if (!tooltip.hidden) {
+      hideDoc();
+    }
+  });
+  lab.addEventListener('mouseleave', () => hideDoc());
+  lab.addEventListener('keydown', () => hideDoc(0));
+
   // ---- tasks ----------------------------------------------------------------------------
 
   const tasks = Array.from(lab.querySelectorAll('[data-task]')).map((article) => {
     const id = article.dataset.task;
     const seed = article.querySelector('[data-seed]').textContent;
     const solution = article.querySelector('[data-solution]')?.textContent || '';
-    const textarea = article.querySelector('textarea');
+    const textarea = article.querySelector('[data-editor] textarea');
     const saved = store.get(`code:${id}`);
     if (saved !== null) textarea.value = saved;
 
@@ -316,7 +433,15 @@ def run_cell(code):
     const outputEl = article.querySelector('[data-output]');
     const stateEl = article.querySelector('[data-task-state]');
     const runButton = article.querySelector('[data-action="run"]');
-    const task = { id, article, optional: article.classList.contains('ita-task--optional'), done: store.get(`done:${id}`) === '1' };
+    const task = {
+      id,
+      article,
+      title: article.querySelector('.ita-task__title').textContent.trim(),
+      question: article.querySelector('[data-question]').textContent.trim(),
+      response: () => responseEl.value.trim(),
+      optional: article.classList.contains('ita-task--optional'),
+      done: store.get(`done:${id}`) === '1',
+    };
 
     const setDone = (done) => {
       task.done = done;
@@ -332,7 +457,16 @@ def run_cell(code):
       article.classList.add('is-running');
       try {
         const runtime = await getRuntime();
-        const result = await enqueue(() => runtime.execute(getCode()));
+        const code = getCode();
+        if (/(^|[^\w])___([^\w]|$)/.test(code)) {
+          renderOutput(outputEl, { success: false, stderr: 'Ainda há lacunas ___ para completar. Precisa de ajuda? Abra uma dica ou use "Carregar solução".' });
+          return;
+        }
+        const result = await enqueue(() => runtime.execute(code));
+        const missing = result.success === false && /NameError: name '(\w+)' is not defined/.exec(result.stderr || '');
+        if (missing && ['df', 'resultados', 'respostas', 'dificuldade', 'theta', 'np', 'binary_irt_probability', 'make_toy_classification_dataset', 'evaluate_models_on_dataset'].includes(missing[1])) {
+          result.stderr = `\`${missing[1]}\` ainda não existe nesta sessão: execute antes as tarefas anteriores (ou carregue a solução delas).\n\n${result.stderr}`;
+        }
         renderOutput(outputEl, result);
         if (result.success !== false) setDone(true);
         track('run_cell', { cell_label: id, runtime_mode: runtime.kind === 'backend' ? 'cloud' : 'browser' });
@@ -365,11 +499,18 @@ def run_cell(code):
       });
     }
 
+    const responseEl = article.querySelector('[data-response]');
+    responseEl.value = keep.get(`response:${id}`) || '';
+    responseEl.addEventListener('input', () => keep.set(`response:${id}`, responseEl.value));
+    responseEl.addEventListener('change', () => {
+      if (responseEl.value.trim()) track('write_answer', { cell_label: id });
+    });
+
     const answerEl = article.querySelector('[data-answer]');
     const answerButton = article.querySelector('[data-action="answer"]');
-    answerButton.addEventListener('click', () => {
+    answerButton?.addEventListener('click', () => {
       answerEl.hidden = !answerEl.hidden;
-      answerButton.textContent = answerEl.hidden ? 'Resposta' : 'Esconder resposta';
+      answerButton.textContent = answerEl.hidden ? 'Gabarito' : 'Esconder gabarito';
       if (!answerEl.hidden) track('show_answer', { cell_label: id });
     });
     article.querySelector('[data-action="solution"]')?.addEventListener('click', () => setCode(solution));
@@ -407,6 +548,25 @@ def run_cell(code):
     }, { rootMargin: '-40% 0px -55% 0px' });
     tasks.forEach((task) => observer.observe(task.article));
   }
+
+  // ---- export ---------------------------------------------------------------------------
+
+  lab.querySelector('[data-action="export"]')?.addEventListener('click', () => {
+    const heading = document.querySelector('.ita-title')?.textContent.trim() || document.title;
+    const lines = [`# ${heading}`, ''];
+    tasks.forEach((task, index) => {
+      lines.push(`## ${task.optional ? 'Desafio' : `Tarefa ${index + 1}`} · ${task.title}`, '');
+      lines.push(`**Pergunta.** ${task.question}`, '');
+      lines.push(`**Minha resposta.** ${task.response() || '_(sem resposta)_'}`, '');
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `ita-${config.pageId}-respostas.md`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+    track('export_answers');
+  });
 
   updateProgress();
   track('page_view');

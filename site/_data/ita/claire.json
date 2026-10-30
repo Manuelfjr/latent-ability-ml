@@ -1,0 +1,62 @@
+{
+  "n_points": 300,
+  "n_models": 9,
+  "spearman_ari": "0,90",
+  "spearman_silhouette": "0,35",
+  "models": [
+    {
+      "name": "espectral (k=3)",
+      "ability": "0,396",
+      "ari": "0,903",
+      "silhouette": "0,626"
+    },
+    {
+      "name": "mistura gaussiana (k=3)",
+      "ability": "0,394",
+      "ari": "0,951",
+      "silhouette": "0,604"
+    },
+    {
+      "name": "aglomerativo ward (k=3)",
+      "ability": "0,390",
+      "ari": "0,808",
+      "silhouette": "0,607"
+    },
+    {
+      "name": "k-médias (k=3)",
+      "ability": "0,389",
+      "ari": "0,723",
+      "silhouette": "0,656"
+    },
+    {
+      "name": "DBSCAN (eps=1,0)",
+      "ability": "0,385",
+      "ari": "0,797",
+      "silhouette": "0,510"
+    },
+    {
+      "name": "k-médias (k=5)",
+      "ability": "0,383",
+      "ari": "0,708",
+      "silhouette": "0,613"
+    },
+    {
+      "name": "DBSCAN (eps=0,5)",
+      "ability": "0,366",
+      "ari": "0,768",
+      "silhouette": "0,234"
+    },
+    {
+      "name": "k-médias (k=2)",
+      "ability": "0,330",
+      "ari": "0,463",
+      "silhouette": "0,638"
+    },
+    {
+      "name": "aglomerativo single (k=3)",
+      "ability": "0,202",
+      "ari": "0,000",
+      "silhouette": "-0,097"
+    }
+  ]
+}

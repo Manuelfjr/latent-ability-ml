@@ -2,7 +2,7 @@
   "number": 1,
   "title": "Nem todo exemplo é igualmente difícil",
   "minutes": 15,
-  "goal": "Três classificadores com quase a mesma acurácia erram justamente nos mesmos poucos exemplos. A tabela de acertos e erros que aparece aqui é a matéria-prima da IRT.",
+  "goal": "Três classificadores com acurácias praticamente iguais. A pergunta é onde cada um erra, e a resposta já tem a forma da matriz de respostas da IRT.",
   "notebook": "01_parte1_atividade.ipynb",
   "answer_notebook": "01_parte1_respostas.ipynb",
   "tasks": [
@@ -11,72 +11,78 @@
       "title": "Olhe os dados",
       "minutes": 2,
       "optional": false,
-      "do": "Execute a célula. Ela gera um problema de classificação com duas classes.",
-      "question": "Onde as duas classes se misturam? Quais pontos você acha que um modelo vai errar?",
-      "code": "from utils.handson import make_toy_classification_dataset\n\ndf = make_toy_classification_dataset(n_samples=300, class_sep=1.4, random_state=56)\n\nfig, ax = plt.subplots()\nfor label, grupo in df.groupby(\"label\"):\n    ax.scatter(grupo.feature_1, grupo.feature_2, s=18, alpha=0.8, label=f\"classe {label}\")\nax.set_title(\"Duas classes\")\nax.legend()\nplt.show()\n",
+      "do": "Gere um problema sintético de classificação binária em duas dimensões com `make_toy_classification_dataset`: 300 pontos, `class_sep=1.4` e `random_state=56`. Complete as lacunas `___` e execute.",
+      "question": "Antes de treinar qualquer modelo: em que região você espera erros, e por quê?",
+      "code": "from utils.handson import make_toy_classification_dataset, plot_classification_dataset\n\n# 300 pontos, class_sep=1.4, random_state=56\ndf = make_toy_classification_dataset(n_samples=___, class_sep=___, random_state=___)\n\nax = plot_classification_dataset(df)\nax.set_title(\"Duas classes\")\nplt.show()\n",
       "hints": [
-        "Procure a faixa onde pontos vermelhos e azuis aparecem lado a lado.",
+        "Passe o mouse sobre `make_toy_classification_dataset` para ver o que cada argumento faz.",
+        "No gráfico, procure a faixa onde pontos das duas classes aparecem lado a lado.",
         "É nessa faixa de fronteira que os rótulos ficam ambíguos."
       ],
-      "answer": "As duas nuvens se encostam numa faixa no meio do gráfico. Os pontos nessa fronteira são os candidatos naturais a erro, para qualquer modelo.",
-      "solution": ""
+      "answer": "Na faixa em que as duas nuvens se sobrepõem. Ali P(y ∣ x) fica perto de 1/2 e parte do erro é irredutível (erro de Bayes): nenhum classificador acerta esses pontos de forma sistemática.",
+      "solution": "from utils.handson import make_toy_classification_dataset, plot_classification_dataset\n\n# 300 pontos, class_sep=1.4, random_state=56\ndf = make_toy_classification_dataset(n_samples=300, class_sep=1.4, random_state=56)\n\nax = plot_classification_dataset(df)\nax.set_title(\"Duas classes\")\nplt.show()\n"
     },
     {
       "id": "parte1-t2",
       "title": "Treine três modelos",
       "minutes": 3,
       "optional": false,
-      "do": "Execute. A célula treina uma árvore de decisão, um k-vizinhos e uma regressão logística e mostra a acurácia de cada um no teste.",
-      "question": "Qual modelo ganhou? A diferença é grande o suficiente para importar?",
-      "code": "from utils.handson import evaluate_models_on_dataset, summarize_classification_results\n\nresultados = evaluate_models_on_dataset(df, scenario=\"ita\", random_state=56)\n\nsummarize_classification_results(resultados).set_index(\"model\")[[\"accuracy\"]].round(3)\n",
+      "do": "Treine três classificadores com vieses indutivos diferentes (árvore de decisão, k-vizinhos e regressão logística) com `evaluate_models_on_dataset`, que reserva 30% dos dados (90 exemplos) para teste. Passe o `df` da tarefa anterior e mostre a coluna `\"accuracy\"` do resumo.",
+      "question": "A diferença justificaria escolher um dos modelos? O que essa tabela não informa?",
+      "code": "from utils.handson import evaluate_models_on_dataset, summarize_classification_results\n\n# Treina os três classificadores; devolve uma linha por (modelo, exemplo de teste)\nresultados = evaluate_models_on_dataset(___, scenario=\"ita\", random_state=56)\nprint(\"colunas:\", resultados.columns.tolist())\n\n# Uma linha por modelo: mostre só a coluna de acurácia\nsummarize_classification_results(resultados).set_index(\"model\")[[___]].round(3)\n",
       "hints": [
-        "Compare as três acurácias: estão a cerca de 2 pontos percentuais uma da outra."
+        "A primeira lacuna é o conjunto de dados; a segunda é o nome da coluna, entre aspas.",
+        "Com 90 exemplos de teste, quantos exemplos são 2 pontos percentuais?"
       ],
-      "answer": "As três acurácias ficam entre 0,92 e 0,94. Só por essa tabela, os modelos parecem intercambiáveis — e ela não diz em quais exemplos cada um erra.",
-      "solution": ""
+      "answer": "As acurácias ficam entre 0,92 e 0,94. Com 90 exemplos, 2 pontos percentuais são 2 exemplos, dentro do ruído amostral. E um escalar por modelo não diz *quais* exemplos foram errados nem se os modelos erram nos mesmos lugares.",
+      "solution": "from utils.handson import evaluate_models_on_dataset, summarize_classification_results\n\n# Treina os três classificadores; devolve uma linha por (modelo, exemplo de teste)\nresultados = evaluate_models_on_dataset(df, scenario=\"ita\", random_state=56)\nprint(\"colunas:\", resultados.columns.tolist())\n\n# Uma linha por modelo: mostre só a coluna de acurácia\nsummarize_classification_results(resultados).set_index(\"model\")[[\"accuracy\"]].round(3)\n"
     },
     {
       "id": "parte1-t3",
       "title": "Quem acertou o quê?",
       "minutes": 3,
       "optional": false,
-      "do": "Execute. Cada linha é um modelo e cada coluna é um exemplo de teste: `1` é acerto, `0` é erro. Aparecem só os 12 primeiros exemplos.",
-      "question": "Encontre um exemplo que todos acertam e um exemplo em que os modelos discordam.",
-      "code": "respostas = resultados.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\n\nprint(respostas.shape, \"→ (modelos, exemplos de teste)\")\nrespostas.iloc[:, :12]\n",
+      "do": "Reorganize o resultado longo como matriz binária com `DataFrame.pivot`: modelos (`model`) nas linhas, exemplos de teste (`example_id`) nas colunas e acerto (`correct`: `1` acerto, `0` erro) nas células. Aparecem as 12 primeiras colunas.",
+      "question": "Que tipo de coluna ajuda a comparar os modelos, e que tipo não ajuda?",
+      "code": "# Modelos nas linhas, exemplos de teste nas colunas, acerto (1) ou erro (0) nas células\nrespostas = resultados.pivot(index=___, columns=___, values=___)\n\nprint(respostas.shape, \"→ (modelos, exemplos de teste)\")\nrespostas.iloc[:, :12]\n",
       "hints": [
+        "`pivot(index=\"model\", columns=\"example_id\", values=\"correct\")`.",
         "Uma coluna só com `1` é um exemplo que todo mundo resolve.",
         "Procure uma coluna que misture `0` e `1`."
       ],
-      "answer": "Quase todas as colunas são só `1`. Algumas misturam `0` e `1`: já nas primeiras colunas há exemplos que só a árvore erra e um que só a árvore acerta. Essa tabela (modelos × exemplos, acerto/erro) é exatamente a entrada da IRT.",
-      "solution": ""
+      "answer": "Colunas constantes (todos acertam ou todos erram) não distinguem os modelos; só as colunas mistas carregam informação. Esta matriz respondente × item com respostas dicotômicas é a entrada de um modelo de IRT: os modelos fazem o papel de alunos, e os exemplos, o de questões de uma prova.",
+      "solution": "# Modelos nas linhas, exemplos de teste nas colunas, acerto (1) ou erro (0) nas células\nrespostas = resultados.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\n\nprint(respostas.shape, \"→ (modelos, exemplos de teste)\")\nrespostas.iloc[:, :12]\n"
     },
     {
       "id": "parte1-t4",
       "title": "Meça a dificuldade",
       "minutes": 3,
       "optional": false,
-      "do": "A dificuldade de um exemplo pode ser medida como a fração de modelos que erraram. Execute para listar os mais difíceis.",
-      "question": "Quantos exemplos todos os modelos erram? E quantos ninguém erra?",
-      "code": "dificuldade = 1 - respostas.mean(axis=0)   # fração de modelos que erraram\n\nprint(\"errados por todos:  \", int((dificuldade == 1).sum()))\nprint(\"errados por ninguém:\", int((dificuldade == 0).sum()))\ndificuldade.sort_values(ascending=False).head(8).round(2)\n",
+      "do": "Uma primeira medida de dificuldade, sem modelo latente: a fração de classificadores que erra cada exemplo (o análogo do índice de dificuldade da teoria clássica dos testes). Escreva-a a partir de `respostas`, em uma linha.",
+      "question": "Quantos exemplos de fato diferenciam os modelos? O que isso diz sobre o tamanho efetivo do teste?",
+      "code": "dificuldade = ___   # fração de modelos que erraram cada exemplo (uma série indexada por example_id)\n\nprint(\"errados por todos:  \", int((dificuldade == 1).sum()))\nprint(\"errados por ninguém:\", int((dificuldade == 0).sum()))\ndificuldade.sort_values(ascending=False).head(8).round(2)\n",
       "hints": [
-        "`respostas.mean(axis=0)` é a média de cada coluna: a fração de modelos que acertaram aquele exemplo."
+        "`respostas.mean(axis=0)` é a média de cada coluna: a fração de modelos que acertaram aquele exemplo.",
+        "A fração que errou é o complemento: `1 - respostas.mean(axis=0)`."
       ],
-      "answer": "Cerca de 80 dos 90 exemplos têm dificuldade 0 e 2 são errados por todos. Quase toda a informação que separa os modelos vem de uns dez exemplos.",
-      "solution": ""
+      "answer": "79 dos 90 exemplos são acertados por todos e 2 são errados por todos; sobram 9 exemplos informativos. A comparação entre os modelos é decidida por menos de uma dezena de itens: o tamanho efetivo do teste é muito menor que 90.",
+      "solution": "dificuldade = 1 - respostas.mean(axis=0)   # fração de modelos que erraram cada exemplo\n\nprint(\"errados por todos:  \", int((dificuldade == 1).sum()))\nprint(\"errados por ninguém:\", int((dificuldade == 0).sum()))\ndificuldade.sort_values(ascending=False).head(8).round(2)\n"
     },
     {
       "id": "parte1-t5",
       "title": "Veja onde eles estão",
       "minutes": 3,
       "optional": false,
-      "do": "Execute para destacar, no mapa, os exemplos que pelo menos um modelo errou.",
-      "question": "Os exemplos difíceis estão espalhados ao acaso ou concentrados em alguma região?",
-      "code": "dificeis = dificuldade[dificuldade > 0].index\nteste = df[df.example_id.isin(respostas.columns)]\nfacil = teste[~teste.example_id.isin(dificeis)]\ndificil = teste[teste.example_id.isin(dificeis)]\n\nfig, ax = plt.subplots()\nfor label, cor in [(0, \"#B4ADA4\"), (1, \"#5E5E5E\")]:\n    grupo = facil[facil.label == label]\n    ax.scatter(grupo.feature_1, grupo.feature_2, s=16, color=cor, label=f\"classe {label}: todos acertam\")\nax.scatter(dificil.feature_1, dificil.feature_2, s=90, color=\"#F04E44\", label=\"algum modelo erra\")\nax.set_title(\"Onde os modelos erram\")\nax.legend()\nplt.show()\n",
+      "do": "Destaque, no plano das features, os exemplos de teste que pelo menos um modelo errou. Complete o filtro sobre `dificuldade`; o gráfico já está pronto.",
+      "question": "A dificuldade parece uma propriedade do exemplo ou ruído? Que limitação tem a medida da tarefa anterior?",
+      "code": "dificeis = dificuldade[___].index   # exemplos que pelo menos um modelo errou\nteste = df[df.example_id.isin(respostas.columns)]\nfacil = teste[~teste.example_id.isin(dificeis)]\ndificil = teste[teste.example_id.isin(dificeis)]\n\nfig, ax = plt.subplots()\nfor label, cor in [(0, \"#B4ADA4\"), (1, \"#5E5E5E\")]:\n    grupo = facil[facil.label == label]\n    ax.scatter(grupo.feature_1, grupo.feature_2, s=16, color=cor, label=f\"classe {label}: todos acertam\")\nax.scatter(dificil.feature_1, dificil.feature_2, s=90, color=\"#F04E44\", label=\"algum modelo erra\")\nax.set_title(\"Onde os modelos erram\")\nax.legend()\nplt.show()\n",
       "hints": [
-        "Compare com o gráfico da tarefa 1."
+        "O filtro é uma condição booleana: `dificuldade > 0`.",
+        "Compare com o gráfico da tarefa 1.",
+        "Na fração de erros, o erro de um modelo forte e o de um fraco valem o mesmo?"
       ],
-      "answer": "Os exemplos difíceis ficam na faixa em que as duas nuvens se encontram. Dificuldade é uma propriedade do exemplo — não é ruído aleatório.",
-      "solution": ""
+      "answer": "Os exemplos difíceis se concentram na região de sobreposição: dificuldade é uma propriedade do exemplo. A limitação é que a fração de erros trata todos os modelos como equivalentes: errar um exemplo que só o pior modelo erra pesa o mesmo que errar um que derruba o melhor. A IRT resolve isso estimando, ao mesmo tempo, a habilidade de cada modelo e a dificuldade de cada exemplo.",
+      "solution": "dificeis = dificuldade[dificuldade > 0].index   # exemplos que pelo menos um modelo errou\nteste = df[df.example_id.isin(respostas.columns)]\nfacil = teste[~teste.example_id.isin(dificeis)]\ndificil = teste[teste.example_id.isin(dificeis)]\n\nfig, ax = plt.subplots()\nfor label, cor in [(0, \"#B4ADA4\"), (1, \"#5E5E5E\")]:\n    grupo = facil[facil.label == label]\n    ax.scatter(grupo.feature_1, grupo.feature_2, s=16, color=cor, label=f\"classe {label}: todos acertam\")\nax.scatter(dificil.feature_1, dificil.feature_2, s=90, color=\"#F04E44\", label=\"algum modelo erra\")\nax.set_title(\"Onde os modelos erram\")\nax.legend()\nplt.show()\n"
     },
     {
       "id": "parte1-t6",
@@ -84,13 +90,13 @@
       "minutes": 3,
       "optional": true,
       "do": "Esta célula refaz tudo de uma vez. Mude `class_sep` de `1.4` para `0.6` e execute.",
-      "question": "O que acontece com o número de exemplos difíceis e com a diferença entre os modelos?",
+      "question": "O que acontece com o número de exemplos informativos e com a separação entre os modelos?",
       "code": "class_sep = 1.4   # <- mude aqui\n\ndados = make_toy_classification_dataset(n_samples=300, class_sep=class_sep, random_state=56)\nres = evaluate_models_on_dataset(dados, scenario=\"desafio\", random_state=56)\ntabela = res.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\n\nprint(\"exemplos difíceis:\", int((tabela.mean(axis=0) < 1).sum()), \"de\", tabela.shape[1])\ntabela.mean(axis=1).round(3).rename(\"acurácia\")\n",
       "hints": [
         "Com `class_sep` menor, as classes se sobrepõem mais."
       ],
-      "answer": "Com `class_sep = 0.6` os exemplos difíceis passam de 11 para cerca de 36 e as acurácias caem para perto de 0,77. Com tanta sobreposição, quase todo exemplo da fronteira vira um teste para os modelos.",
-      "solution": ""
+      "answer": "Com `class_sep = 0.6`, os exemplos que algum modelo erra passam de 11 para cerca de 36 e as acurácias caem para perto de 0,77. O teste fica mais informativo, mas também mais ruidoso. É nesse regime que um modelo latente compensa: ele separa o que é habilidade do modelo do que é dificuldade do exemplo.",
+      "solution": "class_sep = 0.6   # <- mude aqui\n\ndados = make_toy_classification_dataset(n_samples=300, class_sep=class_sep, random_state=56)\nres = evaluate_models_on_dataset(dados, scenario=\"desafio\", random_state=56)\ntabela = res.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\n\nprint(\"exemplos difíceis:\", int((tabela.mean(axis=0) < 1).sum()), \"de\", tabela.shape[1])\ntabela.mean(axis=1).round(3).rename(\"acurácia\")\n"
     }
   ]
 }

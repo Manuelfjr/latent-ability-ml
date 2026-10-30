@@ -18,6 +18,9 @@ playground: true
 
 {% include ita-lab.html part="parte2" %}
 
+{% include ita-claire.html %}
+
 <div class="ita-actions">
+  {% if site.ita_gabarito %}<a class="ita-button" href="{{ '/ita/gabarito/' | relative_url }}">Ver o gabarito completo</a>{% endif %}
   <a class="ita-button ita-button--quiet" href="{{ '/ita/referencias/' | relative_url }}">Para ir além: referências</a>
 </div>
