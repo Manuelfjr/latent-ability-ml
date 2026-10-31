@@ -71,7 +71,7 @@ def code(text: str) -> dict:
 
 
 def notebook(part: dict, number: int, answers: bool) -> dict:
-    suffix = " — gabarito" if answers else ""
+    suffix = " (gabarito)" if answers else ""
     cells = [
         md(f"# Parte {number} · {part['title']}{suffix}\n\n**Avaliação com habilidade latente · Instituto Kunumi**\n\n{part['goal']}"),
         md(

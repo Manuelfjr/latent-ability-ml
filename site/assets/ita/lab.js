@@ -223,7 +223,7 @@ def run_cell(code):
         setStatus('Python pronto · no navegador', 'ready');
         return runtime;
       } catch (error) {
-        setStatus('Python indisponível — use o Colab', 'error');
+        setStatus('Python indisponível: use o Colab', 'error');
         runtimePromise = null;
         throw error;
       }
