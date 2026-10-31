@@ -98,6 +98,30 @@ PARTE_1 = {
             "hints": ["Mude uma coisa de cada vez para conseguir atribuir o efeito."],
             "answer": "Não há resposta única. Alguns comportamentos típicos: com desbalanceamento forte, a acurácia fica alta mesmo para um modelo que ignora a classe minoritária, e a acurácia balanceada denuncia isso; com mais ruído de rótulo, cresce o número de exemplos que todos erram, e esses exemplos não informam nada sobre os modelos; com classes sobrepostas, o número de exemplos informativos cresce e a comparação entre modelos fica mais rica, e mais ruidosa.",
         },
+        {
+            "title": "Os modelos sabem quando erram?",
+            "minutes": 4,
+            "optional": True,
+            "extra": True,
+            "do": "Além da classe, cada modelo dá uma probabilidade. Transformamos isso em confiança (0 = em cima do muro, 1 = certeza total) e comparamos acertos com erros.",
+            "question": "Algum modelo erra com a mesma convicção com que acerta? Em que aplicação isso seria um problema? E o que as probabilidades dizem sobre os exemplos 200 e 248, que todos erram?",
+            "explore": "Volte ao mapa da tarefa 4 e localize os exemplos 200 e 248. A confiança dos modelos ajuda a separar rótulo trocado de exemplo ambíguo?",
+            "code": "import numpy as np\n\n# Confiança na classe prevista: 0 = em cima do muro (P = 0,5); 1 = certeza total (P = 0 ou 1)\nresultados[\"confianca\"] = (resultados[\"predicted_probability\"] - 0.5).abs() * 2\n\nrng = np.random.default_rng(0)\nfig, ax = plt.subplots()\nfor posicao, (modelo, grupo) in enumerate(resultados.groupby(\"model\")):\n    for acerto, cor, desvio, nome in [(1, \"#4392D2\", -0.15, \"acertos\"), (0, \"#F04E44\", 0.15, \"erros\")]:\n        y = grupo.loc[grupo.correct == acerto, \"confianca\"]\n        x = posicao + desvio + rng.uniform(-0.07, 0.07, len(y))\n        ax.scatter(x, y, s=22 if acerto else 48, color=cor, alpha=0.6 if acerto else 0.95,\n                   edgecolor=\"#1C2127\", linewidth=0.3, label=nome if posicao == 0 else None)\nax.set_xticks(range(3), sorted(resultados.model.unique()))\nax.set_ylabel(\"confiança na classe prevista\")\nax.set_title(\"Os modelos sabem quando erram?\")\nax.legend(fontsize=8)\nplt.show()\n\nprint(\"Confiança média:\")\nprint(resultados.groupby([\"model\", \"correct\"])[\"confianca\"].mean().unstack()\n      .rename(columns={0: \"quando erra\", 1: \"quando acerta\"}).round(2).to_string())\n\n# P(classe 1) dada por cada modelo aos dois exemplos que todos erram (o rótulo dos dois é 1)\nresultados[resultados.example_id.isin([200, 248])].pivot(index=\"model\", columns=\"example_id\", values=\"predicted_probability\").round(2)\n",
+            "hints": ["Compare a coluna \"quando erra\" entre os três modelos.", "Os dois exemplos têm rótulo 1: uma probabilidade perto de 0 é certeza da classe errada."],
+            "answer": "Uma leitura possível: a árvore erra com quase a mesma convicção com que acerta (confiança média de 0,90 nos erros e 0,98 nos acertos), porque cada folha pura dá probabilidade 0 ou 1. k-vizinhos (0,47) e logística (0,37) hesitam quando erram. Com acurácias praticamente iguais, os modelos se comportam de forma bem diferente: se a aplicação usa a probabilidade, por exemplo para mandar casos duvidosos a um especialista, a árvore é a pior escolha. Os dois exemplos que todos erram também se separam. No 248, os três dão P(classe 1) ≤ 0,01, certeza quase total contra o rótulo, a assinatura típica de rótulo trocado. No 200, as probabilidades ficam entre 0,24 e 0,33, mais compatível com um exemplo ambíguo perto da fronteira.",
+        },
+        {
+            "title": "Outro sorteio, outro vencedor?",
+            "minutes": 4,
+            "optional": True,
+            "extra": True,
+            "do": "A tabela da tarefa 2 veio de um único sorteio de quais 90 exemplos ficam para teste. Repetimos a avaliação com 20 sorteios diferentes dos mesmos dados.",
+            "question": "A diferença entre os modelos na tarefa 2 sobrevive a outros sorteios? O que isso muda na forma de reportar um resultado?",
+            "explore": "Aumente para 50 sorteios, ou mude `test_size` em `evaluate_models_on_dataset` (passe o mouse sobre ela). Com um teste maior, a variação diminui?",
+            "code": "import numpy as np\nimport pandas as pd\n\n# Mesmos 300 pontos, 20 sorteios diferentes de quais 90 ficam para teste\nacuracias = pd.DataFrame({\n    semente: evaluate_models_on_dataset(df, scenario=\"sorteio\", random_state=semente).groupby(\"model\")[\"correct\"].mean()\n    for semente in range(20)\n}).T\n\nrng = np.random.default_rng(0)\nfig, ax = plt.subplots()\nfor posicao, modelo in enumerate(acuracias.columns):\n    ax.scatter(posicao + rng.uniform(-0.12, 0.12, 20), acuracias[modelo], s=30, color=\"#4392D2\", alpha=0.6, edgecolor=\"#1C2127\", linewidth=0.3)\n    ax.hlines(acuracias[modelo].mean(), posicao - 0.25, posicao + 0.25, color=\"#F04E44\", linewidth=2.6)\nax.set_xticks(range(len(acuracias.columns)), acuracias.columns)\nax.set_ylabel(\"acurácia no teste\")\nax.set_title(\"20 sorteios do conjunto de teste (traço = média)\")\nplt.show()\n\nprint(\"Quantas vezes cada modelo ficou em primeiro (empates contam para todos os empatados):\")\nprint((acuracias.eq(acuracias.max(axis=1), axis=0)).sum().to_string())\nacuracias.describe().loc[[\"mean\", \"std\", \"min\", \"max\"]].round(3)\n",
+            "hints": ["Compare a distância entre as médias com a altura de cada nuvem de pontos."],
+            "answer": "Uma leitura possível: as médias ficam entre 0,913 e 0,922, enquanto cada modelo varia de 0,87 a 0,97 conforme o sorteio (desvio padrão de cerca de 0,025). A diferença entre os modelos é bem menor que a variação de um sorteio para outro: cada um fica em primeiro (ou empatado) em 7 a 13 dos 20 sorteios. Escolher o \"melhor\" pela tabela da tarefa 2 seria quase cara ou coroa. Um único número esconde isso; vale reportar a variação (vários sorteios, validação cruzada, intervalos) e, mais ainda, olhar *quais* exemplos cada modelo erra, que é o caminho da IRT.",
+        },
     ],
 }
 
@@ -168,11 +192,47 @@ PARTE_2 = {
             "hints": ["Para comparar dois rankings, `scipy.stats.spearmanr` ou `.corr(method=\"spearman\")`."],
             "answer": "Não há resposta única. No ponto de partida, saem 9 exemplos, 6 deles com rótulo trocado (todos os do teste), e o topo do ranking se reorganiza: modelos que dependiam de \"acertar\" exemplos com rótulo errado perdem posições. A base do ranking não muda. Mensagem geral: a avaliação de modelos depende da qualidade da prova, e a IRT dá ferramentas para auditar a prova junto com os modelos.",
         },
+        {
+            "title": "Onde a prova mede bem?",
+            "minutes": 4,
+            "optional": True,
+            "extra": True,
+            "do": "Cada item contribui com informação a²·P(1 − P), concentrada perto da sua dificuldade. Somando todos, temos a informação da prova e, dela, um erro padrão aproximado de θ em cada nível de habilidade. Os traços vermelhos são os 24 modelos.",
+            "question": "Em que faixa de habilidade a prova mede bem, e onde estão os modelos? A diferença entre \"logística · 100%\" (θ = 1,42) e \"árvore · 50%\" (θ = 1,93), da tarefa 3, é confiável?",
+            "explore": "Que tipo de exemplo você acrescentaria à prova para medir melhor os modelos do topo? Essa é a ideia por trás dos testes adaptativos.",
+            "code": "from utils.handson import binary_irt_probability\n\n# Informação de Fisher da prova: soma, item a item, de a² · P(θ) · (1 − P(θ))\ntheta = np.linspace(-3, 4, 300)\na = itens[\"discrimination\"].to_numpy()\nd = itens[\"difficulty\"].to_numpy()\nP = binary_irt_probability(theta[:, None], d[None, :], a[None, :])\ninformacao = (a[None, :] ** 2 * P * (1 - P)).sum(axis=1)\nerro_padrao = 1 / np.sqrt(informacao)   # quanto θ pode oscilar só por causa da prova\n\nfig, ax = plt.subplots()\nax.plot(theta, erro_padrao, color=\"#4392D2\")\nax.plot(habilidade, np.full(len(habilidade), 0.02), \"|\", color=\"#F04E44\", markersize=18, markeredgewidth=2,\n        label=\"habilidade estimada de cada modelo\")\nax.set_ylim(0, 0.8)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"erro padrão de θ (aproximado)\")\nax.set_title(\"Onde a prova mede bem?\")\nax.legend(fontsize=8)\nplt.show()\n\npd.DataFrame({\"θ\": [-1, 0, 1, 2, 3]}).assign(\n    **{\"erro padrão\": lambda t: 1 / np.sqrt(np.interp(t[\"θ\"], theta, informacao))}\n).round(2)\n",
+            "hints": ["Erro padrão baixo quer dizer θ medido com precisão.", "Compare a diferença 1,93 − 1,42 com o erro padrão perto de θ = 1,5."],
+            "answer": "Uma leitura possível: a prova é mais precisa entre θ ≈ −0,4 e 0 (erro padrão de cerca de 0,16) e piora para cima: 0,26 em θ = 1 e 0,40 em θ = 2. Mas dois terços dos modelos (16 de 24) estão entre θ = 1 e 2,2, justamente onde a prova mede pior. A diferença entre os dois modelos da tarefa 3 (cerca de 0,5) é só um pouco maior que um erro padrão nessa região: indica uma diferença, mas sem folga. Para separar os melhores, faltam exemplos difíceis e discriminativos (δ entre 1 e 2,5). Escolher itens cuja informação está onde o respondente está é o princípio dos testes adaptativos. O erro padrão aqui é aproximado: ignora a incerteza dos próprios parâmetros dos itens.",
+        },
+        {
+            "title": "Uma prova de 15 questões",
+            "minutes": 4,
+            "optional": True,
+            "extra": True,
+            "do": "Uma prova menor ranqueia os modelos tão bem quanto a completa? Comparamos os 15 exemplos mais discriminativos com 30 provas de 15 exemplos sorteados, medindo a concordância (Spearman) com o ranking da prova de 90.",
+            "question": "Quanto se perde com uma prova curta bem escolhida, e quanto com uma sorteada? Na tabela, o que os 15 escolhidos têm em comum, e o que isso implica para os modelos do topo?",
+            "explore": "Mude `k` (5, 10, 30). Tente outro critério, por exemplo espalhar δ entre 0 e 2,5 em vez de pegar só a maior discriminação.",
+            "code": "k = 15   # tamanho da prova curta\n\n# Os k exemplos mais discriminativos (entre os que alguém acerta e alguém erra, com a > 0)\ninformativos = R.columns[(R.min(axis=0) == 0) & (R.max(axis=0) == 1)]\nmelhores = itens.loc[informativos].query(\"discrimination > 0\").nlargest(k, \"discrimination\").index\nhabilidade_curta, _ = fit_binary_2pl(R[melhores])\nconcordancia = habilidade_curta.corr(habilidade, method=\"spearman\")\n\n# Comparação: 30 provas de k exemplos sorteados ao acaso\nrng = np.random.default_rng(0)\nsorteadas = []\nfor _ in range(30):\n    sorteio = rng.choice(R.columns, size=k, replace=False)\n    h, _ = fit_binary_2pl(R[sorteio])\n    sorteadas.append(h.corr(habilidade, method=\"spearman\"))\n\nfig, ax = plt.subplots()\nax.hist(sorteadas, bins=12, color=\"#4392D2\", edgecolor=\"#F0F0F0\")\nax.axvline(concordancia, color=\"#F04E44\", linewidth=2.6, label=f\"os {k} mais discriminativos\")\nax.set_xlabel(\"Spearman com o ranking da prova completa\")\nax.set_ylabel(\"provas sorteadas\")\nax.set_title(f\"Uma prova de {k} questões ranqueia tão bem quanto a de 90?\")\nax.legend(fontsize=8)\nplt.show()\n\nprint(f\"{k} mais discriminativos: {concordancia:.2f}\")\nprint(f\"{k} sorteados: mediana {np.median(sorteadas):.2f}, pior {min(sorteadas):.2f}, melhor {max(sorteadas):.2f}\")\nitens.loc[melhores].sort_values(\"difficulty\").round(2)\n",
+            "hints": ["Vários exemplos da tabela têm exatamente os mesmos δ e a. Por quê?", "Lembre da tarefa anterior: onde a prova curta concentra a informação?"],
+            "answer": "Uma leitura possível: os 15 mais discriminativos reproduzem o ranking com Spearman de 0,95; provas sorteadas de 15 exemplos têm mediana 0,81 e podem cair a 0,40. Escolher bem os itens importa mais que o tamanho da prova. Mas a tabela mostra um problema: muitos dos escolhidos são clones (mesmo padrão de acertos, mesmos δ e a), e 13 dos 15 têm δ entre −0,6 e 0,2. A prova curta mede bem o meio e quase nada do topo, onde estão os modelos que mais interessam. Um critério melhor evitaria duplicatas e espalharia δ pela faixa de interesse. É essa ideia que permite avaliar modelos novos com uma fração do custo, por exemplo em benchmarks de modelos de linguagem.",
+        },
+        {
+            "title": "Quanto ruído a IRT aguenta?",
+            "minutes": 5,
+            "optional": True,
+            "extra": True,
+            "do": "Repetimos todo o processo com 0%, 4%, 8%, 15% e 25% de rótulos trocados. Em cada caso, os suspeitos são os n exemplos mais difíceis (n = número real de trocados no teste) mais os de discriminação negativa. Leva alguns segundos.",
+            "question": "Até que nível de ruído a IRT ainda encontra os rótulos trocados? O que acontece com os falsos alarmes? E por que aparecem suspeitos mesmo com 0% de ruído?",
+            "explore": "Aqui usamos o número real de trocados, que na prática ninguém sabe. Troque por um critério que não depende disso (por exemplo, `itens_f.difficulty > 2`) e compare.",
+            "code": "# Mesma população, cada vez mais rótulos trocados. A IRT continua achando os trocados?\nbase = make_toy_classification_dataset(n_samples=300, class_sep=1.4, flip_y=0.0, random_state=56)\nlinhas = []\nfor fracao in [0.0, 0.04, 0.08, 0.15, 0.25]:\n    d = flip_labels(base, fraction=fracao, random_state=0)\n    r = evaluate_models_on_dataset(d, scenario=\"ruido\", models=populacao, random_state=56)\n    Rf = r.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\n    _, itens_f = fit_binary_2pl(Rf)\n    trocado = d.set_index(\"example_id\").loc[Rf.columns, \"label_flipped\"]\n    n = int(trocado.sum())\n    # suspeitos: os n mais difíceis, mais os de discriminação negativa\n    suspeitos = itens_f.nlargest(n, \"difficulty\").index.union(itens_f.index[itens_f.discrimination < 0])\n    linhas.append({\n        \"fração trocada\": fracao,\n        \"acurácia média\": Rf.to_numpy().mean(),\n        \"trocados no teste\": n,\n        \"suspeitos\": len(suspeitos),\n        \"trocados entre os suspeitos\": int(trocado[suspeitos].sum()),\n    })\n\nruido = pd.DataFrame(linhas).set_index(\"fração trocada\")\nruido.round(3)\n",
+            "hints": ["Falsos alarmes = suspeitos − trocados entre os suspeitos.", "Com 0% de ruído, quem são os suspeitos? Lembre dos exemplos ambíguos da tarefa 4."],
+            "answer": "Uma leitura possível: a busca encontra praticamente todos os rótulos trocados até 25% (24 de 25), mas o preço cresce: os suspeitos passam de 4 (com 3 trocados) para 37 (com 25 trocados), ou seja, 13 falsos alarmes. Com 0% de ruído ainda aparecem 2 suspeitos, ambos de discriminação negativa: exemplos ambíguos que modelos fracos acertam por acaso. Conforme o ruído cresce, a própria prova fica menos confiável (a acurácia média cai de 0,90 para 0,61) e fica mais difícil distinguir rótulo errado de exemplo difícil. A IRT é uma boa ferramenta de triagem para revisão humana, não um detector automático, e na prática o critério precisa ser escolhido sem saber quantos rótulos estão errados.",
+        },
     ],
 }
 
 PARTE_2["epilogue"] = (
-    "## Para ir além: e quando não há rótulos?\n\n"
+    "## Fechamento: e quando não há rótulos?\n\n"
     "Em agrupamento não existe acerto, então não há matriz de acertos. O **CLAIRE** troca acerto por "
     "*concordância*: para cada ponto i e algoritmo j, p_ij ∈ [0, 1] mede quanto j concorda com os demais "
     "sobre com quem i foi agrupado. Como essas respostas são contínuas, o β4-IRT estima a habilidade de "

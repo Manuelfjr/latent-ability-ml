@@ -555,7 +555,9 @@ def run_cell(code):
     const heading = document.querySelector('.ita-title')?.textContent.trim() || document.title;
     const lines = [`# ${heading}`, ''];
     tasks.forEach((task, index) => {
-      lines.push(`## ${task.optional ? 'Desafio' : `Tarefa ${index + 1}`} · ${task.title}`, '');
+      const badge = task.article.querySelector('.ita-task__num').textContent.trim();
+      const label = /^E\d/.test(badge) ? `Extra ${badge.slice(1)}` : task.optional ? 'Livre' : `Tarefa ${index + 1}`;
+      lines.push(`## ${label} · ${task.title}`, '');
       lines.push(`**Pergunta.** ${task.question}`, '');
       lines.push(`**Minha resposta.** ${task.response() || '_(sem resposta)_'}`, '');
     });

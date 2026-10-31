@@ -74,7 +74,7 @@ erros.sort_values("dificuldade", ascending=False)[["feature_1", "feature_2", "la
 ```
 Gabarito (uma leitura possível): Uma leitura possível: a maioria dos exemplos difíceis fica na faixa de sobreposição, como esperado. Os dois errados por todos merecem atenção: se estão dentro da região da outra classe, o mais provável é rótulo trocado, não incapacidade dos modelos. A limitação da medida é que todo erro vale o mesmo, venha de um modelo forte ou fraco; com só três modelos, ela também é muito grosseira (só quatro valores possíveis). A IRT resolve as duas coisas estimando a habilidade de cada modelo junto com a dificuldade de cada exemplo.
 
-### Livre · Livre: crie o seu cenário
+### Livre: crie o seu cenário
 Enunciado: Os mesmos três modelos, agora num cenário que você controla: separação entre classes, ruído de rótulo e desbalanceamento.
 Pergunta: Que cenário você testou, o que esperava e o que aconteceu? Alguma métrica agregada enganaria você nesse cenário?
 Para explorar: Algumas ideias: classes muito desbalanceadas (`peso_classe_0 = 0.9`) e compare acurácia com acurácia balanceada; muito ruído de rótulo (`flip_y = 0.15`); classes quase sobrepostas (`class_sep = 0.5`).
@@ -95,6 +95,71 @@ print("exemplos que todos erram:      ", int((tabela.max(axis=0) == 0).sum()))
 summarize_classification_results(res).set_index("model")[["accuracy", "balanced_accuracy", "f1"]].round(3)
 ```
 Gabarito (uma leitura possível): Não há resposta única. Alguns comportamentos típicos: com desbalanceamento forte, a acurácia fica alta mesmo para um modelo que ignora a classe minoritária, e a acurácia balanceada denuncia isso; com mais ruído de rótulo, cresce o número de exemplos que todos erram, e esses exemplos não informam nada sobre os modelos; com classes sobrepostas, o número de exemplos informativos cresce e a comparação entre modelos fica mais rica, e mais ruidosa.
+
+### Extra 1 · Os modelos sabem quando erram?
+Enunciado: Além da classe, cada modelo dá uma probabilidade. Transformamos isso em confiança (0 = em cima do muro, 1 = certeza total) e comparamos acertos com erros.
+Pergunta: Algum modelo erra com a mesma convicção com que acerta? Em que aplicação isso seria um problema? E o que as probabilidades dizem sobre os exemplos 200 e 248, que todos erram?
+Para explorar: Volte ao mapa da tarefa 4 e localize os exemplos 200 e 248. A confiança dos modelos ajuda a separar rótulo trocado de exemplo ambíguo?
+Código:
+```python
+import numpy as np
+
+# Confiança na classe prevista: 0 = em cima do muro (P = 0,5); 1 = certeza total (P = 0 ou 1)
+resultados["confianca"] = (resultados["predicted_probability"] - 0.5).abs() * 2
+
+rng = np.random.default_rng(0)
+fig, ax = plt.subplots()
+for posicao, (modelo, grupo) in enumerate(resultados.groupby("model")):
+    for acerto, cor, desvio, nome in [(1, "#4392D2", -0.15, "acertos"), (0, "#F04E44", 0.15, "erros")]:
+        y = grupo.loc[grupo.correct == acerto, "confianca"]
+        x = posicao + desvio + rng.uniform(-0.07, 0.07, len(y))
+        ax.scatter(x, y, s=22 if acerto else 48, color=cor, alpha=0.6 if acerto else 0.95,
+                   edgecolor="#1C2127", linewidth=0.3, label=nome if posicao == 0 else None)
+ax.set_xticks(range(3), sorted(resultados.model.unique()))
+ax.set_ylabel("confiança na classe prevista")
+ax.set_title("Os modelos sabem quando erram?")
+ax.legend(fontsize=8)
+plt.show()
+
+print("Confiança média:")
+print(resultados.groupby(["model", "correct"])["confianca"].mean().unstack()
+      .rename(columns={0: "quando erra", 1: "quando acerta"}).round(2).to_string())
+
+# P(classe 1) dada por cada modelo aos dois exemplos que todos erram (o rótulo dos dois é 1)
+resultados[resultados.example_id.isin([200, 248])].pivot(index="model", columns="example_id", values="predicted_probability").round(2)
+```
+Gabarito (uma leitura possível): Uma leitura possível: a árvore erra com quase a mesma convicção com que acerta (confiança média de 0,90 nos erros e 0,98 nos acertos), porque cada folha pura dá probabilidade 0 ou 1. k-vizinhos (0,47) e logística (0,37) hesitam quando erram. Com acurácias praticamente iguais, os modelos se comportam de forma bem diferente: se a aplicação usa a probabilidade, por exemplo para mandar casos duvidosos a um especialista, a árvore é a pior escolha. Os dois exemplos que todos erram também se separam. No 248, os três dão P(classe 1) ≤ 0,01, certeza quase total contra o rótulo, a assinatura típica de rótulo trocado. No 200, as probabilidades ficam entre 0,24 e 0,33, mais compatível com um exemplo ambíguo perto da fronteira.
+
+### Extra 2 · Outro sorteio, outro vencedor?
+Enunciado: A tabela da tarefa 2 veio de um único sorteio de quais 90 exemplos ficam para teste. Repetimos a avaliação com 20 sorteios diferentes dos mesmos dados.
+Pergunta: A diferença entre os modelos na tarefa 2 sobrevive a outros sorteios? O que isso muda na forma de reportar um resultado?
+Para explorar: Aumente para 50 sorteios, ou mude `test_size` em `evaluate_models_on_dataset` (passe o mouse sobre ela). Com um teste maior, a variação diminui?
+Código:
+```python
+import numpy as np
+import pandas as pd
+
+# Mesmos 300 pontos, 20 sorteios diferentes de quais 90 ficam para teste
+acuracias = pd.DataFrame({
+    semente: evaluate_models_on_dataset(df, scenario="sorteio", random_state=semente).groupby("model")["correct"].mean()
+    for semente in range(20)
+}).T
+
+rng = np.random.default_rng(0)
+fig, ax = plt.subplots()
+for posicao, modelo in enumerate(acuracias.columns):
+    ax.scatter(posicao + rng.uniform(-0.12, 0.12, 20), acuracias[modelo], s=30, color="#4392D2", alpha=0.6, edgecolor="#1C2127", linewidth=0.3)
+    ax.hlines(acuracias[modelo].mean(), posicao - 0.25, posicao + 0.25, color="#F04E44", linewidth=2.6)
+ax.set_xticks(range(len(acuracias.columns)), acuracias.columns)
+ax.set_ylabel("acurácia no teste")
+ax.set_title("20 sorteios do conjunto de teste (traço = média)")
+plt.show()
+
+print("Quantas vezes cada modelo ficou em primeiro (empates contam para todos os empatados):")
+print((acuracias.eq(acuracias.max(axis=1), axis=0)).sum().to_string())
+acuracias.describe().loc[["mean", "std", "min", "max"]].round(3)
+```
+Gabarito (uma leitura possível): Uma leitura possível: as médias ficam entre 0,913 e 0,922, enquanto cada modelo varia de 0,87 a 0,97 conforme o sorteio (desvio padrão de cerca de 0,025). A diferença entre os modelos é bem menor que a variação de um sorteio para outro: cada um fica em primeiro (ou empatado) em 7 a 13 dos 20 sorteios. Escolher o "melhor" pela tabela da tarefa 2 seria quase cara ou coroa. Um único número esconde isso; vale reportar a variação (vários sorteios, validação cruzada, intervalos) e, mais ainda, olhar *quais* exemplos cada modelo erra, que é o caminho da IRT.
 
 ## Parte 2 · Da matriz de respostas à IRT (~20 min)
 
@@ -244,7 +309,7 @@ itens.loc[informativos].sort_values("discrimination").head(10).round(2)
 ```
 Gabarito (uma leitura possível): Uma leitura possível: 27 exemplos são acertados por todos e 4 errados por todos; só 59 de 90 informam alguma coisa, e muitos deles têm parâmetros quase idênticos (são redundantes). Para um teste curto, escolheria exemplos com a alto e δ espalhado na faixa das habilidades que quero separar (por volta de 0 a 2), evitando duplicatas. Os de discriminação negativa saem da prova: dos quatro, dois são justamente os rótulos trocados que não estavam entre os mais difíceis. Rótulo trocado aparece, portanto, de duas formas: dificuldade extrema (ninguém acerta) ou discriminação negativa (só os fracos "acertam").
 
-### Livre · Livre: sua análise
+### Livre: sua análise
 Enunciado: Todos os objetos das tarefas anteriores continuam disponíveis (`R`, `habilidade`, `itens`, `teste`, `fit_binary_2pl`). O código abaixo é só um ponto de partida: tira da prova os exemplos suspeitos e reajusta o modelo.
 Pergunta: Que pergunta você investigou, como, e o que concluiu? O ranking dos modelos mudou ao limpar a prova?
 Para explorar: Outras ideias: monte uma prova curta com os k melhores itens e compare o ranking com o da prova completa; aumente a fração de rótulos trocados e veja quantos a IRT ainda acha; troque o critério de suspeito.
@@ -261,6 +326,107 @@ pd.DataFrame({
 }).sort_values("posição depois")
 ```
 Gabarito (uma leitura possível): Não há resposta única. No ponto de partida, saem 9 exemplos, 6 deles com rótulo trocado (todos os do teste), e o topo do ranking se reorganiza: modelos que dependiam de "acertar" exemplos com rótulo errado perdem posições. A base do ranking não muda. Mensagem geral: a avaliação de modelos depende da qualidade da prova, e a IRT dá ferramentas para auditar a prova junto com os modelos.
+
+### Extra 1 · Onde a prova mede bem?
+Enunciado: Cada item contribui com informação a²·P(1 − P), concentrada perto da sua dificuldade. Somando todos, temos a informação da prova e, dela, um erro padrão aproximado de θ em cada nível de habilidade. Os traços vermelhos são os 24 modelos.
+Pergunta: Em que faixa de habilidade a prova mede bem, e onde estão os modelos? A diferença entre "logística · 100%" (θ = 1,42) e "árvore · 50%" (θ = 1,93), da tarefa 3, é confiável?
+Para explorar: Que tipo de exemplo você acrescentaria à prova para medir melhor os modelos do topo? Essa é a ideia por trás dos testes adaptativos.
+Código:
+```python
+from utils.handson import binary_irt_probability
+
+# Informação de Fisher da prova: soma, item a item, de a² · P(θ) · (1 − P(θ))
+theta = np.linspace(-3, 4, 300)
+a = itens["discrimination"].to_numpy()
+d = itens["difficulty"].to_numpy()
+P = binary_irt_probability(theta[:, None], d[None, :], a[None, :])
+informacao = (a[None, :] ** 2 * P * (1 - P)).sum(axis=1)
+erro_padrao = 1 / np.sqrt(informacao)   # quanto θ pode oscilar só por causa da prova
+
+fig, ax = plt.subplots()
+ax.plot(theta, erro_padrao, color="#4392D2")
+ax.plot(habilidade, np.full(len(habilidade), 0.02), "|", color="#F04E44", markersize=18, markeredgewidth=2,
+        label="habilidade estimada de cada modelo")
+ax.set_ylim(0, 0.8)
+ax.set_xlabel("habilidade θ")
+ax.set_ylabel("erro padrão de θ (aproximado)")
+ax.set_title("Onde a prova mede bem?")
+ax.legend(fontsize=8)
+plt.show()
+
+pd.DataFrame({"θ": [-1, 0, 1, 2, 3]}).assign(
+    **{"erro padrão": lambda t: 1 / np.sqrt(np.interp(t["θ"], theta, informacao))}
+).round(2)
+```
+Gabarito (uma leitura possível): Uma leitura possível: a prova é mais precisa entre θ ≈ −0,4 e 0 (erro padrão de cerca de 0,16) e piora para cima: 0,26 em θ = 1 e 0,40 em θ = 2. Mas dois terços dos modelos (16 de 24) estão entre θ = 1 e 2,2, justamente onde a prova mede pior. A diferença entre os dois modelos da tarefa 3 (cerca de 0,5) é só um pouco maior que um erro padrão nessa região: indica uma diferença, mas sem folga. Para separar os melhores, faltam exemplos difíceis e discriminativos (δ entre 1 e 2,5). Escolher itens cuja informação está onde o respondente está é o princípio dos testes adaptativos. O erro padrão aqui é aproximado: ignora a incerteza dos próprios parâmetros dos itens.
+
+### Extra 2 · Uma prova de 15 questões
+Enunciado: Uma prova menor ranqueia os modelos tão bem quanto a completa? Comparamos os 15 exemplos mais discriminativos com 30 provas de 15 exemplos sorteados, medindo a concordância (Spearman) com o ranking da prova de 90.
+Pergunta: Quanto se perde com uma prova curta bem escolhida, e quanto com uma sorteada? Na tabela, o que os 15 escolhidos têm em comum, e o que isso implica para os modelos do topo?
+Para explorar: Mude `k` (5, 10, 30). Tente outro critério, por exemplo espalhar δ entre 0 e 2,5 em vez de pegar só a maior discriminação.
+Código:
+```python
+k = 15   # tamanho da prova curta
+
+# Os k exemplos mais discriminativos (entre os que alguém acerta e alguém erra, com a > 0)
+informativos = R.columns[(R.min(axis=0) == 0) & (R.max(axis=0) == 1)]
+melhores = itens.loc[informativos].query("discrimination > 0").nlargest(k, "discrimination").index
+habilidade_curta, _ = fit_binary_2pl(R[melhores])
+concordancia = habilidade_curta.corr(habilidade, method="spearman")
+
+# Comparação: 30 provas de k exemplos sorteados ao acaso
+rng = np.random.default_rng(0)
+sorteadas = []
+for _ in range(30):
+    sorteio = rng.choice(R.columns, size=k, replace=False)
+    h, _ = fit_binary_2pl(R[sorteio])
+    sorteadas.append(h.corr(habilidade, method="spearman"))
+
+fig, ax = plt.subplots()
+ax.hist(sorteadas, bins=12, color="#4392D2", edgecolor="#F0F0F0")
+ax.axvline(concordancia, color="#F04E44", linewidth=2.6, label=f"os {k} mais discriminativos")
+ax.set_xlabel("Spearman com o ranking da prova completa")
+ax.set_ylabel("provas sorteadas")
+ax.set_title(f"Uma prova de {k} questões ranqueia tão bem quanto a de 90?")
+ax.legend(fontsize=8)
+plt.show()
+
+print(f"{k} mais discriminativos: {concordancia:.2f}")
+print(f"{k} sorteados: mediana {np.median(sorteadas):.2f}, pior {min(sorteadas):.2f}, melhor {max(sorteadas):.2f}")
+itens.loc[melhores].sort_values("difficulty").round(2)
+```
+Gabarito (uma leitura possível): Uma leitura possível: os 15 mais discriminativos reproduzem o ranking com Spearman de 0,95; provas sorteadas de 15 exemplos têm mediana 0,81 e podem cair a 0,40. Escolher bem os itens importa mais que o tamanho da prova. Mas a tabela mostra um problema: muitos dos escolhidos são clones (mesmo padrão de acertos, mesmos δ e a), e 13 dos 15 têm δ entre −0,6 e 0,2. A prova curta mede bem o meio e quase nada do topo, onde estão os modelos que mais interessam. Um critério melhor evitaria duplicatas e espalharia δ pela faixa de interesse. É essa ideia que permite avaliar modelos novos com uma fração do custo, por exemplo em benchmarks de modelos de linguagem.
+
+### Extra 3 · Quanto ruído a IRT aguenta?
+Enunciado: Repetimos todo o processo com 0%, 4%, 8%, 15% e 25% de rótulos trocados. Em cada caso, os suspeitos são os n exemplos mais difíceis (n = número real de trocados no teste) mais os de discriminação negativa. Leva alguns segundos.
+Pergunta: Até que nível de ruído a IRT ainda encontra os rótulos trocados? O que acontece com os falsos alarmes? E por que aparecem suspeitos mesmo com 0% de ruído?
+Para explorar: Aqui usamos o número real de trocados, que na prática ninguém sabe. Troque por um critério que não depende disso (por exemplo, `itens_f.difficulty > 2`) e compare.
+Código:
+```python
+# Mesma população, cada vez mais rótulos trocados. A IRT continua achando os trocados?
+base = make_toy_classification_dataset(n_samples=300, class_sep=1.4, flip_y=0.0, random_state=56)
+linhas = []
+for fracao in [0.0, 0.04, 0.08, 0.15, 0.25]:
+    d = flip_labels(base, fraction=fracao, random_state=0)
+    r = evaluate_models_on_dataset(d, scenario="ruido", models=populacao, random_state=56)
+    Rf = r.pivot(index="model", columns="example_id", values="correct")
+    _, itens_f = fit_binary_2pl(Rf)
+    trocado = d.set_index("example_id").loc[Rf.columns, "label_flipped"]
+    n = int(trocado.sum())
+    # suspeitos: os n mais difíceis, mais os de discriminação negativa
+    suspeitos = itens_f.nlargest(n, "difficulty").index.union(itens_f.index[itens_f.discrimination < 0])
+    linhas.append({
+        "fração trocada": fracao,
+        "acurácia média": Rf.to_numpy().mean(),
+        "trocados no teste": n,
+        "suspeitos": len(suspeitos),
+        "trocados entre os suspeitos": int(trocado[suspeitos].sum()),
+    })
+
+ruido = pd.DataFrame(linhas).set_index("fração trocada")
+ruido.round(3)
+```
+Gabarito (uma leitura possível): Uma leitura possível: a busca encontra praticamente todos os rótulos trocados até 25% (24 de 25), mas o preço cresce: os suspeitos passam de 4 (com 3 trocados) para 37 (com 25 trocados), ou seja, 13 falsos alarmes. Com 0% de ruído ainda aparecem 2 suspeitos, ambos de discriminação negativa: exemplos ambíguos que modelos fracos acertam por acaso. Conforme o ruído cresce, a própria prova fica menos confiável (a acurácia média cai de 0,90 para 0,61) e fica mais difícil distinguir rótulo errado de exemplo difícil. A IRT é uma boa ferramenta de triagem para revisão humana, não um detector automático, e na prática o critério precisa ser escolhido sem saber quantos rótulos estão errados.
 
 ## Demonstração do CLAIRE (fim da Parte 2, sem exercício)
 300 pontos em três grupos de dispersões diferentes, 9 algoritmos de agrupamento. A concordância entre partições vira uma matriz de respostas contínuas e o β4-IRT estima a habilidade de cada algoritmo e a dificuldade de cada ponto, sem rótulos. Correlação de Spearman entre habilidade CLAIRE e ARI: 0,90; entre habilidade e silhueta: 0,35.

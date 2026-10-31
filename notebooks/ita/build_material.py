@@ -35,6 +35,24 @@ print("Raiz do projeto:", ROOT)
 """
 
 
+EXTRA_INTRO = (
+    "Para quem terminou antes ou quer continuar depois. Estas tarefas não contam no tempo do hands-on "
+    "e usam os objetos das tarefas anteriores."
+)
+
+
+def task_labels(part: dict) -> list[str]:
+    """Tarefa 1, 2, …; "Livre" for the open task; "Extra 1, 2, …" for the bonus block."""
+    labels, extra = [], 0
+    for index, task in enumerate(part["tasks"], 1):
+        if task.get("extra"):
+            extra += 1
+            labels.append(f"Extra {extra}")
+        else:
+            labels.append("Livre" if task.get("optional") else f"Tarefa {index}")
+    return labels
+
+
 def site_data(part: dict, number: int) -> dict:
     return {
         "number": number,
@@ -43,12 +61,15 @@ def site_data(part: dict, number: int) -> dict:
         "goal": part["goal"],
         "notebook": f"0{number}_{part['key']}_atividade.ipynb",
         "answer_notebook": f"0{number}_{part['key']}_respostas.ipynb",
+        "extra_intro": EXTRA_INTRO,
         "tasks": [
             {
                 "id": f"{part['key']}-t{index}",
                 "title": task["title"],
                 "minutes": task["minutes"],
                 "optional": bool(task.get("optional")),
+                "extra": bool(task.get("extra")),
+                "badge": f"E{label.split()[-1]}" if task.get("extra") else "",
                 "do": task["do"],
                 "question": task["question"],
                 "explore": task.get("explore", ""),
@@ -57,7 +78,7 @@ def site_data(part: dict, number: int) -> dict:
                 "answer": task["answer"],
                 "solution": task.get("solution", ""),
             }
-            for index, task in enumerate(part["tasks"], 1)
+            for index, (task, label) in enumerate(zip(part["tasks"], task_labels(part)), 1)
         ],
     }
 
@@ -82,10 +103,12 @@ def notebook(part: dict, number: int, answers: bool) -> dict:
         code(SETUP),
         code(THEME),
     ]
-    for index, task in enumerate(part["tasks"], 1):
-        label = "Livre" if task.get("optional") else f"Tarefa {index}"
+    for task, label in zip(part["tasks"], task_labels(part)):
+        if task.get("extra") and label == "Extra 1":
+            cells.append(md(f"# Para ir além\n\n{EXTRA_INTRO}"))
         explore = f"\n\n**Para explorar.** {task['explore']}" if task.get("explore") else ""
-        cells.append(md(f"## {label} · {task['title']} (~{task['minutes']} min)\n\n{task['do']}\n\n**Pergunta.** {task['question']}{explore}"))
+        heading = task["title"] if label == "Livre" else f"{label} · {task['title']}"
+        cells.append(md(f"## {heading} (~{task['minutes']} min)\n\n{task['do']}\n\n**Pergunta.** {task['question']}{explore}"))
         cells.append(code((task.get("solution") or task["code"]) if answers else task["code"]))
         cells.append(md(f"**Gabarito.** {task['answer']}" if answers else "*Sua análise:* "))
     if part.get("epilogue"):
@@ -121,10 +144,9 @@ def chat_context() -> str:
     out = ["# Material do tutorial", ""]
     for number, part in enumerate(PARTS, 1):
         out += [f"## Parte {number} · {part['title']} (~{part['minutes']} min)", "", part["goal"], ""]
-        for index, task in enumerate(part["tasks"], 1):
-            label = "Livre" if task.get("optional") else f"Tarefa {index}"
+        for task, label in zip(part["tasks"], task_labels(part)):
             out += [
-                f"### {label} · {task['title']}",
+                f"### {task['title'] if label == 'Livre' else label + ' · ' + task['title']}",
                 f"Enunciado: {task['do']}",
                 f"Pergunta: {task['question']}",
                 *( [f"Para explorar: {task['explore']}"] if task.get("explore") else [] ),

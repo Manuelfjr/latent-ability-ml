@@ -14,7 +14,7 @@ lead: Uma leitura possível de cada pergunta, para comparar com a sua. Não é a
   <ol class="ita-key">
     {% for task in part.tasks %}
     <li class="ita-key__item" id="gabarito-{{ task.id }}">
-      <h3><span>{% if task.optional %}Livre{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>{{ task.title }}</h3>
+      <h3><span>{% if task.extra %}{{ task.badge }}{% elsif task.optional %}Livre{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>{{ task.title }}</h3>
       <div class="ita-key__q">{{ task.question | markdownify }}</div>
       <div class="ita-key__a">{{ task.answer | prepend: "**Uma leitura possível.** " | markdownify }}</div>
       <details>

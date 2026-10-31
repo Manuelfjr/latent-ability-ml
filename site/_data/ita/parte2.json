@@ -5,12 +5,15 @@
   "goal": "Uma população de 24 modelos faz a mesma prova de 90 exemplos, alguns com rótulo trocado de propósito. Ajustamos um modelo de IRT de dois parâmetros (2PL) e lemos o que ele diz sobre modelos e exemplos.",
   "notebook": "02_parte2_atividade.ipynb",
   "answer_notebook": "02_parte2_respostas.ipynb",
+  "extra_intro": "Para quem terminou antes ou quer continuar depois. Estas tarefas não contam no tempo do hands-on e usam os objetos das tarefas anteriores.",
   "tasks": [
     {
       "id": "parte2-t1",
       "title": "Leia três itens",
       "minutes": 3,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "Três curvas características do item (CCI) do 2PL, P(θ) = 1 / (1 + exp(−a(θ − δ))). A faixa cinza marca modelos com habilidade entre 0 e 1.",
       "question": "Qual item você usaria para distinguir um modelo com θ = 0 de outro com θ = 1? E qual usaria para separar modelos muito fracos? Justifique lendo as curvas e a tabela.",
       "explore": "No simulador acima, crie um item que não serve para comparar ninguém. Que combinações de δ e a produzem isso?",
@@ -27,6 +30,8 @@
       "title": "Uma população de modelos",
       "minutes": 3,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "O mesmo tipo de problema, agora com 8% dos rótulos trocados de propósito (e registrados). Quatro famílias de classificadores, cada uma treinada com 3%, 6%, 12%, 25%, 50% ou 100% do conjunto de treino: 24 respondentes para a mesma prova.",
       "question": "Quais modelos você esperava no topo e na base? A acurácia separa bem os modelos do meio da tabela?",
       "explore": "Passe o mouse sobre `make_model_population` e `flip_labels` e veja o que dá para mudar. O que você espera que aconteça com mais rótulos trocados?",
@@ -42,6 +47,8 @@
       "title": "Habilidade não é acurácia",
       "minutes": 4,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "Ajustamos o 2PL na matriz 24 × 90 com `fit_binary_2pl`, que estima uma habilidade θ por modelo e uma dificuldade δ e uma discriminação a por exemplo. A função `compara` mostra a dificuldade dos exemplos que só um de dois modelos acerta.",
       "question": "Habilidade e acurácia contam a mesma história? Encontre dois modelos com acurácia (quase) igual e θ diferente: o que explica a diferença?",
       "explore": "Use `compara` com outros pares. Você consegue achar um par em que o modelo de menor acurácia tem θ maior?",
@@ -58,6 +65,8 @@
       "title": "O que torna um exemplo difícil?",
       "minutes": 4,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "A dificuldade δ estimada de cada exemplo de teste, no plano das features. Os × marcam os rótulos que trocamos de propósito, uma informação que a IRT *não* viu.",
       "question": "Onde ficam os exemplos mais difíceis? Quantos dos mais difíceis são rótulos trocados, e o que explica os demais? Que uso prático você vê nisso?",
       "explore": "Procure os × que *não* estão entre os mais difíceis. Olhe a discriminação deles na tarefa seguinte.",
@@ -74,6 +83,8 @@
       "title": "Que exemplos realmente medem algo?",
       "minutes": 3,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "Exemplos que todos acertam ou todos erram não separam ninguém. Para os demais, vemos dificuldade e discriminação juntas.",
       "question": "Que fração da prova realmente informa? Se você só pudesse aplicar 15 exemplos para ranquear novos modelos, quais escolheria, e o que faria com os de discriminação negativa?",
       "explore": "Os exemplos com discriminação negativa são acertados mais por modelos fracos do que por fortes. Quantos deles são rótulos trocados (tarefa anterior)?",
@@ -90,6 +101,8 @@
       "title": "Livre: sua análise",
       "minutes": 5,
       "optional": true,
+      "extra": false,
+      "badge": "",
       "do": "Todos os objetos das tarefas anteriores continuam disponíveis (`R`, `habilidade`, `itens`, `teste`, `fit_binary_2pl`). O código abaixo é só um ponto de partida: tira da prova os exemplos suspeitos e reajusta o modelo.",
       "question": "Que pergunta você investigou, como, e o que concluiu? O ranking dos modelos mudou ao limpar a prova?",
       "explore": "Outras ideias: monte uma prova curta com os k melhores itens e compare o ranking com o da prova completa; aumente a fração de rótulos trocados e veja quantos a IRT ainda acha; troque o critério de suspeito.",
@@ -98,6 +111,60 @@
         "Para comparar dois rankings, `scipy.stats.spearmanr` ou `.corr(method=\"spearman\")`."
       ],
       "answer": "Não há resposta única. No ponto de partida, saem 9 exemplos, 6 deles com rótulo trocado (todos os do teste), e o topo do ranking se reorganiza: modelos que dependiam de \"acertar\" exemplos com rótulo errado perdem posições. A base do ranking não muda. Mensagem geral: a avaliação de modelos depende da qualidade da prova, e a IRT dá ferramentas para auditar a prova junto com os modelos.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t7",
+      "title": "Onde a prova mede bem?",
+      "minutes": 4,
+      "optional": true,
+      "extra": true,
+      "badge": "E1",
+      "do": "Cada item contribui com informação a²·P(1 − P), concentrada perto da sua dificuldade. Somando todos, temos a informação da prova e, dela, um erro padrão aproximado de θ em cada nível de habilidade. Os traços vermelhos são os 24 modelos.",
+      "question": "Em que faixa de habilidade a prova mede bem, e onde estão os modelos? A diferença entre \"logística · 100%\" (θ = 1,42) e \"árvore · 50%\" (θ = 1,93), da tarefa 3, é confiável?",
+      "explore": "Que tipo de exemplo você acrescentaria à prova para medir melhor os modelos do topo? Essa é a ideia por trás dos testes adaptativos.",
+      "code": "from utils.handson import binary_irt_probability\n\n# Informação de Fisher da prova: soma, item a item, de a² · P(θ) · (1 − P(θ))\ntheta = np.linspace(-3, 4, 300)\na = itens[\"discrimination\"].to_numpy()\nd = itens[\"difficulty\"].to_numpy()\nP = binary_irt_probability(theta[:, None], d[None, :], a[None, :])\ninformacao = (a[None, :] ** 2 * P * (1 - P)).sum(axis=1)\nerro_padrao = 1 / np.sqrt(informacao)   # quanto θ pode oscilar só por causa da prova\n\nfig, ax = plt.subplots()\nax.plot(theta, erro_padrao, color=\"#4392D2\")\nax.plot(habilidade, np.full(len(habilidade), 0.02), \"|\", color=\"#F04E44\", markersize=18, markeredgewidth=2,\n        label=\"habilidade estimada de cada modelo\")\nax.set_ylim(0, 0.8)\nax.set_xlabel(\"habilidade θ\")\nax.set_ylabel(\"erro padrão de θ (aproximado)\")\nax.set_title(\"Onde a prova mede bem?\")\nax.legend(fontsize=8)\nplt.show()\n\npd.DataFrame({\"θ\": [-1, 0, 1, 2, 3]}).assign(\n    **{\"erro padrão\": lambda t: 1 / np.sqrt(np.interp(t[\"θ\"], theta, informacao))}\n).round(2)\n",
+      "hints": [
+        "Erro padrão baixo quer dizer θ medido com precisão.",
+        "Compare a diferença 1,93 − 1,42 com o erro padrão perto de θ = 1,5."
+      ],
+      "answer": "Uma leitura possível: a prova é mais precisa entre θ ≈ −0,4 e 0 (erro padrão de cerca de 0,16) e piora para cima: 0,26 em θ = 1 e 0,40 em θ = 2. Mas dois terços dos modelos (16 de 24) estão entre θ = 1 e 2,2, justamente onde a prova mede pior. A diferença entre os dois modelos da tarefa 3 (cerca de 0,5) é só um pouco maior que um erro padrão nessa região: indica uma diferença, mas sem folga. Para separar os melhores, faltam exemplos difíceis e discriminativos (δ entre 1 e 2,5). Escolher itens cuja informação está onde o respondente está é o princípio dos testes adaptativos. O erro padrão aqui é aproximado: ignora a incerteza dos próprios parâmetros dos itens.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t8",
+      "title": "Uma prova de 15 questões",
+      "minutes": 4,
+      "optional": true,
+      "extra": true,
+      "badge": "E2",
+      "do": "Uma prova menor ranqueia os modelos tão bem quanto a completa? Comparamos os 15 exemplos mais discriminativos com 30 provas de 15 exemplos sorteados, medindo a concordância (Spearman) com o ranking da prova de 90.",
+      "question": "Quanto se perde com uma prova curta bem escolhida, e quanto com uma sorteada? Na tabela, o que os 15 escolhidos têm em comum, e o que isso implica para os modelos do topo?",
+      "explore": "Mude `k` (5, 10, 30). Tente outro critério, por exemplo espalhar δ entre 0 e 2,5 em vez de pegar só a maior discriminação.",
+      "code": "k = 15   # tamanho da prova curta\n\n# Os k exemplos mais discriminativos (entre os que alguém acerta e alguém erra, com a > 0)\ninformativos = R.columns[(R.min(axis=0) == 0) & (R.max(axis=0) == 1)]\nmelhores = itens.loc[informativos].query(\"discrimination > 0\").nlargest(k, \"discrimination\").index\nhabilidade_curta, _ = fit_binary_2pl(R[melhores])\nconcordancia = habilidade_curta.corr(habilidade, method=\"spearman\")\n\n# Comparação: 30 provas de k exemplos sorteados ao acaso\nrng = np.random.default_rng(0)\nsorteadas = []\nfor _ in range(30):\n    sorteio = rng.choice(R.columns, size=k, replace=False)\n    h, _ = fit_binary_2pl(R[sorteio])\n    sorteadas.append(h.corr(habilidade, method=\"spearman\"))\n\nfig, ax = plt.subplots()\nax.hist(sorteadas, bins=12, color=\"#4392D2\", edgecolor=\"#F0F0F0\")\nax.axvline(concordancia, color=\"#F04E44\", linewidth=2.6, label=f\"os {k} mais discriminativos\")\nax.set_xlabel(\"Spearman com o ranking da prova completa\")\nax.set_ylabel(\"provas sorteadas\")\nax.set_title(f\"Uma prova de {k} questões ranqueia tão bem quanto a de 90?\")\nax.legend(fontsize=8)\nplt.show()\n\nprint(f\"{k} mais discriminativos: {concordancia:.2f}\")\nprint(f\"{k} sorteados: mediana {np.median(sorteadas):.2f}, pior {min(sorteadas):.2f}, melhor {max(sorteadas):.2f}\")\nitens.loc[melhores].sort_values(\"difficulty\").round(2)\n",
+      "hints": [
+        "Vários exemplos da tabela têm exatamente os mesmos δ e a. Por quê?",
+        "Lembre da tarefa anterior: onde a prova curta concentra a informação?"
+      ],
+      "answer": "Uma leitura possível: os 15 mais discriminativos reproduzem o ranking com Spearman de 0,95; provas sorteadas de 15 exemplos têm mediana 0,81 e podem cair a 0,40. Escolher bem os itens importa mais que o tamanho da prova. Mas a tabela mostra um problema: muitos dos escolhidos são clones (mesmo padrão de acertos, mesmos δ e a), e 13 dos 15 têm δ entre −0,6 e 0,2. A prova curta mede bem o meio e quase nada do topo, onde estão os modelos que mais interessam. Um critério melhor evitaria duplicatas e espalharia δ pela faixa de interesse. É essa ideia que permite avaliar modelos novos com uma fração do custo, por exemplo em benchmarks de modelos de linguagem.",
+      "solution": ""
+    },
+    {
+      "id": "parte2-t9",
+      "title": "Quanto ruído a IRT aguenta?",
+      "minutes": 5,
+      "optional": true,
+      "extra": true,
+      "badge": "E3",
+      "do": "Repetimos todo o processo com 0%, 4%, 8%, 15% e 25% de rótulos trocados. Em cada caso, os suspeitos são os n exemplos mais difíceis (n = número real de trocados no teste) mais os de discriminação negativa. Leva alguns segundos.",
+      "question": "Até que nível de ruído a IRT ainda encontra os rótulos trocados? O que acontece com os falsos alarmes? E por que aparecem suspeitos mesmo com 0% de ruído?",
+      "explore": "Aqui usamos o número real de trocados, que na prática ninguém sabe. Troque por um critério que não depende disso (por exemplo, `itens_f.difficulty > 2`) e compare.",
+      "code": "# Mesma população, cada vez mais rótulos trocados. A IRT continua achando os trocados?\nbase = make_toy_classification_dataset(n_samples=300, class_sep=1.4, flip_y=0.0, random_state=56)\nlinhas = []\nfor fracao in [0.0, 0.04, 0.08, 0.15, 0.25]:\n    d = flip_labels(base, fraction=fracao, random_state=0)\n    r = evaluate_models_on_dataset(d, scenario=\"ruido\", models=populacao, random_state=56)\n    Rf = r.pivot(index=\"model\", columns=\"example_id\", values=\"correct\")\n    _, itens_f = fit_binary_2pl(Rf)\n    trocado = d.set_index(\"example_id\").loc[Rf.columns, \"label_flipped\"]\n    n = int(trocado.sum())\n    # suspeitos: os n mais difíceis, mais os de discriminação negativa\n    suspeitos = itens_f.nlargest(n, \"difficulty\").index.union(itens_f.index[itens_f.discrimination < 0])\n    linhas.append({\n        \"fração trocada\": fracao,\n        \"acurácia média\": Rf.to_numpy().mean(),\n        \"trocados no teste\": n,\n        \"suspeitos\": len(suspeitos),\n        \"trocados entre os suspeitos\": int(trocado[suspeitos].sum()),\n    })\n\nruido = pd.DataFrame(linhas).set_index(\"fração trocada\")\nruido.round(3)\n",
+      "hints": [
+        "Falsos alarmes = suspeitos − trocados entre os suspeitos.",
+        "Com 0% de ruído, quem são os suspeitos? Lembre dos exemplos ambíguos da tarefa 4."
+      ],
+      "answer": "Uma leitura possível: a busca encontra praticamente todos os rótulos trocados até 25% (24 de 25), mas o preço cresce: os suspeitos passam de 4 (com 3 trocados) para 37 (com 25 trocados), ou seja, 13 falsos alarmes. Com 0% de ruído ainda aparecem 2 suspeitos, ambos de discriminação negativa: exemplos ambíguos que modelos fracos acertam por acaso. Conforme o ruído cresce, a própria prova fica menos confiável (a acurácia média cai de 0,90 para 0,61) e fica mais difícil distinguir rótulo errado de exemplo difícil. A IRT é uma boa ferramenta de triagem para revisão humana, não um detector automático, e na prática o critério precisa ser escolhido sem saber quantos rótulos estão errados.",
       "solution": ""
     }
   ]

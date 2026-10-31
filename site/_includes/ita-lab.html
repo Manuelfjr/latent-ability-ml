@@ -9,7 +9,7 @@
     </div>
     <ol class="ita-lab__steps">
       {% for task in part.tasks %}
-      <li><a href="#{{ task.id }}" data-step="{{ task.id }}" title="{{ task.title }}">{% if task.optional %}★{% else %}{{ forloop.index }}{% endif %}</a></li>
+      <li><a href="#{{ task.id }}" data-step="{{ task.id }}" title="{{ task.title }}">{% if task.extra %}{{ task.badge }}{% elsif task.optional %}★{% else %}{{ forloop.index }}{% endif %}</a></li>
       {% endfor %}
     </ol>
     <div class="ita-lab__links">
@@ -18,13 +18,21 @@
     </div>
   </div>
 
+  {%- assign extra_open = false -%}
   {% for task in part.tasks %}
-  <article class="ita-task{% if task.optional %} ita-task--optional{% endif %}" id="{{ task.id }}" data-task="{{ task.id }}">
+  {% if task.extra and extra_open == false %}{% assign extra_open = true %}
+  <div class="ita-lab__extra" id="{{ include.part }}-extra">
+    <p class="ita-kicker">Para ir além</p>
+    <h3 class="ita-h2">Mais perguntas para explorar</h3>
+    <p>{{ part.extra_intro }}</p>
+  </div>
+  {% endif %}
+  <article class="ita-task{% if task.optional %} ita-task--optional{% endif %}{% if task.extra %} ita-task--extra{% endif %}" id="{{ task.id }}" data-task="{{ task.id }}">
     <header class="ita-task__head">
-      <span class="ita-task__num">{% if task.optional %}★{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>
+      <span class="ita-task__num">{% if task.extra %}{{ task.badge }}{% elsif task.optional %}★{% else %}{{ forloop.index | prepend: '0' | slice: -2, 2 }}{% endif %}</span>
       <div class="ita-task__titles">
         <h3 class="ita-task__title">{{ task.title }}</h3>
-        <span class="ita-task__meta">{% if task.optional %}Livre · opcional · {% endif %}~{{ task.minutes }} min</span>
+        <span class="ita-task__meta">{% if task.extra %}Para ir além · opcional · {% elsif task.optional %}Livre · opcional · {% endif %}~{{ task.minutes }} min</span>
       </div>
       <span class="ita-task__state" data-task-state aria-live="polite"></span>
     </header>

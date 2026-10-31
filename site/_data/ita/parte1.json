@@ -5,12 +5,15 @@
   "goal": "Três classificadores com acurácias praticamente iguais. O código já está pronto: seu trabalho é observar, levantar hipóteses e interpretar onde e por que cada um erra.",
   "notebook": "01_parte1_atividade.ipynb",
   "answer_notebook": "01_parte1_respostas.ipynb",
+  "extra_intro": "Para quem terminou antes ou quer continuar depois. Estas tarefas não contam no tempo do hands-on e usam os objetos das tarefas anteriores.",
   "tasks": [
     {
       "id": "parte1-t1",
       "title": "Olhe os dados antes dos modelos",
       "minutes": 2,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "Um problema sintético de classificação binária em duas dimensões, com 300 pontos. Execute e observe.",
       "question": "Antes de treinar qualquer modelo: em que região você espera erros, e por quê? Anote a sua hipótese; vamos voltar a ela.",
       "explore": "Algum ponto parece estar \"do lado errado\"? Que explicações diferentes poderiam existir para ele estar ali?",
@@ -27,6 +30,8 @@
       "title": "Três modelos, quase o mesmo número",
       "minutes": 3,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "Árvore de decisão, k-vizinhos e regressão logística, avaliados nos mesmos 90 exemplos de teste, com três métricas agregadas.",
       "question": "Se você tivesse de escolher um modelo só com esta tabela, qual escolheria, e com que confiança? O que mais você gostaria de saber antes de decidir?",
       "explore": "As três métricas concordam entre si? Em que situação acurácia, acurácia balanceada e F1 contariam histórias diferentes?",
@@ -42,6 +47,8 @@
       "title": "Quem errou o quê?",
       "minutes": 3,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "O mesmo resultado como matriz de respostas: modelos nas linhas, exemplos de teste nas colunas, `1` para acerto e `0` para erro. Aparecem só as colunas em que algum modelo errou.",
       "question": "Que padrões você vê? Os modelos erram nos mesmos exemplos? Algum deles parece ter um \"estilo\" próprio de erro?",
       "explore": "Quantas das 90 colunas sobraram? O que as colunas que desapareceram (todos acertam) dizem sobre o teste como instrumento de medida?",
@@ -58,6 +65,8 @@
       "title": "Onde moram os exemplos difíceis",
       "minutes": 4,
       "optional": false,
+      "extra": false,
+      "badge": "",
       "do": "Uma primeira medida de dificuldade, sem modelo latente: a fração de modelos que erra cada exemplo (o análogo do índice de dificuldade da teoria clássica dos testes), desenhada no plano das features.",
       "question": "Sua hipótese da primeira tarefa se confirmou? Algum exemplo difícil parece mais um problema do rótulo do que do modelo?",
       "explore": "Que limitação tem essa medida? Ela trata da mesma forma o erro de um modelo forte e o de um fraco?",
@@ -74,6 +83,8 @@
       "title": "Livre: crie o seu cenário",
       "minutes": 3,
       "optional": true,
+      "extra": false,
+      "badge": "",
       "do": "Os mesmos três modelos, agora num cenário que você controla: separação entre classes, ruído de rótulo e desbalanceamento.",
       "question": "Que cenário você testou, o que esperava e o que aconteceu? Alguma métrica agregada enganaria você nesse cenário?",
       "explore": "Algumas ideias: classes muito desbalanceadas (`peso_classe_0 = 0.9`) e compare acurácia com acurácia balanceada; muito ruído de rótulo (`flip_y = 0.15`); classes quase sobrepostas (`class_sep = 0.5`).",
@@ -82,6 +93,41 @@
         "Mude uma coisa de cada vez para conseguir atribuir o efeito."
       ],
       "answer": "Não há resposta única. Alguns comportamentos típicos: com desbalanceamento forte, a acurácia fica alta mesmo para um modelo que ignora a classe minoritária, e a acurácia balanceada denuncia isso; com mais ruído de rótulo, cresce o número de exemplos que todos erram, e esses exemplos não informam nada sobre os modelos; com classes sobrepostas, o número de exemplos informativos cresce e a comparação entre modelos fica mais rica, e mais ruidosa.",
+      "solution": ""
+    },
+    {
+      "id": "parte1-t6",
+      "title": "Os modelos sabem quando erram?",
+      "minutes": 4,
+      "optional": true,
+      "extra": true,
+      "badge": "E1",
+      "do": "Além da classe, cada modelo dá uma probabilidade. Transformamos isso em confiança (0 = em cima do muro, 1 = certeza total) e comparamos acertos com erros.",
+      "question": "Algum modelo erra com a mesma convicção com que acerta? Em que aplicação isso seria um problema? E o que as probabilidades dizem sobre os exemplos 200 e 248, que todos erram?",
+      "explore": "Volte ao mapa da tarefa 4 e localize os exemplos 200 e 248. A confiança dos modelos ajuda a separar rótulo trocado de exemplo ambíguo?",
+      "code": "import numpy as np\n\n# Confiança na classe prevista: 0 = em cima do muro (P = 0,5); 1 = certeza total (P = 0 ou 1)\nresultados[\"confianca\"] = (resultados[\"predicted_probability\"] - 0.5).abs() * 2\n\nrng = np.random.default_rng(0)\nfig, ax = plt.subplots()\nfor posicao, (modelo, grupo) in enumerate(resultados.groupby(\"model\")):\n    for acerto, cor, desvio, nome in [(1, \"#4392D2\", -0.15, \"acertos\"), (0, \"#F04E44\", 0.15, \"erros\")]:\n        y = grupo.loc[grupo.correct == acerto, \"confianca\"]\n        x = posicao + desvio + rng.uniform(-0.07, 0.07, len(y))\n        ax.scatter(x, y, s=22 if acerto else 48, color=cor, alpha=0.6 if acerto else 0.95,\n                   edgecolor=\"#1C2127\", linewidth=0.3, label=nome if posicao == 0 else None)\nax.set_xticks(range(3), sorted(resultados.model.unique()))\nax.set_ylabel(\"confiança na classe prevista\")\nax.set_title(\"Os modelos sabem quando erram?\")\nax.legend(fontsize=8)\nplt.show()\n\nprint(\"Confiança média:\")\nprint(resultados.groupby([\"model\", \"correct\"])[\"confianca\"].mean().unstack()\n      .rename(columns={0: \"quando erra\", 1: \"quando acerta\"}).round(2).to_string())\n\n# P(classe 1) dada por cada modelo aos dois exemplos que todos erram (o rótulo dos dois é 1)\nresultados[resultados.example_id.isin([200, 248])].pivot(index=\"model\", columns=\"example_id\", values=\"predicted_probability\").round(2)\n",
+      "hints": [
+        "Compare a coluna \"quando erra\" entre os três modelos.",
+        "Os dois exemplos têm rótulo 1: uma probabilidade perto de 0 é certeza da classe errada."
+      ],
+      "answer": "Uma leitura possível: a árvore erra com quase a mesma convicção com que acerta (confiança média de 0,90 nos erros e 0,98 nos acertos), porque cada folha pura dá probabilidade 0 ou 1. k-vizinhos (0,47) e logística (0,37) hesitam quando erram. Com acurácias praticamente iguais, os modelos se comportam de forma bem diferente: se a aplicação usa a probabilidade, por exemplo para mandar casos duvidosos a um especialista, a árvore é a pior escolha. Os dois exemplos que todos erram também se separam. No 248, os três dão P(classe 1) ≤ 0,01, certeza quase total contra o rótulo, a assinatura típica de rótulo trocado. No 200, as probabilidades ficam entre 0,24 e 0,33, mais compatível com um exemplo ambíguo perto da fronteira.",
+      "solution": ""
+    },
+    {
+      "id": "parte1-t7",
+      "title": "Outro sorteio, outro vencedor?",
+      "minutes": 4,
+      "optional": true,
+      "extra": true,
+      "badge": "E2",
+      "do": "A tabela da tarefa 2 veio de um único sorteio de quais 90 exemplos ficam para teste. Repetimos a avaliação com 20 sorteios diferentes dos mesmos dados.",
+      "question": "A diferença entre os modelos na tarefa 2 sobrevive a outros sorteios? O que isso muda na forma de reportar um resultado?",
+      "explore": "Aumente para 50 sorteios, ou mude `test_size` em `evaluate_models_on_dataset` (passe o mouse sobre ela). Com um teste maior, a variação diminui?",
+      "code": "import numpy as np\nimport pandas as pd\n\n# Mesmos 300 pontos, 20 sorteios diferentes de quais 90 ficam para teste\nacuracias = pd.DataFrame({\n    semente: evaluate_models_on_dataset(df, scenario=\"sorteio\", random_state=semente).groupby(\"model\")[\"correct\"].mean()\n    for semente in range(20)\n}).T\n\nrng = np.random.default_rng(0)\nfig, ax = plt.subplots()\nfor posicao, modelo in enumerate(acuracias.columns):\n    ax.scatter(posicao + rng.uniform(-0.12, 0.12, 20), acuracias[modelo], s=30, color=\"#4392D2\", alpha=0.6, edgecolor=\"#1C2127\", linewidth=0.3)\n    ax.hlines(acuracias[modelo].mean(), posicao - 0.25, posicao + 0.25, color=\"#F04E44\", linewidth=2.6)\nax.set_xticks(range(len(acuracias.columns)), acuracias.columns)\nax.set_ylabel(\"acurácia no teste\")\nax.set_title(\"20 sorteios do conjunto de teste (traço = média)\")\nplt.show()\n\nprint(\"Quantas vezes cada modelo ficou em primeiro (empates contam para todos os empatados):\")\nprint((acuracias.eq(acuracias.max(axis=1), axis=0)).sum().to_string())\nacuracias.describe().loc[[\"mean\", \"std\", \"min\", \"max\"]].round(3)\n",
+      "hints": [
+        "Compare a distância entre as médias com a altura de cada nuvem de pontos."
+      ],
+      "answer": "Uma leitura possível: as médias ficam entre 0,913 e 0,922, enquanto cada modelo varia de 0,87 a 0,97 conforme o sorteio (desvio padrão de cerca de 0,025). A diferença entre os modelos é bem menor que a variação de um sorteio para outro: cada um fica em primeiro (ou empatado) em 7 a 13 dos 20 sorteios. Escolher o \"melhor\" pela tabela da tarefa 2 seria quase cara ou coroa. Um único número esconde isso; vale reportar a variação (vários sorteios, validação cruzada, intervalos) e, mais ainda, olhar *quais* exemplos cada modelo erra, que é o caminho da IRT.",
       "solution": ""
     }
   ]
