@@ -227,6 +227,49 @@
     openButton.setAttribute('aria-expanded', 'false');
     openButton.focus();
   };
+  // Size: an expand toggle and a corner grip; the choice is remembered across pages.
+  const expandButton = root.querySelector('[data-chat-expand]');
+  const grip = root.querySelector('[data-chat-grip]');
+  const sizeKey = 'ita:chat:size';
+  const applySize = (size) => {
+    root.classList.toggle('is-wide', Boolean(size.wide));
+    expandButton.setAttribute('aria-pressed', String(Boolean(size.wide)));
+    expandButton.setAttribute('aria-label', size.wide ? 'Reduzir o assistente' : 'Ampliar o assistente');
+    expandButton.title = size.wide ? 'Reduzir' : 'Ampliar';
+    panel.style.setProperty('--chat-w', size.w ? `${size.w}px` : '');
+    panel.style.setProperty('--chat-h', size.h ? `${size.h}px` : '');
+  };
+  let size = {};
+  try { size = JSON.parse(localStorage.getItem(sizeKey) || '{}'); } catch (_) { size = {}; }
+  const saveSize = () => { try { localStorage.setItem(sizeKey, JSON.stringify(size)); } catch (_) { /* storage blocked */ } };
+  applySize(size);
+  expandButton.addEventListener('click', () => { size = { ...size, wide: !size.wide }; applySize(size); saveSize(); });
+  grip.addEventListener('pointerdown', (event) => {
+    event.preventDefault();
+    const rect = panel.getBoundingClientRect();
+    const start = { x: event.clientX, y: event.clientY, w: rect.width, h: rect.height };
+    root.classList.add('is-resizing');
+    grip.setPointerCapture(event.pointerId);
+    const move = (moveEvent) => {
+      size = {
+        w: Math.round(Math.max(340, Math.min(innerWidth - 40, start.w + start.x - moveEvent.clientX))),
+        h: Math.round(Math.max(380, Math.min(innerHeight - 40, start.h + start.y - moveEvent.clientY))),
+      };
+      applySize(size);
+    };
+    const stop = () => {
+      root.classList.remove('is-resizing');
+      grip.removeEventListener('pointermove', move);
+      grip.removeEventListener('pointerup', stop);
+      grip.removeEventListener('pointercancel', stop);
+      saveSize();
+    };
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', stop);
+    grip.addEventListener('pointercancel', stop);
+  });
+  grip.addEventListener('dblclick', () => { size = {}; applySize(size); saveSize(); });
+
   openButton.addEventListener('click', () => (panel.hidden ? open() : close()));
   closeButton.addEventListener('click', close);
   clearButton.addEventListener('click', () => { history = []; save(); renderHistory(); setStatus(''); });

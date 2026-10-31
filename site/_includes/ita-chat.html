@@ -1,11 +1,18 @@
 <div class="ita-chat" data-chat>
   <section class="ita-chat__panel" data-chat-panel hidden role="dialog" aria-label="Assistente do tutorial">
+    <span class="ita-chat__grip" data-chat-grip aria-hidden="true" title="Arraste para redimensionar"></span>
     <header class="ita-chat__head">
       <div>
         <strong>Assistente do tutorial</strong>
         <span>Claude · pergunte sobre IRT, os gráficos ou a sua análise</span>
       </div>
-      <button type="button" class="ita-chat__icon" data-chat-close aria-label="Fechar o assistente">×</button>
+      <div class="ita-chat__tools">
+        <button type="button" class="ita-chat__icon ita-chat__icon--expand" data-chat-expand aria-pressed="false" aria-label="Ampliar o assistente" title="Ampliar">
+          <svg class="ita-chat__grow" viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9" /></svg>
+          <svg class="ita-chat__shrink" viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3v4h4M9 7l4.5-4.5M7 13V9H3M7 9l-4.5 4.5" /></svg>
+        </button>
+        <button type="button" class="ita-chat__icon" data-chat-close aria-label="Fechar o assistente" title="Fechar">×</button>
+      </div>
     </header>
     <div class="ita-chat__log" data-chat-log aria-live="polite">
       <div class="ita-chat__intro">
