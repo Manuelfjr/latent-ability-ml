@@ -232,7 +232,7 @@ plt.show()
 Gabarito (uma leitura possível): Uma leitura possível: os modelos treinados com 3% dos dados ficam na base, perto do acaso. A partir de uns 12% dos dados, quase todos ficam entre 0,85 e 0,90 de acurácia, e ela praticamente não separa os modelos do meio. A probabilidade média conta outra história: nas árvores treinadas com poucos dados, ponto e barra coincidem, porque as folhas dão probabilidade 0 ou 1; as regressões logísticas acertam muito, mas com pouca convicção ("logística · 50%" tem acurácia de 0,90 e probabilidade média de só 0,75). É essa informação a mais que o β3 usa.
 
 ### Tarefa 3 · Habilidade não é acurácia
-Enunciado: Ajustamos o β3-IRT na matriz `P` (24 × 90) com a classe `Beta3` do pacote [birt-gd](https://github.com/Manuelfjr/birt-gd). Ele estima uma habilidade θ por modelo e uma dificuldade δ e uma discriminação a por exemplo; θ e δ ficam entre 0 e 1. A função `compara` mostra, para dois modelos, a probabilidade média dada à classe correta nos exemplos fáceis e nos difíceis. O ajuste leva uns 20 segundos.
+Enunciado: Ajustamos o β3-IRT na matriz `P` (24 × 90) com a classe `Beta3` do pacote [birt-gd](https://github.com/Manuelfjr/birt-gd). Ele estima uma habilidade θ por modelo e uma dificuldade δ e uma discriminação a por exemplo; θ e δ ficam entre 0 e 1. A função `compara` mostra, para dois modelos, a probabilidade média dada à classe correta nos exemplos fáceis e nos difíceis. O ajuste leva cerca de 1 minuto no servidor.
 Pergunta: Habilidade e acurácia contam a mesma história? Encontre dois modelos com a mesma acurácia e θ bem diferente: o que explica a diferença?
 Para explorar: Use `compara` com outros pares, por exemplo "k-vizinhos · 6% dos dados" e "árvore · 50% dos dados", que também têm a mesma acurácia. A diferença agora está nos exemplos fáceis ou nos difíceis?
 Código:
@@ -242,7 +242,7 @@ from birt import Beta3
 # β3-IRT do pacote birt-gd. O birt espera os exemplos nas linhas e os modelos nas colunas.
 beta3 = Beta3(learning_rate=1, epochs=5000, n_respondents=P.shape[0], n_items=P.shape[1],
               n_inits=1000, n_workers=1, random_seed=1, tol=1e-8)
-beta3.fit(P.T.to_numpy())   # leva uns 20 segundos
+beta3.fit(P.T.to_numpy())   # leva cerca de 1 minuto
 
 habilidade = pd.Series(beta3.abilities, index=P.index, name="habilidade θ")   # entre 0 e 1
 itens = pd.DataFrame({"difficulty": beta3.difficulties, "discrimination": beta3.discriminations}, index=P.columns)
