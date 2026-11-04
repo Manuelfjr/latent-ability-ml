@@ -2,19 +2,19 @@
   <div class="ita-playground__text">
     <p class="ita-kicker">Laboratório · sem código</p>
     <h2 class="ita-h2" id="playground-title">Brinque com uma curva</h2>
-    <p>Arraste os controles. A curva vermelha é o item que você está montando; a tracejada é um item de referência com δ = 0 e a = 1.</p>
+    <p>Arraste os controles. A curva vermelha é o item que você está montando; a tracejada é um item de referência com δ = 0,5 e a = 1, em que a resposta esperada é igual a θ.</p>
     <div class="ita-playground__controls">
       <label>
-        <span>Dificuldade δ <output data-out="delta">0,0</output></span>
-        <input type="range" min="-2" max="2" step="0.1" value="0" data-param="delta" />
+        <span>Dificuldade δ <output data-out="delta">0,50</output></span>
+        <input type="range" min="0.05" max="0.95" step="0.01" value="0.5" data-param="delta" />
       </label>
       <label>
         <span>Discriminação a <output data-out="a">1,0</output></span>
         <input type="range" min="-3" max="5" step="0.1" value="1" data-param="a" />
       </label>
       <label>
-        <span>Habilidade θ do respondente <output data-out="theta">1,0</output></span>
-        <input type="range" min="-3" max="3" step="0.1" value="1" data-param="theta" />
+        <span>Habilidade θ do respondente <output data-out="theta">0,70</output></span>
+        <input type="range" min="0.01" max="0.99" step="0.01" value="0.7" data-param="theta" />
       </label>
     </div>
     <p class="ita-playground__readout" data-readout aria-live="polite"></p>
@@ -22,6 +22,6 @@
   </div>
   <figure class="ita-playground__chart">
     <svg viewBox="0 0 640 380" role="img" aria-labelledby="playground-title" data-chart></svg>
-    <figcaption>P(acerto) = 1 / (1 + e<sup>−a(θ − δ)</sup>)</figcaption>
+    <figcaption>β3-IRT: E[p] = 1 / (1 + (δ / (1 − δ))<sup>a</sup> · ((1 − θ) / θ)<sup>a</sup>)</figcaption>
   </figure>
 </section>

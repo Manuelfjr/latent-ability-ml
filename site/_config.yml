@@ -7,6 +7,10 @@ theme: null
 permalink: pretty
 repo_url: https://github.com/manuelfjr/latent-ability-ml
 
+# Jekyll skips files starting with "_"; the in-browser Python needs the packages' __init__.py.
+include:
+  - __init__.py
+
 notebook_runtime_api_urls:
   - "https://manuelfjr-latent-ability-backend.hf.space"
 admin_analytics_enabled: true

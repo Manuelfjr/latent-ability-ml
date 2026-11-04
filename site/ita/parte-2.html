@@ -2,16 +2,17 @@
 title: Da matriz de respostas à IRT
 permalink: /ita/parte-2/
 kicker: Parte 2 · 20 minutos de hands-on
-lead: Vinte e quatro modelos fazem a mesma prova, com alguns rótulos trocados de propósito. Ajustamos a IRT e investigamos o que ela revela sobre os modelos e sobre a própria prova.
+lead: Vinte e quatro modelos fazem a mesma prova, com alguns rótulos trocados de propósito. Ajustamos o β3-IRT, que usa a probabilidade que cada modelo dá à resposta certa, e investigamos o que ele revela sobre os modelos e sobre a própria prova.
 lab: parte2
 playground: true
 ---
 <section class="ita-section">
   <p class="ita-kicker">A ideia em um minuto</p>
   <ul class="ita-ideas">
-    <li><strong>Habilidade θ.</strong> Quanto o respondente (aqui, um modelo) sabe. Fica no eixo horizontal.</li>
-    <li><strong>Dificuldade δ.</strong> A habilidade em que a chance de acerto chega a 50%. Move a curva para os lados.</li>
-    <li><strong>Discriminação a.</strong> Quão íngreme é a curva. Quanto maior, melhor o item separa habilidades próximas. Negativa: quem sabe mais acerta menos.</li>
+    <li><strong>Resposta p.</strong> No β3-IRT, a resposta é contínua: a probabilidade, entre 0 e 1, que o modelo dá à classe correta. Não só acertou ou errou, mas com quanta convicção.</li>
+    <li><strong>Habilidade θ.</strong> Quanto o respondente (aqui, um modelo) sabe, entre 0 e 1. Fica no eixo horizontal.</li>
+    <li><strong>Dificuldade δ.</strong> Também entre 0 e 1: a habilidade em que a resposta esperada chega a 0,5. Move a curva para os lados.</li>
+    <li><strong>Discriminação a.</strong> Quão íngreme é a curva. Quanto maior, melhor o item separa habilidades próximas. Entre 0 e 1, a curva vira um S deitado; negativa, quem sabe mais acerta menos.</li>
   </ul>
   {% include ita-irt-playground.html %}
 </section>

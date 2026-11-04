@@ -186,8 +186,8 @@ def run_cell(code):
     await loadScript(`${PYODIDE_URL}pyodide.js`);
     const pyodide = await window.loadPyodide({ indexURL: PYODIDE_URL });
     await pyodide.loadPackage(['numpy', 'pandas', 'matplotlib', 'scipy', 'scikit-learn']);
-    pyodide.FS.mkdirTree('/home/pyodide/utils');
     for (const file of config.pythonFiles || []) {
+      pyodide.FS.mkdirTree(`/home/pyodide/${file.path.split('/').slice(0, -1).join('/')}`);
       const response = await fetch(file.url);
       if (!response.ok) throw new Error(`Falha ao baixar ${file.path}`);
       pyodide.FS.writeFile(`/home/pyodide/${file.path}`, await response.text());
@@ -324,11 +324,11 @@ def run_cell(code):
   };
 
   const helperDocs = new Map();
-  Promise.all((config.pythonFiles || []).filter((file) => /\.py$/.test(file.path) && !/__init__/.test(file.path)).map(async (file) => {
+  Promise.all((config.pythonFiles || []).filter((file) => /\.py$/.test(file.path) && file.path !== 'utils/__init__.py').map(async (file) => {
     try {
       const response = await fetch(file.url);
       if (!response.ok) return;
-      const moduleName = file.path.replace(/\.py$/, '').replace(/\//g, '.');
+      const moduleName = file.path.replace(/(\/__init__)?\.py$/, '').replace(/\//g, '.');
       parseDocs(await response.text(), moduleName).forEach((entry, name) => helperDocs.set(name, entry));
     } catch (_) { /* docs are a convenience; the lab works without them */ }
   }));

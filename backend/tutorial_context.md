@@ -163,44 +163,45 @@ Gabarito (uma leitura possível): Uma leitura possível: as médias ficam entre 
 
 ## Parte 2 · Da matriz de respostas à IRT (~20 min)
 
-Uma população de 24 modelos faz a mesma prova de 90 exemplos, alguns com rótulo trocado de propósito. Ajustamos um modelo de IRT de dois parâmetros (2PL) e lemos o que ele diz sobre modelos e exemplos.
+Uma população de 24 modelos faz a mesma prova de 90 exemplos, alguns com rótulo trocado de propósito. Em vez de só acerto ou erro, usamos a probabilidade que cada modelo dá à classe correta e ajustamos o β3-IRT (pacote birt-gd), que estima a habilidade de cada modelo e a dificuldade e a discriminação de cada exemplo.
 
 ### Tarefa 1 · Leia três itens
-Enunciado: Três curvas características do item (CCI) do 2PL, P(θ) = 1 / (1 + exp(−a(θ − δ))). A faixa cinza marca modelos com habilidade entre 0 e 1.
-Pergunta: Qual item você usaria para distinguir um modelo com θ = 0 de outro com θ = 1? E qual usaria para separar modelos muito fracos? Justifique lendo as curvas e a tabela.
-Para explorar: No simulador acima, crie um item que não serve para comparar ninguém. Que combinações de δ e a produzem isso?
+Enunciado: No β3-IRT, a resposta de um modelo a um exemplo é contínua: a probabilidade que ele dá à classe correta. A curva característica do item dá a resposta esperada em função da habilidade θ, com θ e a dificuldade δ entre 0 e 1: E[p] = 1 / (1 + (δ / (1 − δ))^a · ((1 − θ) / θ)^a). Quando θ = δ, a resposta esperada é 0,5. A faixa cinza marca modelos com habilidade entre 0,5 e 0,8.
+Pergunta: Qual item você usaria para distinguir um modelo com θ = 0,5 de outro com θ = 0,8? E qual usaria para separar modelos fracos? O que há de diferente no formato da curva do item C?
+Para explorar: No simulador acima, ponha a entre 0 e 1, e depois abaixo de 0. Que formatos de curva o β3 permite que uma curva logística não permite?
 Código:
 ```python
 import numpy as np
 import pandas as pd
-from utils.handson import binary_irt_probability
+from utils.handson import beta3_expected_response
 
-theta = np.linspace(-3, 3, 200)   # habilidade latente
-itens = {"A": (-1.0, 1.0), "B": (0.5, 1.0), "C": (0.5, 4.0)}   # nome: (dificuldade δ, discriminação a)
+theta = np.linspace(0.001, 0.999, 300)   # habilidade latente, entre 0 e 1
+itens = {"A": (0.3, 1.0), "B": (0.6, 4.0), "C": (0.6, 0.5)}   # nome: (dificuldade δ, discriminação a)
 
 fig, ax = plt.subplots()
-ax.axvspan(0, 1, color="#B4ADA4", alpha=0.25, label="modelos entre θ = 0 e θ = 1")
+ax.axvspan(0.5, 0.8, color="#B4ADA4", alpha=0.25, label="modelos entre θ = 0,5 e θ = 0,8")
 for nome, (d, a) in itens.items():
-    ax.plot(theta, binary_irt_probability(theta, d, a), label=f"item {nome}: δ = {d}, a = {a}")
+    ax.plot(theta, beta3_expected_response(theta, d, a), label=f"item {nome}: δ = {d}, a = {a}")
 ax.axhline(0.5, color="#B4ADA4", linestyle="--", linewidth=1)
 ax.set_xlabel("habilidade θ")
-ax.set_ylabel("P(acerto)")
+ax.set_ylabel("resposta esperada (prob. da classe correta)")
 ax.set_title("Três itens, três comportamentos")
 ax.legend(fontsize=8)
 plt.show()
 
-pd.DataFrame({nome: binary_irt_probability(np.array([-1.0, 0.0, 1.0]), d, a) for nome, (d, a) in itens.items()},
-             index=["θ = −1", "θ = 0", "θ = 1"]).round(2)
+pd.DataFrame({nome: beta3_expected_response(np.array([0.2, 0.5, 0.8]), d, a) for nome, (d, a) in itens.items()},
+             index=["θ = 0,2", "θ = 0,5", "θ = 0,8"]).round(2)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: o item C (δ = 0,5, a = 4) vai de 0,12 em θ = 0 para 0,88 em θ = 1: é o melhor para essa comparação, porque sua dificuldade está entre os dois e a curva é íngreme. O item A, centrado em θ = −1, é mais útil para separar modelos fracos. Itens inúteis têm a próxima de zero (curva achatada) ou δ muito longe das habilidades de interesse (todos acertam ou todos erram). Em termos formais, a informação de Fisher de um item, a²·P(1 − P), é máxima em θ = δ e cresce com a².
+Gabarito (uma leitura possível): Uma leitura possível: o item B (δ = 0,6, a = 4) vai de 0,16 em θ = 0,5 para 0,98 em θ = 0,8: é o melhor para essa comparação, porque sua dificuldade está entre os dois e a curva é íngreme. O item A, mais fácil (δ = 0,3), separa melhor os modelos fracos: 0,37 em θ = 0,2 contra 0,70 em θ = 0,5. O item C (a = 0,5) quase não separa ninguém no meio (0,45 contra 0,62), e sua curva tem forma de S deitado: muda rápido perto de 0 e de 1 e devagar no meio. Essa flexibilidade é uma diferença do β3 para a IRT logística clássica: com 0 < a < 1 a curva deixa de ser um S, e com a < 0 ela desce.
 
 ### Tarefa 2 · Uma população de modelos
-Enunciado: O mesmo tipo de problema, agora com 8% dos rótulos trocados de propósito (e registrados). Quatro famílias de classificadores, cada uma treinada com 3%, 6%, 12%, 25%, 50% ou 100% do conjunto de treino: 24 respondentes para a mesma prova.
-Pergunta: Quais modelos você esperava no topo e na base? A acurácia separa bem os modelos do meio da tabela?
-Para explorar: Passe o mouse sobre `make_model_population` e `flip_labels` e veja o que dá para mudar. O que você espera que aconteça com mais rótulos trocados?
+Enunciado: O mesmo tipo de problema, agora com 8% dos rótulos trocados de propósito (e registrados). Quatro famílias de classificadores, cada uma treinada com 3%, 6%, 12%, 25%, 50% ou 100% do conjunto de treino: 24 respondentes para a mesma prova. Guardamos duas matrizes: `R`, com acerto (1) ou erro (0), e `P`, com a probabilidade que cada modelo dá à classe correta, que é a resposta usada pelo β3.
+Pergunta: Quais modelos você esperava no topo e na base? A acurácia separa bem os modelos do meio da tabela? Onde a probabilidade média (pontos) e a acurácia (barras) contam histórias diferentes?
+Para explorar: Passe o mouse sobre `correct_class_probability`, `make_model_population` e `flip_labels`. Que família de modelo tem os pontos mais distantes das barras, e por quê?
 Código:
 ```python
 from utils.handson import (
+    correct_class_probability,
     evaluate_models_on_dataset,
     flip_labels,
     make_model_population,
@@ -212,32 +213,44 @@ dados = flip_labels(dados, fraction=0.08, random_state=0)   # 8% dos rótulos tr
 
 populacao = make_model_population()   # 4 famílias × 6 frações do conjunto de treino = 24 modelos
 res = evaluate_models_on_dataset(dados, scenario="ita", models=populacao, random_state=56)
-R = res.pivot(index="model", columns="example_id", values="correct")
-print(R.shape, "→ (modelos, exemplos de teste)")
+res["p_acerto"] = correct_class_probability(res)   # probabilidade que o modelo dá à classe correta
 
-acuracia = R.mean(axis=1).sort_values()
+P = res.pivot(index="model", columns="example_id", values="p_acerto")   # respostas contínuas, entre 0 e 1
+R = res.pivot(index="model", columns="example_id", values="correct")    # só acerto (1) ou erro (0)
+print(P.shape, "→ (modelos, exemplos de teste)")
+
+resumo = pd.DataFrame({"acurácia": R.mean(axis=1), "P média": P.mean(axis=1)}).sort_values("acurácia")
 fig, ax = plt.subplots(figsize=(7, 6))
-ax.barh(acuracia.index, acuracia.values, color="#4392D2", height=0.7)
+ax.barh(resumo.index, resumo["acurácia"], color="#4392D2", height=0.7, label="acurácia")
+ax.scatter(resumo["P média"], resumo.index, color="#F04E44", s=36, zorder=3, label="probabilidade média da classe correta")
 ax.set_xlim(0.4, 1.0)
-ax.set_xlabel("acurácia no teste")
 ax.set_title("24 modelos, uma prova de 90 questões")
 ax.tick_params(axis="y", labelsize=8)
+ax.legend(fontsize=8, loc="lower right")
 plt.show()
 ```
-Gabarito (uma leitura possível): Uma leitura possível: os modelos treinados com 3% dos dados ficam na base, perto do acaso, como esperado. Mas, a partir de uns 12% dos dados, quase todos ficam entre 0,85 e 0,90, e a acurácia praticamente não separa os modelos do meio. Também não é verdade que mais dados sempre dão acurácia maior: o ruído de rótulo e o tamanho do teste embaralham a ordem.
+Gabarito (uma leitura possível): Uma leitura possível: os modelos treinados com 3% dos dados ficam na base, perto do acaso. A partir de uns 12% dos dados, quase todos ficam entre 0,85 e 0,90 de acurácia, e ela praticamente não separa os modelos do meio. A probabilidade média conta outra história: nas árvores treinadas com poucos dados, ponto e barra coincidem, porque as folhas dão probabilidade 0 ou 1; as regressões logísticas acertam muito, mas com pouca convicção ("logística · 50%" tem acurácia de 0,90 e probabilidade média de só 0,75). É essa informação a mais que o β3 usa.
 
 ### Tarefa 3 · Habilidade não é acurácia
-Enunciado: Ajustamos o 2PL na matriz 24 × 90 com `fit_binary_2pl`, que estima uma habilidade θ por modelo e uma dificuldade δ e uma discriminação a por exemplo. A função `compara` mostra a dificuldade dos exemplos que só um de dois modelos acerta.
-Pergunta: Habilidade e acurácia contam a mesma história? Encontre dois modelos com acurácia (quase) igual e θ diferente: o que explica a diferença?
-Para explorar: Use `compara` com outros pares. Você consegue achar um par em que o modelo de menor acurácia tem θ maior?
+Enunciado: Ajustamos o β3-IRT na matriz `P` (24 × 90) com a classe `Beta3` do pacote [birt-gd](https://github.com/Manuelfjr/birt-gd). Ele estima uma habilidade θ por modelo e uma dificuldade δ e uma discriminação a por exemplo; θ e δ ficam entre 0 e 1. A função `compara` mostra, para dois modelos, a probabilidade média dada à classe correta nos exemplos fáceis e nos difíceis. O ajuste leva uns 20 segundos.
+Pergunta: Habilidade e acurácia contam a mesma história? Encontre dois modelos com a mesma acurácia e θ bem diferente: o que explica a diferença?
+Para explorar: Use `compara` com outros pares, por exemplo "k-vizinhos · 6% dos dados" e "árvore · 50% dos dados", que também têm a mesma acurácia. A diferença agora está nos exemplos fáceis ou nos difíceis?
 Código:
 ```python
-from utils.handson import fit_binary_2pl
+from birt import Beta3
 
-habilidade, itens = fit_binary_2pl(R)   # θ por modelo; δ e a por exemplo de teste
+# β3-IRT do pacote birt-gd. O birt espera os exemplos nas linhas e os modelos nas colunas.
+beta3 = Beta3(learning_rate=1, epochs=5000, n_respondents=P.shape[0], n_items=P.shape[1],
+              n_inits=1000, n_workers=1, random_seed=1, tol=1e-8)
+beta3.fit(P.T.to_numpy())   # leva uns 20 segundos
 
-comparacao = pd.DataFrame({"acurácia": R.mean(axis=1), "habilidade θ": habilidade}).sort_values("habilidade θ")
-print("correlação de Spearman:", round(comparacao.corr(method="spearman").iloc[0, 1], 2))
+habilidade = pd.Series(beta3.abilities, index=P.index, name="habilidade θ")   # entre 0 e 1
+itens = pd.DataFrame({"difficulty": beta3.difficulties, "discrimination": beta3.discriminations}, index=P.columns)
+
+comparacao = pd.DataFrame({"acurácia": R.mean(axis=1), "P média": P.mean(axis=1), "habilidade θ": habilidade})
+comparacao = comparacao.sort_values("habilidade θ")
+print("Spearman com θ: acurácia", round(comparacao.corr(method="spearman").loc["acurácia", "habilidade θ"], 2),
+      "· P média", round(comparacao.corr(method="spearman").loc["P média", "habilidade θ"], 2))
 
 fig, ax = plt.subplots()
 ax.scatter(comparacao["acurácia"], comparacao["habilidade θ"], s=40, color="#4392D2", edgecolor="#1C2127", linewidth=0.5)
@@ -248,25 +261,26 @@ plt.show()
 
 
 def compara(a, b):
-    """Dificuldade dos exemplos que só um dos dois modelos acerta."""
-    so_a = R.columns[(R.loc[a] == 1) & (R.loc[b] == 0)]
-    so_b = R.columns[(R.loc[a] == 0) & (R.loc[b] == 1)]
-    print(f"só {a} acerta:", itens.loc[so_a, "difficulty"].round(2).tolist())
-    print(f"só {b} acerta:", itens.loc[so_b, "difficulty"].round(2).tolist())
+    """Acurácia, probabilidade média da classe correta nos exemplos fáceis e difíceis, e θ de dois modelos."""
+    facil = itens["difficulty"] < 0.5
+    print(pd.DataFrame({m: {"acurácia": R.loc[m].mean(),
+                            "P média nos fáceis (δ < 0,5)": P.loc[m, facil].mean(),
+                            "P média nos difíceis (δ ≥ 0,5)": P.loc[m, ~facil].mean(),
+                            "θ": habilidade[m]} for m in (a, b)}).T.round(2).to_string())
 
 
-compara("logística · 100% dos dados", "árvore · 50% dos dados")   # <- troque os nomes
+compara("logística · 50% dos dados", "árvore · 12% dos dados")   # <- troque os nomes
 comparacao.round(2)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: a correlação de Spearman é 0,86, então as duas réguas concordam no geral, mas discordam no detalhe. "logística · 100% dos dados" e "árvore · 50% dos dados" acertam ambos 87% da prova, e θ vale 1,42 e 1,93. A diferença está em *quais* exemplos: a logística acerta 4 exemplos fáceis que a árvore erra (δ ≈ −2,7 a −1,5), enquanto a árvore acerta 4 exemplos difíceis que a logística erra (δ ≈ 1,3 a 2,4). A IRT pondera cada acerto pelo que ele revela sobre a habilidade; a acurácia conta todos igual.
+Gabarito (uma leitura possível): Uma leitura possível: a correlação de Spearman entre acurácia e θ é só 0,68, enquanto entre a probabilidade média e θ é 0,94: o β3 mede quanto o modelo aposta na classe correta, não só se ele passa de 50%. "logística · 50% dos dados" e "árvore · 12% dos dados" acertam ambos 90% da prova, mas θ vale 0,78 e 0,96. A árvore dá, em média, probabilidade 1,00 à classe correta nos exemplos fáceis e 0,82 nos difíceis; a logística, só 0,77 e 0,73, hesitando até no óbvio. Já no par "k-vizinhos · 6%" e "árvore · 50%" (acurácia de 0,87 nos dois, θ de 0,73 e 0,86), a diferença está em *quais* exemplos: o k-vizinhos é confiante nos fáceis (0,98) e fraco nos difíceis (0,59). Se convicção deve contar como habilidade é uma escolha de modelagem, e vale discutir.
 
 ### Tarefa 4 · O que torna um exemplo difícil?
 Enunciado: A dificuldade δ estimada de cada exemplo de teste, no plano das features. Os × marcam os rótulos que trocamos de propósito, uma informação que a IRT *não* viu.
 Pergunta: Onde ficam os exemplos mais difíceis? Quantos dos mais difíceis são rótulos trocados, e o que explica os demais? Que uso prático você vê nisso?
-Para explorar: Procure os × que *não* estão entre os mais difíceis. Olhe a discriminação deles na tarefa seguinte.
+Para explorar: Seis rótulos de teste foram trocados. Quantos aparecem na tabela? Procure o que falta na tarefa seguinte.
 Código:
 ```python
-teste = dados.set_index("example_id").loc[R.columns].assign(
+teste = dados.set_index("example_id").loc[P.columns].assign(
     dificuldade=itens["difficulty"], discriminacao=itens["discrimination"]
 )
 
@@ -283,104 +297,117 @@ plt.show()
 
 teste.sort_values("dificuldade", ascending=False).head(8)[["dificuldade", "discriminacao", "label", "label_flipped"]].round(2)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: os quatro exemplos mais difíceis (δ = 3,68, que nenhum modelo acerta) são todos rótulos trocados; a IRT os encontrou sem saber disso. Os seguintes ficam na região de sobreposição: são difíceis por ambiguidade real, não por erro de anotação. Na prática, ordenar exemplos por dificuldade é uma forma barata de priorizar revisão de rótulos, mas ela não distingue sozinha "rótulo errado" de "exemplo ambíguo"; para isso é preciso olhar a geometria, ou a discriminação.
+Gabarito (uma leitura possível): Uma leitura possível: os cinco exemplos mais difíceis (δ ≈ 0,98, em que quase todo modelo dá probabilidade baixa à classe "correta") são todos rótulos trocados; a IRT os encontrou sem saber disso. O sexto rótulo trocado não está entre eles: ele aparece na tarefa seguinte, com discriminação negativa. Os seguintes da lista (δ entre 0,8 e 0,9) ficam na região de sobreposição: são difíceis por ambiguidade real, não por erro de anotação. Na prática, ordenar exemplos por dificuldade é uma forma barata de priorizar a revisão de rótulos, mas ela não distingue sozinha "rótulo errado" de "exemplo ambíguo"; para isso é preciso olhar a geometria, ou a discriminação.
 
 ### Tarefa 5 · Que exemplos realmente medem algo?
-Enunciado: Exemplos que todos acertam ou todos erram não separam ninguém. Para os demais, vemos dificuldade e discriminação juntas.
-Pergunta: Que fração da prova realmente informa? Se você só pudesse aplicar 15 exemplos para ranquear novos modelos, quais escolheria, e o que faria com os de discriminação negativa?
-Para explorar: Os exemplos com discriminação negativa são acertados mais por modelos fracos do que por fortes. Quantos deles são rótulos trocados (tarefa anterior)?
+Enunciado: Dificuldade e discriminação de todos os exemplos, separando os que todos os modelos acertam (probabilidade da classe correta acima de 0,5), os que todos erram e os demais. A tabela lista os exemplos de menor discriminação.
+Pergunta: Na IRT clássica, um exemplo que todos acertam não informa nada. E aqui? Se você só pudesse aplicar 15 exemplos para ranquear novos modelos, quais escolheria, e o que faria com os de discriminação negativa?
+Para explorar: Nos exemplos de discriminação negativa, os modelos fracos dão mais probabilidade à classe correta do que os fortes. Quantos deles são rótulos trocados?
 Código:
 ```python
-print("todos acertam:", int((R.min(axis=0) == 1).sum()))
-print("todos erram:  ", int((R.max(axis=0) == 0).sum()))
-informativos = R.columns[(R.min(axis=0) == 0) & (R.max(axis=0) == 1)]   # pelo menos um acerto e um erro
-print("informativos: ", len(informativos), "de", R.shape[1])
+todos_acertam = P.columns[P.min(axis=0) > 0.5]   # todo modelo dá mais de 50% à classe correta
+todos_erram = P.columns[P.max(axis=0) < 0.5]
+print("todos acertam:", len(todos_acertam), "· todos erram:", len(todos_erram), "· demais:", P.shape[1] - len(todos_acertam) - len(todos_erram))
 
 fig, ax = plt.subplots()
-ax.scatter(itens.loc[informativos, "difficulty"], itens.loc[informativos, "discrimination"],
-           s=40, color="#4392D2", edgecolor="#1C2127", linewidth=0.5)
+for grupo, cor, nome in [(todos_acertam, "#B4ADA4", "todos acertam"), (todos_erram, "#1C2127", "todos erram")]:
+    ax.scatter(itens.loc[grupo, "difficulty"], itens.loc[grupo, "discrimination"], s=40, color=cor,
+               edgecolor="#1C2127", linewidth=0.5, label=nome)
+demais = P.columns.difference(todos_acertam.union(todos_erram))
+ax.scatter(itens.loc[demais, "difficulty"], itens.loc[demais, "discrimination"], s=40, color="#4392D2",
+           edgecolor="#1C2127", linewidth=0.5, label="alguém acerta, alguém erra")
 ax.axhline(0, color="#B4ADA4", linewidth=1)
 ax.set_xlabel("dificuldade δ")
 ax.set_ylabel("discriminação a")
-ax.set_title("Os exemplos que separam os modelos")
+ax.set_title("Dificuldade e discriminação de cada exemplo")
+ax.legend(fontsize=8)
 plt.show()
 
-itens.loc[informativos].sort_values("discrimination").head(10).round(2)
+itens.assign(rotulo_trocado=teste["label_flipped"]).sort_values("discrimination").head(8).round(2)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: 27 exemplos são acertados por todos e 4 errados por todos; só 59 de 90 informam alguma coisa, e muitos deles têm parâmetros quase idênticos (são redundantes). Para um teste curto, escolheria exemplos com a alto e δ espalhado na faixa das habilidades que quero separar (por volta de 0 a 2), evitando duplicatas. Os de discriminação negativa saem da prova: dos quatro, dois são justamente os rótulos trocados que não estavam entre os mais difíceis. Rótulo trocado aparece, portanto, de duas formas: dificuldade extrema (ninguém acerta) ou discriminação negativa (só os fracos "acertam").
+Gabarito (uma leitura possível): Uma leitura possível: 27 exemplos são acertados por todos e 4 errados por todos, mas no β3 isso não os torna inúteis: os 27 fáceis (δ ≈ 0,1) ainda têm discriminação entre 0,5 e 1,1, porque os modelos fortes os acertam com mais convicção. É a vantagem de usar respostas contínuas. Os mais discriminativos (a acima de 2) têm δ entre 0,54 e 0,71; para um teste curto, escolheria entre eles, evitando duplicatas e espalhando δ. Três exemplos têm discriminação negativa: um é o sexto rótulo trocado (o 75, com a = −2,29, o menor de todos); os outros dois (295 e 34) não foram trocados por nós, mas merecem revisão. Rótulo trocado aparece, portanto, de duas formas: dificuldade extrema ou discriminação negativa.
 
 ### Livre: sua análise
-Enunciado: Todos os objetos das tarefas anteriores continuam disponíveis (`R`, `habilidade`, `itens`, `teste`, `fit_binary_2pl`). O código abaixo é só um ponto de partida: tira da prova os exemplos suspeitos e reajusta o modelo.
+Enunciado: Todos os objetos das tarefas anteriores continuam disponíveis (`P`, `R`, `habilidade`, `itens`, `teste`). Para reajustar muitas vezes, use `fit_beta3`: a mesma formulação do `Beta3` do birt, em numpy, que roda em menos de um segundo. O código abaixo é só um ponto de partida: tira da prova os exemplos suspeitos e reajusta o modelo.
 Pergunta: Que pergunta você investigou, como, e o que concluiu? O ranking dos modelos mudou ao limpar a prova?
 Para explorar: Outras ideias: monte uma prova curta com os k melhores itens e compare o ranking com o da prova completa; aumente a fração de rótulos trocados e veja quantos a IRT ainda acha; troque o critério de suspeito.
 Código:
 ```python
+from utils.handson import fit_beta3
+
 # Um ponto de partida: o ranking dos modelos muda se tirarmos da prova os exemplos suspeitos?
+# fit_beta3 é a mesma formulação do birt, em numpy: reajusta em menos de um segundo.
 suspeitos = itens.index[(itens.discrimination < 0) | (itens.difficulty > itens.difficulty.quantile(0.95))]
-habilidade_sem, _ = fit_binary_2pl(R.drop(columns=suspeitos))
+habilidade_com, _ = fit_beta3(P)
+habilidade_sem, _ = fit_beta3(P.drop(columns=suspeitos))
 
 print(len(suspeitos), "exemplos removidos; deles,", int(teste.loc[suspeitos, "label_flipped"].sum()), "tinham rótulo trocado")
 pd.DataFrame({
-    "posição antes": habilidade.rank(ascending=False).astype(int),
-    "posição depois": habilidade_sem.rank(ascending=False).astype(int),
+    "posição antes": habilidade_com.rank(ascending=False, method="min").astype(int),
+    "posição depois": habilidade_sem.rank(ascending=False, method="min").astype(int),
 }).sort_values("posição depois")
 ```
-Gabarito (uma leitura possível): Não há resposta única. No ponto de partida, saem 9 exemplos, 6 deles com rótulo trocado (todos os do teste), e o topo do ranking se reorganiza: modelos que dependiam de "acertar" exemplos com rótulo errado perdem posições. A base do ranking não muda. Mensagem geral: a avaliação de modelos depende da qualidade da prova, e a IRT dá ferramentas para auditar a prova junto com os modelos.
+Gabarito (uma leitura possível): Não há resposta única. No ponto de partida, saem 8 exemplos, 6 deles com rótulo trocado (todos os do teste), e o ranking quase não muda: só há trocas entre vizinhos, como o 2º e o 3º lugares. Com respostas contínuas, alguns exemplos ruins pesam pouco diante de 90. Isso não quer dizer que os suspeitos não importam: eles distorcem a dificuldade e a discriminação estimadas e, num benchmark real, apontam exatamente onde revisar. Mensagem geral: a IRT dá ferramentas para auditar a prova junto com os modelos.
 
-### Extra 1 · Onde a prova mede bem?
-Enunciado: Cada item contribui com informação a²·P(1 − P), concentrada perto da sua dificuldade. Somando todos, temos a informação da prova e, dela, um erro padrão aproximado de θ em cada nível de habilidade. Os traços vermelhos são os 24 modelos.
-Pergunta: Em que faixa de habilidade a prova mede bem, e onde estão os modelos? A diferença entre "logística · 100%" (θ = 1,42) e "árvore · 50%" (θ = 1,93), da tarefa 3, é confiável?
-Para explorar: Que tipo de exemplo você acrescentaria à prova para medir melhor os modelos do topo? Essa é a ideia por trás dos testes adaptativos.
+### Extra 1 · O que a confiança acrescenta?
+Enunciado: A IRT clássica (2PL) só vê acerto ou erro. Ajustamos um 2PL na matriz `R` e comparamos o ranking dele com o do β3, que vê a probabilidade dada à classe correta. As linhas vermelhas são os modelos que mudam 4 posições ou mais.
+Pergunta: Quem sobe e quem desce quando a confiança passa a contar? Qual dos dois rankings você usaria para escolher um modelo, e de que depende essa escolha?
+Para explorar: Volte à tarefa extra 1 da Parte 1, sobre a confiança nos erros. Um modelo que erra com convicção deveria ser punido mais do que um que erra hesitando?
 Código:
 ```python
-from utils.handson import binary_irt_probability
+from utils.handson import fit_binary_2pl
 
-# Informação de Fisher da prova: soma, item a item, de a² · P(θ) · (1 − P(θ))
-theta = np.linspace(-3, 4, 300)
-a = itens["discrimination"].to_numpy()
-d = itens["difficulty"].to_numpy()
-P = binary_irt_probability(theta[:, None], d[None, :], a[None, :])
-informacao = (a[None, :] ** 2 * P * (1 - P)).sum(axis=1)
-erro_padrao = 1 / np.sqrt(informacao)   # quanto θ pode oscilar só por causa da prova
+# A IRT clássica (2PL) só vê acerto ou erro; o β3 vê quanto o modelo apostou na classe correta.
+habilidade_2pl, _ = fit_binary_2pl(R)
+posicoes = pd.DataFrame({
+    "acurácia": R.mean(axis=1),
+    "P média": P.mean(axis=1),
+    "posição 2PL (acerto/erro)": habilidade_2pl.rank(ascending=False, method="min").astype(int),
+    "posição β3 (probabilidade)": habilidade.rank(ascending=False, method="min").astype(int),
+})
+posicoes["subiu"] = posicoes["posição 2PL (acerto/erro)"] - posicoes["posição β3 (probabilidade)"]
 
-fig, ax = plt.subplots()
-ax.plot(theta, erro_padrao, color="#4392D2")
-ax.plot(habilidade, np.full(len(habilidade), 0.02), "|", color="#F04E44", markersize=18, markeredgewidth=2,
-        label="habilidade estimada de cada modelo")
-ax.set_ylim(0, 0.8)
-ax.set_xlabel("habilidade θ")
-ax.set_ylabel("erro padrão de θ (aproximado)")
-ax.set_title("Onde a prova mede bem?")
-ax.legend(fontsize=8)
+fig, ax = plt.subplots(figsize=(6, 6))
+for modelo, linha in posicoes.iterrows():
+    destaque = abs(linha["subiu"]) >= 4
+    ax.plot([0, 1], [linha["posição 2PL (acerto/erro)"], linha["posição β3 (probabilidade)"]],
+            color="#F04E44" if destaque else "#B4ADA4", linewidth=2.6 if destaque else 1.2, marker="o", markersize=5)
+    if destaque:
+        ax.text(1.04, linha["posição β3 (probabilidade)"], modelo, va="center", fontsize=8)
+ax.set_xticks([0, 1], ["2PL\n(acerto/erro)", "β3\n(probabilidade)"])
+ax.set_xlim(-0.2, 1.9)
+ax.invert_yaxis()
+ax.set_ylabel("posição no ranking (1 = melhor)")
+ax.set_title("O ranking muda quando a confiança conta")
 plt.show()
 
-pd.DataFrame({"θ": [-1, 0, 1, 2, 3]}).assign(
-    **{"erro padrão": lambda t: 1 / np.sqrt(np.interp(t["θ"], theta, informacao))}
-).round(2)
+posicoes.sort_values("subiu").round(2)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: a prova é mais precisa entre θ ≈ −0,4 e 0 (erro padrão de cerca de 0,16) e piora para cima: 0,26 em θ = 1 e 0,40 em θ = 2. Mas dois terços dos modelos (16 de 24) estão entre θ = 1 e 2,2, justamente onde a prova mede pior. A diferença entre os dois modelos da tarefa 3 (cerca de 0,5) é só um pouco maior que um erro padrão nessa região: indica uma diferença, mas sem folga. Para separar os melhores, faltam exemplos difíceis e discriminativos (δ entre 1 e 2,5). Escolher itens cuja informação está onde o respondente está é o princípio dos testes adaptativos. O erro padrão aqui é aproximado: ignora a incerteza dos próprios parâmetros dos itens.
+Gabarito (uma leitura possível): Uma leitura possível: as regressões logísticas são as que mais descem. "logística · 50% dos dados" cai do 3º para o 15º lugar: tem a maior acurácia da população (0,90), mas probabilidade média de só 0,75. A árvore e o k-vizinhos treinados com 25% dos dados sobem 5 e 7 posições: acertam um pouco menos, porém com mais convicção. Nenhum dos dois rankings é "o certo". Se a aplicação usa só a classe prevista, o 2PL descreve melhor o que importa; se usa a probabilidade (triagem, abstenção, decisões com custo), o β3 é mais fiel. O β3 também tem um preço: recompensa convicção, mesmo quando o modelo é mal calibrado.
 
 ### Extra 2 · Uma prova de 15 questões
-Enunciado: Uma prova menor ranqueia os modelos tão bem quanto a completa? Comparamos os 15 exemplos mais discriminativos com 30 provas de 15 exemplos sorteados, medindo a concordância (Spearman) com o ranking da prova de 90.
-Pergunta: Quanto se perde com uma prova curta bem escolhida, e quanto com uma sorteada? Na tabela, o que os 15 escolhidos têm em comum, e o que isso implica para os modelos do topo?
-Para explorar: Mude `k` (5, 10, 30). Tente outro critério, por exemplo espalhar δ entre 0 e 2,5 em vez de pegar só a maior discriminação.
+Enunciado: Uma prova menor ranqueia os modelos tão bem quanto a completa? Comparamos os 15 exemplos mais discriminativos com 30 provas de 15 exemplos sorteados, medindo a concordância (Spearman) com o ranking da prova de 90. Para reajustar 32 vezes, usamos `fit_beta3`.
+Pergunta: Quanto se perde com uma prova curta bem escolhida, e quanto com uma sorteada? Na tabela, o que os 15 escolhidos têm em comum?
+Para explorar: Mude `k` (5, 10, 30). Tente outro critério, por exemplo espalhar δ pela faixa das habilidades em vez de pegar só a maior discriminação.
 Código:
 ```python
 k = 15   # tamanho da prova curta
 
-# Os k exemplos mais discriminativos (entre os que alguém acerta e alguém erra, com a > 0)
-informativos = R.columns[(R.min(axis=0) == 0) & (R.max(axis=0) == 1)]
-melhores = itens.loc[informativos].query("discrimination > 0").nlargest(k, "discrimination").index
-habilidade_curta, _ = fit_binary_2pl(R[melhores])
-concordancia = habilidade_curta.corr(habilidade, method="spearman")
+# Ajuste rápido (fit_beta3, mesma formulação do birt) na prova completa, como referência
+habilidade_completa, itens_completa = fit_beta3(P)
+
+# Os k exemplos mais discriminativos (a > 0)
+melhores = itens_completa.query("discrimination > 0").nlargest(k, "discrimination").index
+habilidade_curta, _ = fit_beta3(P[melhores])
+concordancia = habilidade_curta.corr(habilidade_completa, method="spearman")
 
 # Comparação: 30 provas de k exemplos sorteados ao acaso
 rng = np.random.default_rng(0)
 sorteadas = []
 for _ in range(30):
-    sorteio = rng.choice(R.columns, size=k, replace=False)
-    h, _ = fit_binary_2pl(R[sorteio])
-    sorteadas.append(h.corr(habilidade, method="spearman"))
+    sorteio = rng.choice(P.columns, size=k, replace=False)
+    h, _ = fit_beta3(P[sorteio])
+    sorteadas.append(h.corr(habilidade_completa, method="spearman"))
 
 fig, ax = plt.subplots()
 ax.hist(sorteadas, bins=12, color="#4392D2", edgecolor="#F0F0F0")
@@ -393,14 +420,14 @@ plt.show()
 
 print(f"{k} mais discriminativos: {concordancia:.2f}")
 print(f"{k} sorteados: mediana {np.median(sorteadas):.2f}, pior {min(sorteadas):.2f}, melhor {max(sorteadas):.2f}")
-itens.loc[melhores].sort_values("difficulty").round(2)
+itens_completa.loc[melhores].sort_values("difficulty").round(2)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: os 15 mais discriminativos reproduzem o ranking com Spearman de 0,95; provas sorteadas de 15 exemplos têm mediana 0,81 e podem cair a 0,40. Escolher bem os itens importa mais que o tamanho da prova. Mas a tabela mostra um problema: muitos dos escolhidos são clones (mesmo padrão de acertos, mesmos δ e a), e 13 dos 15 têm δ entre −0,6 e 0,2. A prova curta mede bem o meio e quase nada do topo, onde estão os modelos que mais interessam. Um critério melhor evitaria duplicatas e espalharia δ pela faixa de interesse. É essa ideia que permite avaliar modelos novos com uma fração do custo, por exemplo em benchmarks de modelos de linguagem.
+Gabarito (uma leitura possível): Uma leitura possível: os 15 mais discriminativos reproduzem o ranking com Spearman de 0,96, e a mediana das provas sorteadas também é alta (0,95): com respostas contínuas, cada exemplo carrega mais informação do que um simples acerto. Mas o sorteio tem cauda: a pior prova sorteada cai a 0,19, e a seleção pela discriminação elimina esse risco. Os 15 escolhidos são quase clones (a ≈ 2,1 e δ entre 0,38 e 0,56, abaixo da habilidade da maioria dos modelos): medem bem uma faixa estreita da escala. Um critério melhor evitaria duplicatas e espalharia δ pela faixa de interesse. É essa ideia que permite avaliar modelos novos com uma fração do custo, por exemplo em benchmarks de modelos de linguagem.
 
 ### Extra 3 · Quanto ruído a IRT aguenta?
-Enunciado: Repetimos todo o processo com 0%, 4%, 8%, 15% e 25% de rótulos trocados. Em cada caso, os suspeitos são os n exemplos mais difíceis (n = número real de trocados no teste) mais os de discriminação negativa. Leva alguns segundos.
+Enunciado: Repetimos todo o processo com 0%, 4%, 8%, 15% e 25% de rótulos trocados, ajustando o β3 com `fit_beta3`. Em cada caso, os suspeitos são os n exemplos mais difíceis (n = número real de trocados no teste) mais os de discriminação negativa. Leva alguns segundos.
 Pergunta: Até que nível de ruído a IRT ainda encontra os rótulos trocados? O que acontece com os falsos alarmes? E por que aparecem suspeitos mesmo com 0% de ruído?
-Para explorar: Aqui usamos o número real de trocados, que na prática ninguém sabe. Troque por um critério que não depende disso (por exemplo, `itens_f.difficulty > 2`) e compare.
+Para explorar: Aqui usamos o número real de trocados, que na prática ninguém sabe. Troque por um critério que não depende disso (por exemplo, `itens_f.difficulty > 0.9`) e compare.
 Código:
 ```python
 # Mesma população, cada vez mais rótulos trocados. A IRT continua achando os trocados?
@@ -409,15 +436,16 @@ linhas = []
 for fracao in [0.0, 0.04, 0.08, 0.15, 0.25]:
     d = flip_labels(base, fraction=fracao, random_state=0)
     r = evaluate_models_on_dataset(d, scenario="ruido", models=populacao, random_state=56)
-    Rf = r.pivot(index="model", columns="example_id", values="correct")
-    _, itens_f = fit_binary_2pl(Rf)
-    trocado = d.set_index("example_id").loc[Rf.columns, "label_flipped"]
+    r["p_acerto"] = correct_class_probability(r)
+    Pf = r.pivot(index="model", columns="example_id", values="p_acerto")
+    _, itens_f = fit_beta3(Pf)
+    trocado = d.set_index("example_id").loc[Pf.columns, "label_flipped"]
     n = int(trocado.sum())
     # suspeitos: os n mais difíceis, mais os de discriminação negativa
     suspeitos = itens_f.nlargest(n, "difficulty").index.union(itens_f.index[itens_f.discrimination < 0])
     linhas.append({
         "fração trocada": fracao,
-        "acurácia média": Rf.to_numpy().mean(),
+        "P média": Pf.to_numpy().mean(),
         "trocados no teste": n,
         "suspeitos": len(suspeitos),
         "trocados entre os suspeitos": int(trocado[suspeitos].sum()),
@@ -426,7 +454,7 @@ for fracao in [0.0, 0.04, 0.08, 0.15, 0.25]:
 ruido = pd.DataFrame(linhas).set_index("fração trocada")
 ruido.round(3)
 ```
-Gabarito (uma leitura possível): Uma leitura possível: a busca encontra praticamente todos os rótulos trocados até 25% (24 de 25), mas o preço cresce: os suspeitos passam de 4 (com 3 trocados) para 37 (com 25 trocados), ou seja, 13 falsos alarmes. Com 0% de ruído ainda aparecem 2 suspeitos, ambos de discriminação negativa: exemplos ambíguos que modelos fracos acertam por acaso. Conforme o ruído cresce, a própria prova fica menos confiável (a acurácia média cai de 0,90 para 0,61) e fica mais difícil distinguir rótulo errado de exemplo difícil. A IRT é uma boa ferramenta de triagem para revisão humana, não um detector automático, e na prática o critério precisa ser escolhido sem saber quantos rótulos estão errados.
+Gabarito (uma leitura possível): Uma leitura possível: a busca encontra praticamente todos os rótulos trocados até 25% (24 de 25), mas o preço cresce: de 4 suspeitos (com 3 trocados) para 38 (com 25 trocados), ou seja, 14 falsos alarmes. Com 0% de ruído ainda aparecem 3 suspeitos, todos de discriminação negativa: exemplos ambíguos em que os modelos fracos dão mais probabilidade à classe correta que os fortes. Conforme o ruído cresce, a própria prova fica menos confiável (a probabilidade média da classe correta cai de 0,88 para 0,56), e fica mais difícil distinguir rótulo errado de exemplo difícil. A IRT é uma boa ferramenta de triagem para revisão humana, não um detector automático.
 
 ## Demonstração do CLAIRE (fim da Parte 2, sem exercício)
 300 pontos em três grupos de dispersões diferentes, 9 algoritmos de agrupamento. A concordância entre partições vira uma matriz de respostas contínuas e o β4-IRT estima a habilidade de cada algoritmo e a dificuldade de cada ponto, sem rótulos. Correlação de Spearman entre habilidade CLAIRE e ARI: 0,90; entre habilidade e silhueta: 0,35.
@@ -470,3 +498,6 @@ Referência: Ferreira-Junior et al. (2025), CLAIRE, Machine Learning 114, 256. d
 - `make_model_population(fractions, random_state)`: Build a population of classifiers with a spread of abilities.
 - `flip_labels(df, fraction, random_state)`: Swap the label of a random fraction of examples, keeping a record.
 - `fit_binary_2pl(responses, n_iter, learning_rate)`: Fit a 2PL IRT model to a binary response matrix.
+- `beta3_expected_response(theta, difficulty, discrimination)`: Compute the Beta3-IRT expected response E[p | theta, difficulty, discrimination].
+- `correct_class_probability(results)`: Probability each model gives to the true class of each test example.
+- `fit_beta3(responses, n_iter, learning_rate)`: Fit a Beta3-IRT model to a matrix of responses in ``[0, 1]``.

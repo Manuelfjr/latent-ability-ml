@@ -291,7 +291,7 @@ body.ita {
 
 /* ---- key ideas (part pages) ------------------------------------------------------------- */
 
-.ita-ideas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px; margin: 24px 0 0; padding: 0; list-style: none; }
+.ita-ideas { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin: 24px 0 0; padding: 0; list-style: none; }
 .ita-ideas li { border-top: 1px solid var(--rule); padding-top: 14px; color: var(--ink-muted); }
 .ita-ideas strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
 

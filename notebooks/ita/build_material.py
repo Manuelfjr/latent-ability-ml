@@ -22,11 +22,12 @@ SETUP = """import subprocess
 import sys
 from pathlib import Path
 
-# No Colab, baixa o repositório do tutorial; localmente, encontra a raiz a partir desta pasta.
+# No Colab, baixa o repositório do tutorial e instala o birt-gd (β3-IRT); localmente, encontra a raiz.
 if "google.colab" in sys.modules:
     ROOT = Path("/content/latent-ability-ml")
     if not ROOT.exists():
         subprocess.check_call(["git", "clone", "-q", "https://github.com/manuelfjr/latent-ability-ml.git", str(ROOT)])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", "birt-gd"])
 else:
     ROOT = next(p for p in [Path.cwd(), *Path.cwd().parents] if (p / "utils" / "handson.py").exists())
 

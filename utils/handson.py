@@ -1609,6 +1609,35 @@ def flip_labels(df: pd.DataFrame, fraction: float = 0.08, random_state: int = 0)
     return noisy
 
 
+def _fit_logistic_irt(observed: np.ndarray, n_iter: int, learning_rate: float) -> tuple[np.ndarray, ...]:
+    """Fit P = sigmoid(a * (theta - delta)) to responses in [0, 1] by penalised cross-entropy.
+
+    Joint maximum a posteriori estimation with Adam and weak Gaussian priors
+    (theta ~ N(0, 1), delta ~ N(0, 2), a ~ N(1, 1)). Shared by the 2PL (binary
+    responses) and the Beta3-IRT (continuous responses, on the logit scale).
+    """
+    n_respondents, n_items = observed.shape
+    theta, delta, alpha = np.zeros(n_respondents), np.zeros(n_items), np.ones(n_items)
+    params = [theta, delta, alpha]
+    first = [np.zeros_like(p) for p in params]
+    second = [np.zeros_like(p) for p in params]
+    for step in range(1, n_iter + 1):
+        gap = theta[:, None] - delta[None, :]
+        residual = observed - 1.0 / (1.0 + np.exp(-alpha[None, :] * gap))
+        grads = [
+            (residual * alpha[None, :]).sum(axis=1) - theta,
+            -(residual * alpha[None, :]).sum(axis=0) - delta / 4.0,
+            (residual * gap).sum(axis=0) - (alpha - 1.0),
+        ]
+        for index, (param, grad) in enumerate(zip(params, grads)):
+            first[index] = 0.9 * first[index] + 0.1 * grad
+            second[index] = 0.999 * second[index] + 0.001 * grad**2
+            m_hat = first[index] / (1 - 0.9**step)
+            v_hat = second[index] / (1 - 0.999**step)
+            param += learning_rate * m_hat / (np.sqrt(v_hat) + 1e-8)
+    return theta, delta, alpha
+
+
 def fit_binary_2pl(
     responses: pd.DataFrame,
     n_iter: int = 3000,
@@ -1644,26 +1673,121 @@ def fit_binary_2pl(
     >>> list(items.columns)
     ['difficulty', 'discrimination']
     """
-    observed = responses.to_numpy(dtype=float)
-    n_respondents, n_items = observed.shape
-    theta, delta, alpha = np.zeros(n_respondents), np.zeros(n_items), np.ones(n_items)
-    params = [theta, delta, alpha]
-    first = [np.zeros_like(p) for p in params]
-    second = [np.zeros_like(p) for p in params]
-    for step in range(1, n_iter + 1):
-        gap = theta[:, None] - delta[None, :]
-        residual = observed - 1.0 / (1.0 + np.exp(-alpha[None, :] * gap))
-        grads = [
-            (residual * alpha[None, :]).sum(axis=1) - theta,
-            -(residual * alpha[None, :]).sum(axis=0) - delta / 4.0,
-            (residual * gap).sum(axis=0) - (alpha - 1.0),
-        ]
-        for index, (param, grad) in enumerate(zip(params, grads)):
-            first[index] = 0.9 * first[index] + 0.1 * grad
-            second[index] = 0.999 * second[index] + 0.001 * grad**2
-            m_hat = first[index] / (1 - 0.9**step)
-            v_hat = second[index] / (1 - 0.999**step)
-            param += learning_rate * m_hat / (np.sqrt(v_hat) + 1e-8)
+    theta, delta, alpha = _fit_logistic_irt(responses.to_numpy(dtype=float), n_iter, learning_rate)
     abilities = pd.Series(theta, index=responses.index, name="ability")
     items = pd.DataFrame({"difficulty": delta, "discrimination": alpha}, index=responses.columns)
+    return abilities, items
+
+
+def beta3_expected_response(
+    theta: np.ndarray | float,
+    difficulty: np.ndarray | float,
+    discrimination: np.ndarray | float = 1.0,
+) -> np.ndarray:
+    """Compute the Beta3-IRT expected response E[p | theta, difficulty, discrimination].
+
+    ``E[p] = 1 / (1 + (difficulty / (1 - difficulty)) ** a * ((1 - theta) / theta) ** a)``,
+    which equals ``sigmoid(a * (logit(theta) - logit(difficulty)))``. Ability
+    and difficulty live in ``(0, 1)``; the response is 0.5 when they are equal.
+
+    Parameters
+    ----------
+    theta : numpy.ndarray or float
+        Ability value or array of ability values in ``(0, 1)``.
+    difficulty : numpy.ndarray or float
+        Item difficulty value or array of values in ``(0, 1)``.
+    discrimination : numpy.ndarray or float, default=1.0
+        Item discrimination. Values between 0 and 1 give flatter, non-logistic
+        curves; negative values give decreasing curves.
+
+    Returns
+    -------
+    numpy.ndarray
+        Expected response (e.g. the probability given to the correct class).
+
+    Examples
+    --------
+    >>> round(float(beta3_expected_response(0.5, 0.5, 1.0)), 2)
+    0.5
+    >>> round(float(beta3_expected_response(0.8, 0.5, 1.0)), 2)
+    0.8
+    """
+    theta = np.clip(np.asarray(theta, dtype=float), 1e-6, 1.0 - 1e-6)
+    difficulty = np.clip(np.asarray(difficulty, dtype=float), 1e-6, 1.0 - 1e-6)
+    discrimination = np.asarray(discrimination, dtype=float)
+    return 1.0 / (1.0 + np.power(difficulty / (1.0 - difficulty), discrimination)
+                  * np.power((1.0 - theta) / theta, discrimination))
+
+
+def correct_class_probability(results: pd.DataFrame) -> pd.Series:
+    """Probability each model gives to the true class of each test example.
+
+    This is the continuous response used by the Beta3-IRT: 1 means a confident
+    correct answer, 0 a confident wrong one, and 0.5 a model on the fence.
+
+    Parameters
+    ----------
+    results : pandas.DataFrame
+        Output of :func:`evaluate_models_on_dataset`, with ``label`` and
+        ``predicted_probability`` (probability of class 1) columns.
+
+    Returns
+    -------
+    pandas.Series
+        Probability of the true class, aligned with ``results``.
+
+    Examples
+    --------
+    >>> toy = pd.DataFrame({"label": [1, 0], "predicted_probability": [0.9, 0.9]})
+    >>> correct_class_probability(toy).round(2).tolist()
+    [0.9, 0.1]
+    """
+    p_one = results["predicted_probability"].astype(float)
+    return p_one.where(results["label"] == 1, 1.0 - p_one).rename("p_correct")
+
+
+def fit_beta3(
+    responses: pd.DataFrame,
+    n_iter: int = 3000,
+    learning_rate: float = 0.05,
+) -> tuple[pd.Series, pd.DataFrame]:
+    """Fit a Beta3-IRT model to a matrix of responses in ``[0, 1]``.
+
+    Same formulation as ``birt.Beta3`` (Ferreira-Junior et al.): the expected
+    response is :func:`beta3_expected_response`, fitted by cross-entropy
+    between observed and expected responses, here in numpy with Adam and weak
+    priors on the logit scale so it also runs in the browser. Ability and
+    difficulty are returned in ``(0, 1)``; discrimination is not constrained
+    to be positive.
+
+    Parameters
+    ----------
+    responses : pandas.DataFrame
+        Respondent-by-item matrix of values in ``[0, 1]`` (models in the rows,
+        test examples in the columns), such as the probability each model
+        gives to the true class.
+    n_iter : int, default=3000
+        Number of gradient steps.
+    learning_rate : float, default=0.05
+        Adam step size.
+
+    Returns
+    -------
+    tuple[pandas.Series, pandas.DataFrame]
+        Abilities in ``(0, 1)`` indexed by respondent, and a DataFrame indexed
+        by item with ``difficulty`` (in ``(0, 1)``) and ``discrimination``.
+
+    Examples
+    --------
+    >>> matrix = pd.DataFrame([[0.9, 0.8, 0.3], [0.7, 0.4, 0.2], [0.95, 0.9, 0.8]], index=["a", "b", "c"])
+    >>> abilities, items = fit_beta3(matrix, n_iter=200)
+    >>> bool(abilities.between(0, 1).all()), list(items.columns)
+    (True, ['difficulty', 'discrimination'])
+    """
+    observed = np.clip(responses.to_numpy(dtype=float), 0.0, 1.0)
+    theta, delta, alpha = _fit_logistic_irt(observed, n_iter, learning_rate)
+    abilities = pd.Series(1.0 / (1.0 + np.exp(-theta)), index=responses.index, name="ability")
+    items = pd.DataFrame(
+        {"difficulty": 1.0 / (1.0 + np.exp(-delta)), "discrimination": alpha}, index=responses.columns
+    )
     return abilities, items
