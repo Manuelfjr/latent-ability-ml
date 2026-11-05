@@ -401,7 +401,7 @@ def run_cell(code):
     const seed = article.querySelector('[data-seed]').textContent;
     const solution = article.querySelector('[data-solution]')?.textContent || '';
     const textarea = article.querySelector('[data-editor] textarea');
-    const saved = store.get(`code:${id}`);
+    const saved = store.get(`mycode:${id}`);
     if (saved !== null) textarea.value = saved;
 
     let editor = null;
@@ -416,34 +416,18 @@ def run_cell(code):
           Tab: (cm) => cm.replaceSelection('    '),
         },
       });
-      editor.on('change', () => store.set(`code:${id}`, editor.getValue()));
+      editor.on('change', () => store.set(`mycode:${id}`, editor.getValue()));
     } else {
-      textarea.addEventListener('input', () => store.set(`code:${id}`, textarea.value));
+      textarea.addEventListener('input', () => store.set(`mycode:${id}`, textarea.value));
       textarea.addEventListener('keydown', (event) => {
         if (event.key === 'Enter' && event.shiftKey) { event.preventDefault(); run(); }
       });
     }
 
-    // The code starts hidden: "Executar" runs it anyway; the toggle shows it to read or change.
-    const codeEl = article.querySelector('[data-editor]');
-    const codeToggle = article.querySelector('[data-action="toggle-code"]');
-    const showCode = (show) => {
-      codeEl.hidden = !show;
-      codeToggle.textContent = show ? 'Esconder código' : 'Mostrar código';
-      codeToggle.setAttribute('aria-expanded', String(show));
-      if (show) editor?.refresh();
-      if (show) store.set(`showcode:${id}`, '1'); else store.remove(`showcode:${id}`);
-    };
-    codeToggle.addEventListener('click', () => {
-      showCode(codeEl.hidden);
-      if (!codeEl.hidden) track('show_code', { cell_label: id });
-    });
-    if (store.get(`showcode:${id}`) === '1') showCode(true);
-
     const getCode = () => (editor ? editor.getValue() : textarea.value);
     const setCode = (value) => {
       if (editor) editor.setValue(value); else textarea.value = value;
-      store.set(`code:${id}`, value);
+      store.set(`mycode:${id}`, value);
     };
 
     const outputEl = article.querySelector('[data-output]');
@@ -467,35 +451,68 @@ def run_cell(code):
       updateProgress();
     };
 
-    async function run() {
+    // Runs the participant's own code (the editor) or, with source = 'answer', the ready answer.
+    async function run(source = 'mine') {
+      const button = source === 'answer' ? runAnswerButton : runButton;
+      const label = button.textContent;
       runButton.disabled = true;
-      runButton.textContent = 'Executando…';
+      runAnswerButton.disabled = true;
+      button.textContent = 'Executando…';
       article.classList.add('is-running');
       try {
-        const runtime = await getRuntime();
-        const code = getCode();
-        if (/(^|[^\w])___([^\w]|$)/.test(code)) {
-          renderOutput(outputEl, { success: false, stderr: 'Ainda há lacunas ___ para completar. Precisa de ajuda? Abra uma dica ou use "Carregar solução".' });
+        const code = source === 'answer' ? answerCode : getCode();
+        if (!code.split('\n').some((line) => line.trim() && !line.trim().startsWith('#'))) {
+          renderOutput(outputEl, { success: false, stderr: 'O editor ainda não tem código. Escreva o seu, ou abra "Resposta em código" e use "Executar resposta".' });
           return;
         }
+        const runtime = await getRuntime();
         const result = await enqueue(() => runtime.execute(code));
         const missing = result.success === false && /NameError: name '(\w+)' is not defined/.exec(result.stderr || '');
-        if (missing && ['df', 'resultados', 'respostas', 'dificuldade', 'theta', 'np', 'binary_irt_probability', 'make_toy_classification_dataset', 'evaluate_models_on_dataset'].includes(missing[1])) {
-          result.stderr = `\`${missing[1]}\` ainda não existe nesta sessão: execute antes as tarefas anteriores (ou carregue a solução delas).\n\n${result.stderr}`;
+        if (missing) {
+          result.stderr = `\`${missing[1]}\` ainda não existe nesta sessão. Se ele vem de uma tarefa anterior, rode a resposta dela ("Resposta em código" → "Executar resposta"); se é seu, confira o nome ou importe o que falta.\n\n${result.stderr}`;
         }
         renderOutput(outputEl, result);
         if (result.success !== false) setDone(true);
-        track('run_cell', { cell_label: id, runtime_mode: runtime.kind === 'backend' ? 'cloud' : 'browser' });
+        track(source === 'answer' ? 'run_answer' : 'run_cell', { cell_label: id, runtime_mode: runtime.kind === 'backend' ? 'cloud' : 'browser' });
       } catch (error) {
         renderOutput(outputEl, { success: false, stderr: `Não foi possível executar: ${error.message || error}` });
       } finally {
         runButton.disabled = false;
-        runButton.textContent = 'Executar';
+        runAnswerButton.disabled = false;
+        button.textContent = label;
         article.classList.remove('is-running');
       }
     }
 
-    article.querySelector('[data-action="run"]').addEventListener('click', run);
+    article.querySelector('[data-action="run"]').addEventListener('click', () => run());
+
+    // Ready answer: hidden by default; run it as is, or copy it into the editor to start from it.
+    const answerCodeEl = article.querySelector('[data-answer-code]');
+    const answerTextarea = answerCodeEl.querySelector('textarea');
+    const answerCode = answerTextarea.value;
+    const answerToggle = article.querySelector('[data-action="toggle-answer-code"]');
+    const runAnswerButton = article.querySelector('[data-action="run-answer"]');
+    let answerEditor = null;
+    answerToggle.addEventListener('click', () => {
+      answerCodeEl.hidden = !answerCodeEl.hidden;
+      answerToggle.setAttribute('aria-expanded', String(!answerCodeEl.hidden));
+      answerToggle.textContent = answerCodeEl.hidden ? 'Resposta em código' : 'Esconder resposta em código';
+      if (answerCodeEl.hidden) return;
+      if (!answerEditor && window.CodeMirror) {
+        answerEditor = window.CodeMirror.fromTextArea(answerTextarea, {
+          mode: 'python', lineNumbers: true, readOnly: true, viewportMargin: Infinity,
+        });
+      }
+      answerEditor?.refresh();
+      track('show_answer_code', { cell_label: id });
+    });
+    runAnswerButton.addEventListener('click', () => run('answer'));
+    article.querySelector('[data-action="copy-answer"]').addEventListener('click', () => {
+      setCode(answerCode);
+      track('copy_answer_code', { cell_label: id });
+      (editor ? editor.getWrapperElement() : textarea).scrollIntoView({ block: 'center', behavior: 'smooth' });
+      editor?.focus();
+    });
     article.querySelector('[data-action="reset"]').addEventListener('click', () => setCode(seed));
 
     const hintButton = article.querySelector('[data-action="hint"]');

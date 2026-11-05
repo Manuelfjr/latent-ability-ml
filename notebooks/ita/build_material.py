@@ -88,8 +88,13 @@ def md(text: str) -> dict:
     return {"cell_type": "markdown", "metadata": {}, "source": text.splitlines(keepends=True)}
 
 
-def code(text: str) -> dict:
-    return {"cell_type": "code", "metadata": {}, "execution_count": None, "outputs": [], "source": text.rstrip("\n").splitlines(keepends=True)}
+def code(text: str, metadata: dict | None = None) -> dict:
+    return {"cell_type": "code", "metadata": metadata or {}, "execution_count": None, "outputs": [], "source": text.rstrip("\n").splitlines(keepends=True)}
+
+
+MY_CODE = "# Escreva aqui o seu código, do jeito que preferir.\n# Prefere partir do código pronto? Rode (ou abra) a célula \"Resposta em código\" logo abaixo.\n"
+# Collapsed in Colab (form view) and in Jupyter (source_hidden); it still runs when collapsed.
+HIDDEN = {"cellView": "form", "jupyter": {"source_hidden": True}}
 
 
 def notebook(part: dict, number: int, answers: bool) -> dict:
@@ -97,9 +102,11 @@ def notebook(part: dict, number: int, answers: bool) -> dict:
     cells = [
         md(f"# Parte {number} · {part['title']}{suffix}\n\n**Avaliação com habilidade latente · Instituto Kunumi**\n\n{part['goal']}"),
         md(
-            "**Execute a célula de preparação primeiro.** Depois siga as tarefas em ordem. O código já está pronto: "
-            "execute, observe e escreva a sua análise. Mude o que quiser para testar hipóteses; as funções de "
-            "`utils/handson.py` estão documentadas (`help(funcao)` ou Shift + Tab no Jupyter e no Colab)."
+            "**Execute a célula de preparação primeiro.** Depois siga as tarefas em ordem. Em cada tarefa há uma "
+            "célula para o seu código, do jeito que preferir, e logo abaixo a **resposta em código**, recolhida: "
+            "rode-a direto ou abra para ler e modificar. As tarefas seguintes usam os objetos criados pelas "
+            "respostas. As funções de `utils/handson.py` estão documentadas (`help(funcao)` ou Shift + Tab no "
+            "Jupyter e no Colab)."
         ),
         code(SETUP),
         code(THEME),
@@ -110,7 +117,11 @@ def notebook(part: dict, number: int, answers: bool) -> dict:
         explore = f"\n\n**Para explorar.** {task['explore']}" if task.get("explore") else ""
         heading = task["title"] if label == "Livre" else f"{label} · {task['title']}"
         cells.append(md(f"## {heading} (~{task['minutes']} min)\n\n{task['do']}\n\n**Pergunta.** {task['question']}{explore}"))
-        cells.append(code((task.get("solution") or task["code"]) if answers else task["code"]))
+        if answers:
+            cells.append(code(task.get("solution") or task["code"]))
+        else:
+            cells.append(code(MY_CODE))
+            cells.append(code("#@title Resposta em código (clique para mostrar)\n" + task["code"], HIDDEN))
         cells.append(md(f"**Gabarito.** {task['answer']}" if answers else "*Sua análise:* "))
     if part.get("epilogue"):
         cells.append(md(part["epilogue"]))

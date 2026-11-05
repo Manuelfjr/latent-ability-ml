@@ -19,6 +19,11 @@
   </div>
 
   {%- assign extra_open = false -%}
+  {%- capture starter -%}
+# Escreva aqui o seu código, do jeito que preferir.
+# Passe o mouse sobre uma função de utils.handson para ler a documentação.
+# Prefere partir do código pronto? Abra "Resposta em código" logo abaixo.
+{% endcapture -%}
   {% for task in part.tasks %}
   {% if task.extra and extra_open == false %}{% assign extra_open = true %}
   <div class="ita-lab__extra" id="{{ include.part }}-extra">
@@ -41,9 +46,8 @@
       <div class="ita-task__question"><span>Pergunta</span>{{ task.question | markdownify }}</div>
       {% if task.explore != "" %}<div class="ita-task__explore"><span>Para explorar</span>{{ task.explore | markdownify }}</div>{% endif %}
       <script type="text/plain" data-question>{{ task.question }}</script>
-      <button type="button" class="ita-task__code-toggle" data-action="toggle-code" aria-expanded="false" aria-controls="{{ task.id }}-code">Mostrar código</button>
-      <div class="ita-task__editor" id="{{ task.id }}-code" data-editor hidden>
-        <textarea spellcheck="false" aria-label="Código da tarefa {{ forloop.index }}">{{ task.code | xml_escape }}</textarea>
+      <div class="ita-task__editor" data-editor>
+        <textarea spellcheck="false" aria-label="Seu código para a tarefa {{ forloop.index }}">{{ starter | xml_escape }}</textarea>
       </div>
       <div class="ita-task__actions">
         <button class="ita-button" type="button" data-action="run">Executar</button>
@@ -52,6 +56,16 @@
         {% if task.solution != "" %}<button class="ita-button ita-button--quiet" type="button" data-action="solution">Carregar solução</button>{% endif %}
         <button class="ita-button ita-button--quiet" type="button" data-action="reset">Recomeçar</button>
         <span class="ita-task__shortcut">Shift + Enter executa</span>
+      </div>
+      <button type="button" class="ita-task__code-toggle" data-action="toggle-answer-code" aria-expanded="false" aria-controls="{{ task.id }}-answer-code">Resposta em código</button>
+      <div class="ita-task__answer-code" id="{{ task.id }}-answer-code" data-answer-code hidden>
+        <div class="ita-task__editor ita-task__editor--answer" data-answer-editor>
+          <textarea spellcheck="false" readonly aria-label="Resposta em código da tarefa {{ forloop.index }}">{{ task.code | xml_escape }}</textarea>
+        </div>
+        <div class="ita-task__actions">
+          <button class="ita-button" type="button" data-action="run-answer">Executar resposta</button>
+          <button class="ita-button ita-button--quiet" type="button" data-action="copy-answer">Copiar para o editor</button>
+        </div>
       </div>
       <div class="ita-task__hints" data-hints hidden>
         {% for hint in task.hints %}<div class="ita-note" data-hint hidden><strong>Dica {{ forloop.index }}</strong>{{ hint | markdownify }}</div>{% endfor %}
@@ -67,7 +81,7 @@
       </div>
       {% endif %}
     </div>
-    <script type="text/plain" data-seed>{{ task.code }}</script>
+    <script type="text/plain" data-seed>{{ starter }}</script>
     {% if task.solution != "" %}<script type="text/plain" data-solution>{{ task.solution }}</script>{% endif %}
   </article>
   {% endfor %}

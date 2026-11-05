@@ -512,13 +512,11 @@ body.ita {
 
 /* editor (dark code surface: Chumbo ground, Gelo ink) */
 .ita-task__editor { border-radius: var(--radius); overflow: hidden; background: var(--kunumi-chumbo); }
-.ita-task__editor[hidden] { display: none; }
-.ita-task__editor[hidden] ~ .ita-task__actions .ita-task__shortcut { display: none; }
 .ita-task__code-toggle {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin: 4px 0 12px;
+  margin: 18px 0 0;
   padding: 0;
   border: 0;
   background: none;
@@ -540,6 +538,8 @@ body.ita {
 }
 .ita-task__code-toggle[aria-expanded="true"]::before { transform: rotate(45deg); }
 .ita-task__code-toggle:hover { color: var(--accent); }
+.ita-task__answer-code { margin-top: 12px; padding-left: 14px; border-left: 3px solid var(--accent); }
+.ita-task__answer-code[hidden] { display: none; }
 .ita-task__editor textarea {
   display: block;
   width: 100%;
