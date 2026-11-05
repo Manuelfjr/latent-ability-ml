@@ -49,7 +49,8 @@
       <div class="ita-content">
         {% if page.hero %}
         <section class="ita-hero">
-          <div class="ita-hero__inner">
+          <div class="ita-hero__inner{% if page.qr %} ita-hero__inner--qr{% endif %}">
+            <div class="ita-hero__main">
             <p class="ita-kicker ita-kicker--light">{{ page.kicker }}</p>
             <h1 class="ita-hero__title">{{ page.hero }}</h1>
             <p class="ita-hero__lead">{{ page.lead }}</p>
@@ -59,6 +60,8 @@
               {% if page.cta2_url %}<a class="ita-button ita-button--ghost-light" href="{{ page.cta2_url }}">{{ page.cta2_label }}</a>{% endif %}
             </div>
             {% endif %}
+            </div>
+            {% if page.qr %}{% include ita-qr.html %}{% endif %}
           </div>
         </section>
         {% else %}

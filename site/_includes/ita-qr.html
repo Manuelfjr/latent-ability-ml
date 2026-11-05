@@ -1,0 +1,44 @@
+{%- assign site_url = '/ita/' | absolute_url -%}
+{%- assign site_label = site_url | remove: 'https://' | remove: 'http://' | remove_last: '/' -%}
+<aside class="ita-hero__qr" aria-label="Acesse o site">
+  <img src="{{ '/assets/ita/qr-ita.svg' | relative_url }}" alt="QR code para {{ site_label }}" width="164" height="164" />
+  <p class="ita-hero__qr-cta">Aponte a câmera</p>
+  <p class="ita-hero__qr-url">{{ site_label }}</p>
+  <button type="button" class="ita-hero__qr-project" data-qr-open>Projetar para a plateia</button>
+</aside>
+
+<dialog class="ita-qr" data-qr-dialog aria-label="QR code do tutorial">
+  <div class="ita-qr__inner">
+    <div class="ita-qr__text">
+      <img class="ita-qr__logo" src="{{ '/assets/instituto/instituto-negative-complete.png' | relative_url }}" alt="Instituto Kunumi" />
+      <p class="ita-kicker ita-kicker--light">Tutorial · ITA</p>
+      <h2 class="ita-qr__title">Avaliação com habilidade latente</h2>
+      <p class="ita-qr__lead">Abra no seu computador para acompanhar e fazer o hands-on, direto no navegador.</p>
+      <p class="ita-qr__url">{{ site_label }}</p>
+    </div>
+    <div class="ita-qr__code">
+      <img src="{{ '/assets/ita/qr-ita.svg' | relative_url }}" alt="QR code para {{ site_label }}" />
+    </div>
+  </div>
+  <button type="button" class="ita-qr__close" data-qr-close aria-label="Fechar">×</button>
+</dialog>
+<script>
+  (() => {
+    const dialog = document.querySelector('[data-qr-dialog]');
+    if (!dialog) return;
+    const open = () => { if (!dialog.open) dialog.showModal(); };
+    const close = () => {
+      dialog.close();
+      if (location.hash === '#qr') history.replaceState(null, '', location.pathname + location.search);
+    };
+    document.querySelector('[data-qr-open]')?.addEventListener('click', open);
+    dialog.querySelector('[data-qr-close]').addEventListener('click', close);
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) close(); });
+    dialog.addEventListener('cancel', () => {
+      if (location.hash === '#qr') history.replaceState(null, '', location.pathname + location.search);
+    });
+    // /ita/#qr abre direto no modo projeção.
+    if (location.hash === '#qr') open();
+    addEventListener('hashchange', () => { if (location.hash === '#qr') open(); });
+  })();
+</script>

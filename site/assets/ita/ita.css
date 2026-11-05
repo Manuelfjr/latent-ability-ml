@@ -56,7 +56,7 @@ body.ita {
 
 /* ---- titles: display face, always uppercase, +3% --------------------------------------- */
 
-.ita-title, .ita-hero__title, .ita-h2, .ita-task__title, .ita-part__title, .ita-step__title {
+.ita-title, .ita-hero__title, .ita-h2, .ita-task__title, .ita-part__title, .ita-step__title, .ita-qr__title {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: var(--track-display);
@@ -195,6 +195,80 @@ body.ita {
   font-size: clamp(1.05rem, 1.6vw, 1.25rem);
   color: color-mix(in srgb, var(--kunumi-gelo) 82%, transparent);
 }
+
+/* ---- QR code: hero card and projector view ------------------------------------------------ */
+
+.ita-hero__inner--qr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 40px; align-items: start; }
+.ita-hero__qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 220px;
+  padding: 18px 18px 14px;
+  border-radius: var(--radius);
+  background: var(--kunumi-gelo);
+  color: var(--kunumi-chumbo);
+  text-align: center;
+}
+.ita-hero__qr img { display: block; width: 164px; height: 164px; margin-bottom: 6px; }
+.ita-hero__qr-cta { margin: 0; font-family: var(--font-display); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+.ita-hero__qr-url { margin: 0; font-size: 0.75rem; line-height: 1.35; color: var(--ink-muted); overflow-wrap: anywhere; }
+.ita-hero__qr-project {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--kunumi-chumbo);
+  font: 500 0.8rem var(--font-body);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ita-hero__qr-project:hover { color: var(--accent); }
+
+.ita-qr {
+  width: 100vw;
+  max-width: none;
+  height: 100vh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--kunumi-chumbo) url("../instituto/instituto-gamma-waves-01.png") center bottom / cover no-repeat;
+  color: var(--kunumi-gelo);
+}
+.ita-qr::backdrop { background: var(--kunumi-chumbo); }
+.ita-qr__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: clamp(32px, 6vw, 96px);
+  align-items: center;
+  height: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(32px, 6vh, 72px) clamp(24px, 6vw, 96px);
+}
+.ita-qr__logo { width: clamp(120px, 14vw, 200px); margin-bottom: clamp(24px, 6vh, 56px); }
+.ita-qr__title { font-size: clamp(2rem, 4vw, 3.8rem); line-height: 1.05; max-width: 14ch; margin: 0; color: var(--kunumi-gelo); }
+.ita-qr__lead { margin: 20px 0 0; max-width: 40ch; font-size: clamp(1.05rem, 1.6vw, 1.4rem); color: color-mix(in srgb, var(--kunumi-gelo) 82%, transparent); }
+.ita-qr__url { margin: clamp(20px, 4vh, 40px) 0 0; font-family: var(--font-mono); font-size: clamp(1rem, 1.8vw, 1.6rem); color: var(--kunumi-gelo); overflow-wrap: anywhere; }
+.ita-qr__code { padding: clamp(16px, 2.2vw, 28px); border-radius: var(--radius); background: var(--kunumi-gelo); }
+.ita-qr__code img { display: block; width: min(62vh, 40vw); height: min(62vh, 40vw); }
+.ita-qr__close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  border: 0;
+  background: none;
+  color: var(--kunumi-gelo);
+  font-size: 2.4rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.ita-qr__close:hover { opacity: 1; color: var(--accent); }
 
 /* ---- page head (inner pages) ------------------------------------------------------------ */
 
@@ -752,6 +826,10 @@ body.ita {
   .ita-task__shortcut { display: none; }
   .ita-part { padding: 22px; }
   .ita-hero__inner { padding-bottom: 140px; }
+  .ita-hero__inner--qr { display: block; }
+  .ita-hero__qr { display: none; }
+  .ita-qr__inner { grid-template-columns: 1fr; align-content: center; justify-items: start; }
+  .ita-qr__code img { width: min(70vw, 46vh); height: min(70vw, 46vh); }
 }
 
 @media (prefers-reduced-motion: reduce) {

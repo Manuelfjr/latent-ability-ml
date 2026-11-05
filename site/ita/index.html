@@ -8,6 +8,7 @@ cta_url: /ita/parte-1/
 cta_label: Começar pela Parte 1
 cta2_url: "#agenda"
 cta2_label: Ver a agenda
+qr: true
 ---
 <section class="ita-section" id="agenda">
   <p class="ita-kicker">Agenda</p>
@@ -42,13 +43,17 @@ cta2_label: Ver a agenda
       <span class="ita-part__num">01</span>
       <h3 class="ita-part__title">{{ site.data.ita.parte1.title }}</h3>
       <p>Três classificadores com quase a mesma acurácia e os poucos exemplos que realmente os separam.</p>
-      <span class="ita-part__meta">{{ site.data.ita.parte1.tasks.size | minus: 1 }} tarefas + 1 livre · <span>~{{ site.data.ita.parte1.minutes }} min</span></span>
+      {%- assign obrigatorias = site.data.ita.parte1.tasks | where: "optional", false -%}
+      {%- assign extras = site.data.ita.parte1.tasks | where: "extra", true -%}
+      <span class="ita-part__meta">{{ obrigatorias.size }} tarefas + 1 livre + {{ extras.size }} extras · <span>~{{ site.data.ita.parte1.minutes }} min</span></span>
     </a>
     <a class="ita-part" href="{{ '/ita/parte-2/' | relative_url }}">
       <span class="ita-part__num">02</span>
       <h3 class="ita-part__title">{{ site.data.ita.parte2.title }}</h3>
       <p>Vinte e quatro modelos, uma prova com rótulos trocados de propósito, e o que a IRT descobre sobre modelos e exemplos.</p>
-      <span class="ita-part__meta">{{ site.data.ita.parte2.tasks.size | minus: 1 }} tarefas + 1 livre · <span>~{{ site.data.ita.parte2.minutes }} min</span></span>
+      {%- assign obrigatorias = site.data.ita.parte2.tasks | where: "optional", false -%}
+      {%- assign extras = site.data.ita.parte2.tasks | where: "extra", true -%}
+      <span class="ita-part__meta">{{ obrigatorias.size }} tarefas + 1 livre + {{ extras.size }} extras · <span>~{{ site.data.ita.parte2.minutes }} min</span></span>
     </a>
   </div>
 </section>
