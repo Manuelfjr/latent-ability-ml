@@ -512,6 +512,34 @@ body.ita {
 
 /* editor (dark code surface: Chumbo ground, Gelo ink) */
 .ita-task__editor { border-radius: var(--radius); overflow: hidden; background: var(--kunumi-chumbo); }
+.ita-task__editor[hidden] { display: none; }
+.ita-task__editor[hidden] ~ .ita-task__actions .ita-task__shortcut { display: none; }
+.ita-task__code-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: 500 0.9rem var(--font-body);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.ita-task__code-toggle::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 180ms var(--ease);
+}
+.ita-task__code-toggle[aria-expanded="true"]::before { transform: rotate(45deg); }
+.ita-task__code-toggle:hover { color: var(--accent); }
 .ita-task__editor textarea {
   display: block;
   width: 100%;

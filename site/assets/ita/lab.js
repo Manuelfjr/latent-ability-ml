@@ -424,6 +424,22 @@ def run_cell(code):
       });
     }
 
+    // The code starts hidden: "Executar" runs it anyway; the toggle shows it to read or change.
+    const codeEl = article.querySelector('[data-editor]');
+    const codeToggle = article.querySelector('[data-action="toggle-code"]');
+    const showCode = (show) => {
+      codeEl.hidden = !show;
+      codeToggle.textContent = show ? 'Esconder código' : 'Mostrar código';
+      codeToggle.setAttribute('aria-expanded', String(show));
+      if (show) editor?.refresh();
+      if (show) store.set(`showcode:${id}`, '1'); else store.remove(`showcode:${id}`);
+    };
+    codeToggle.addEventListener('click', () => {
+      showCode(codeEl.hidden);
+      if (!codeEl.hidden) track('show_code', { cell_label: id });
+    });
+    if (store.get(`showcode:${id}`) === '1') showCode(true);
+
     const getCode = () => (editor ? editor.getValue() : textarea.value);
     const setCode = (value) => {
       if (editor) editor.setValue(value); else textarea.value = value;

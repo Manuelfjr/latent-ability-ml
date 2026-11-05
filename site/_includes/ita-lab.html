@@ -41,7 +41,8 @@
       <div class="ita-task__question"><span>Pergunta</span>{{ task.question | markdownify }}</div>
       {% if task.explore != "" %}<div class="ita-task__explore"><span>Para explorar</span>{{ task.explore | markdownify }}</div>{% endif %}
       <script type="text/plain" data-question>{{ task.question }}</script>
-      <div class="ita-task__editor" data-editor>
+      <button type="button" class="ita-task__code-toggle" data-action="toggle-code" aria-expanded="false" aria-controls="{{ task.id }}-code">Mostrar código</button>
+      <div class="ita-task__editor" id="{{ task.id }}-code" data-editor hidden>
         <textarea spellcheck="false" aria-label="Código da tarefa {{ forloop.index }}">{{ task.code | xml_escape }}</textarea>
       </div>
       <div class="ita-task__actions">
